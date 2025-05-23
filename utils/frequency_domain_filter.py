@@ -42,18 +42,6 @@ def run_filter(args, train_loader):
     global_mask_amp = calculator.compute_global_statistics(train_loader)
     return global_mask_amp
 
-def apply_difference(data, n=1):
-    """
-    Apply differencing to the data.
-    :param data: Input data [batch, length, channel]
-    :param n: Order of differencing
-    :return: Differenced data and the last original data point for each series
-    """
-    for i in range(n):
-        data[:, 1:, :] = data[:, 1:, :] - data[:, :-1, :]
-    last_value = data[:, -1:, :]
-    return data
-
 class FrequencyDomainFilter(nn.Module):
     def __init__(self, args, global_mask_amp):
         super(FrequencyDomainFilter, self).__init__()
@@ -88,6 +76,5 @@ class FrequencyDomainFilter(nn.Module):
         return filtered_data
 
     def forward(self, batch_x):
-        differenced_data = apply_difference(batch_x, n=1)
-        filtered_data = self.apply_global_filter(differenced_data)
-        return filtered_data
+        x = self.apply_global_filter(batch_x)
+        return x
