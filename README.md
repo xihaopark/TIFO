@@ -1,8 +1,8 @@
-# Anonymous Submission Code for NIPS2025-12507
+# Anonymous Submission Code for TIFO
 
 ## Introduction
 
-This repository contains the anonymous submission code for **NIPS2025-12507**. 
+This repository contains the anonymous submission code. 
 To maintain anonymity, the code does not include any identity information.
 
 ## Getting Started
