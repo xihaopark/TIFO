@@ -1,0 +1,25 @@
+# macOS metadata
+.DS_Store
+._*
+
+# Python caches and local environments
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# Local datasets, checkpoints, logs, and generated experiment outputs
+dataset/
+checkpoints/
+logs/
+results/
+test_results/
+result_*.txt
+
+# Editor and temporary files
+.idea/
+.vscode/
+*.swp
+*.tmp
+
