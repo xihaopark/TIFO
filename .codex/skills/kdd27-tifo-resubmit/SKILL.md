@@ -17,6 +17,21 @@ Treat this as an official **Resubmit**, not a rejected-paper fresh submission.
 6. Inspect the live manuscript and both workspaces' current git status. Do not rely on an earlier report when the files can be checked.
 7. Preserve the immutable review PDF. Never edit or overwrite it.
 
+## Author-frozen theory boundary
+
+Treat the current theoretical formulation as frozen from 2026-07-16. Do not
+rewrite, weaken, replace, or reframe the theory unless the user explicitly
+reopens it. When a reviewer concern appears theoretical:
+
+1. audit whether the method, implementation and experiment actually contradict
+   the frozen theory;
+2. address the concern first through method consistency, direct evidence,
+   limitations and precise explanation;
+3. flag any genuine contradiction for an author decision instead of silently
+   editing the theoretical statement.
+
+Method implementation and experimental design remain open to revision.
+
 ## Source-of-truth order
 
 Use sources in this order when they disagree:
@@ -54,6 +69,9 @@ Do not reconstruct reviewer or experiment state from memory. The current files a
 - main-table provenance audit: `/home/park/TS/FredNormer/project_management/experiments/table1_provenance_audit.md`;
 - cross-workspace evidence ledger: `/home/park/TS/FredNormer/project_management/evidence_ledger.md`;
 - proposed matched protocol: `/home/park/TS/FredNormer/project_management/experiments/protocol_contract.md`;
+- unified experiment launcher: `/home/park/TS/FredNormer/project_management/experiments/system/README.md`;
+- representative run matrix: `/home/park/TS/FredNormer/project_management/experiments/system/gate_ettm2_96.json`;
+- current baseline decision: `/home/park/TS/FredNormer/project_management/baselines/baseline_selection_20260716.md`;
 - pinned baseline sources: `/home/park/TS/FredNormer/project_management/baselines/THIRD_PARTY_SOURCES.md`.
 
 Update these ledgers before promoting a result or marking a concern resolved.
@@ -77,13 +95,18 @@ When TKDE evidence looks reusable, first record a compatibility check covering d
 
 Work in this order unless the user directs otherwise:
 
-1. Close the theory–algorithm gap.
-2. Justify and validate the stationarity score `S = mu/sigma`.
-3. Explain TIFO’s relationship to normalization, filtering, and the cited closest methods.
-4. Strengthen baselines and fairness evidence, especially recent methods and original-backbone comparisons.
-5. Validate distribution-shift and stationarity-aware representation claims.
-6. Reconcile the diagram, algorithm, equations, and implementation.
-7. Repair tables, cross-references, inconsistent highlighting, grammar, and reproducibility details.
+1. Establish the reproducible experiment system and pass the representative
+   Ori/TIFO gate.
+2. Run the selected recent baselines, TimeEmb and TFPS (NeurIPS 2025), under a
+   matched task and disclosed optimization budget.
+3. Reconcile the method diagram, algorithm, equations and implementation while
+   preserving the frozen theory.
+4. Validate the stationarity score and distribution-shift claims with direct
+   evidence.
+5. Explain TIFO’s relationship to normalization, filtering and the cited
+   closest methods.
+6. Repair tables, cross-references, highlighting, grammar and reproducibility
+   details after evidence is available.
 
 Do not polish an unsupported central claim before resolving its evidence gap.
 
