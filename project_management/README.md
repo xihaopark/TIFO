@@ -57,7 +57,7 @@ not a result database, and a result directory name is not a complete config.
 | manuscript | highlighted draft with gaps | placeholders, unsupported claims and internal red markup |
 | submission | not ready | scientific and formatting gates remain open |
 
-Overall readiness: `h96_core_gate_passed; patchtst_and_horizon_coverage_open`.
+Overall readiness: `main_experiment_core_complete; broader_dataset_coverage_open`.
 
 ## Operating rules
 
