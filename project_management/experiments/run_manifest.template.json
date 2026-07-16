@@ -1,0 +1,62 @@
+{
+  "schema_version": "tifo-kdd-resubmit-run-v1",
+  "run_id": "EXP-GATE-ETTM2-01__dataset__backbone__method__horizon__seed",
+  "run_class": "standard",
+  "status": "planned",
+  "review": {
+    "ledger_ids": ["EL-EX-01"],
+    "concern_ids": ["EX-1", "R1.5", "R2.1"],
+    "paper_targets": ["table: 1st_results"]
+  },
+  "data": {
+    "dataset": "",
+    "path": "",
+    "sha256": "",
+    "split_implementation": "",
+    "scaler_fit_scope": "train_only"
+  },
+  "task": {
+    "features": "M",
+    "seq_len": 96,
+    "label_len": 48,
+    "pred_len": 96
+  },
+  "model": {
+    "backbone": "",
+    "method": "ori",
+    "patch_len": null,
+    "stride": null,
+    "frequency_config": {},
+    "architecture_config": {}
+  },
+  "training": {
+    "seed": 2021,
+    "optimizer": "Adam",
+    "learning_rate": null,
+    "scheduler": "",
+    "batch_size": null,
+    "max_epochs": null,
+    "patience": null,
+    "selection_metric": "validation_mse"
+  },
+  "provenance": {
+    "git_revision": "",
+    "git_dirty": null,
+    "exact_command": "",
+    "environment_file": "",
+    "hardware": ""
+  },
+  "artifacts": {
+    "config": "",
+    "log": "",
+    "checkpoint": "",
+    "metrics": "",
+    "predictions": ""
+  },
+  "outcome": {
+    "mse": null,
+    "mae": null,
+    "runtime_seconds": null,
+    "failure_reason": ""
+  }
+}

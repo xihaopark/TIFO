@@ -17,9 +17,11 @@ results/
 test_results/
 result_*.txt
 
+# Reproducibly fetched upstream baselines (see project_management/baselines/)
+third_party/
+
 # Editor and temporary files
 .idea/
 .vscode/
 *.swp
 *.tmp
-
