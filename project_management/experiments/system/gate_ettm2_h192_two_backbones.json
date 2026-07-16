@@ -1,0 +1,37 @@
+{
+  "protocol_id": "kdd_resubmit_ettm2_h192_two_backbones_gate_v1",
+  "defaults": {
+    "python": "/mnt/data1/park/Time Series/Forecasting/TKDE/envs/fredformer-cu128/bin/python",
+    "dataset": "ETTm2",
+    "data_type": "ETTm2",
+    "root_path": "/home/park/TS/FredNormer/dataset/ETT-small",
+    "data_path": "ETTm2.csv",
+    "features": "M",
+    "seq_len": 96,
+    "label_len": 48,
+    "pred_len": 192,
+    "enc_in": 7,
+    "dec_in": 7,
+    "c_out": 7,
+    "train_epochs": 30,
+    "patience": 5,
+    "batch_size": 32,
+    "learning_rate": 0.0001,
+    "num_workers": 0,
+    "cpu_threads": 4
+  },
+  "runs": [
+    {"run_id": "gate_ettm2_h192_itransformer_ori_s2021", "engine": "native", "backbone": "iTransformer", "method": "ori", "seed": 2021, "model_args": {"d_model": 128, "d_ff": 128, "e_layers": 2, "n_heads": 8, "factor": 3}},
+    {"run_id": "gate_ettm2_h192_itransformer_tifo_s2021", "engine": "native", "backbone": "iTransformer", "method": "tifo", "seed": 2021, "model_args": {"d_model": 128, "d_ff": 128, "e_layers": 2, "n_heads": 8, "factor": 3, "filter_dim": 512, "tifo_variant": "historical", "tifo_dropout": 0.5}},
+    {"run_id": "gate_ettm2_h192_itransformer_ori_s2022", "engine": "native", "backbone": "iTransformer", "method": "ori", "seed": 2022, "model_args": {"d_model": 128, "d_ff": 128, "e_layers": 2, "n_heads": 8, "factor": 3}},
+    {"run_id": "gate_ettm2_h192_itransformer_tifo_s2022", "engine": "native", "backbone": "iTransformer", "method": "tifo", "seed": 2022, "model_args": {"d_model": 128, "d_ff": 128, "e_layers": 2, "n_heads": 8, "factor": 3, "filter_dim": 512, "tifo_variant": "historical", "tifo_dropout": 0.5}},
+    {"run_id": "gate_ettm2_h192_itransformer_ori_s2023", "engine": "native", "backbone": "iTransformer", "method": "ori", "seed": 2023, "model_args": {"d_model": 128, "d_ff": 128, "e_layers": 2, "n_heads": 8, "factor": 3}},
+    {"run_id": "gate_ettm2_h192_itransformer_tifo_s2023", "engine": "native", "backbone": "iTransformer", "method": "tifo", "seed": 2023, "model_args": {"d_model": 128, "d_ff": 128, "e_layers": 2, "n_heads": 8, "factor": 3, "filter_dim": 512, "tifo_variant": "historical", "tifo_dropout": 0.5}},
+    {"run_id": "gate_ettm2_h192_patchtst_ori_s2021", "engine": "native", "backbone": "PatchTST", "method": "ori", "seed": 2021, "batch_size": 128, "model_args": {"d_model": 512, "d_ff": 2048, "e_layers": 3, "n_heads": 2, "factor": 3, "patch_len": 16, "stride": 8}},
+    {"run_id": "gate_ettm2_h192_patchtst_tifo_s2021", "engine": "native", "backbone": "PatchTST", "method": "tifo", "seed": 2021, "batch_size": 128, "model_args": {"d_model": 512, "d_ff": 2048, "e_layers": 3, "n_heads": 2, "factor": 3, "patch_len": 16, "stride": 8, "filter_dim": 512, "tifo_variant": "historical", "tifo_dropout": 0.5}},
+    {"run_id": "gate_ettm2_h192_patchtst_ori_s2022", "engine": "native", "backbone": "PatchTST", "method": "ori", "seed": 2022, "batch_size": 128, "model_args": {"d_model": 512, "d_ff": 2048, "e_layers": 3, "n_heads": 2, "factor": 3, "patch_len": 16, "stride": 8}},
+    {"run_id": "gate_ettm2_h192_patchtst_tifo_s2022", "engine": "native", "backbone": "PatchTST", "method": "tifo", "seed": 2022, "batch_size": 128, "model_args": {"d_model": 512, "d_ff": 2048, "e_layers": 3, "n_heads": 2, "factor": 3, "patch_len": 16, "stride": 8, "filter_dim": 512, "tifo_variant": "historical", "tifo_dropout": 0.5}},
+    {"run_id": "gate_ettm2_h192_patchtst_ori_s2023", "engine": "native", "backbone": "PatchTST", "method": "ori", "seed": 2023, "batch_size": 128, "model_args": {"d_model": 512, "d_ff": 2048, "e_layers": 3, "n_heads": 2, "factor": 3, "patch_len": 16, "stride": 8}},
+    {"run_id": "gate_ettm2_h192_patchtst_tifo_s2023", "engine": "native", "backbone": "PatchTST", "method": "tifo", "seed": 2023, "batch_size": 128, "model_args": {"d_model": 512, "d_ff": 2048, "e_layers": 3, "n_heads": 2, "factor": 3, "patch_len": 16, "stride": 8, "filter_dim": 512, "tifo_variant": "historical", "tifo_dropout": 0.5}}
+  ]
+}
