@@ -52,6 +52,7 @@ Do not reconstruct reviewer or experiment state from memory. The current files a
 - atomic review tracker: `/home/park/TS/FredNormer/project_management/reviews/analysis/comment_inventory.md`;
 - experiment compatibility and gap matrix: `/home/park/TS/FredNormer/project_management/experiments/paper_code_evidence_matrix.md`;
 - main-table provenance audit: `/home/park/TS/FredNormer/project_management/experiments/table1_provenance_audit.md`;
+- cross-workspace evidence ledger: `/home/park/TS/FredNormer/project_management/evidence_ledger.md`;
 - proposed matched protocol: `/home/park/TS/FredNormer/project_management/experiments/protocol_contract.md`;
 - pinned baseline sources: `/home/park/TS/FredNormer/project_management/baselines/THIRD_PARTY_SOURCES.md`.
 
