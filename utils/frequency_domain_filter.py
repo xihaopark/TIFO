@@ -78,6 +78,9 @@ class FrequencyDomainFilter(nn.Module):
             )
 
         self.seq_len = args.seq_len
+        self.residual_alpha = float(getattr(args, "tifo_residual_alpha", 1.0))
+        if not 0.0 <= self.residual_alpha <= 1.0:
+            raise ValueError("tifo_residual_alpha must be in [0, 1]")
         self.register_buffer(
             "stationarity_score", global_mask_amp.detach().clone().float()
         )
@@ -143,6 +146,8 @@ class FrequencyDomainFilter(nn.Module):
             raise ValueError(
                 f"TIFO expected sequence length {self.seq_len}, got {x.size(1)}"
             )
+        if self.residual_alpha == 0.0:
+            return x
         spectrum = (
             torch.fft.fft(x, dim=1)
             if self.variant == "historical"
@@ -154,8 +159,12 @@ class FrequencyDomainFilter(nn.Module):
             spectrum.imag * imag_weight,
         )
         if self.variant == "historical":
-            return torch.fft.ifft(weighted_spectrum, n=self.seq_len, dim=1).real
-        return torch.fft.irfft(weighted_spectrum, n=self.seq_len, dim=1)
+            filtered = torch.fft.ifft(weighted_spectrum, n=self.seq_len, dim=1).real
+        else:
+            filtered = torch.fft.irfft(weighted_spectrum, n=self.seq_len, dim=1)
+        if self.residual_alpha == 1.0:
+            return filtered
+        return x + self.residual_alpha * (filtered - x)
 
 
 def build_frequency_domain_filter(args, global_mask_amp):
