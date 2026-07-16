@@ -52,12 +52,12 @@ not a result database, and a result directory name is not a complete config.
 | historical result inventory | audited | most cells are single-run and Table 1 provenance does not match |
 | protocol | representative gate frozen | full-table split and input-length contradictions remain |
 | baseline sources | pinned, patched and smoke-tested | expand only after the representative gate is frozen |
-| matched Ori/TIFO experiments | iTransformer ETTm2/H96 gate passed | PatchTST and broader coverage still required |
+| matched Ori/TIFO experiments | iTransformer H96 complete on all seven datasets, three seeds | PatchTST and additional horizons still required |
 | recent baselines | TimeEmb and TFPS three-seed gate complete | broader dataset/horizon coverage remains |
 | manuscript | highlighted draft with gaps | placeholders, unsupported claims and internal red markup |
 | submission | not ready | scientific and formatting gates remain open |
 
-Overall readiness: `representative_gate_passed; coverage_experiments_open`.
+Overall readiness: `itransformer_h96_coverage_complete; patchtst_and_horizon_coverage_open`.
 
 ## Operating rules
 

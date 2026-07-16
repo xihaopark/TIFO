@@ -31,7 +31,15 @@ def method_label(record: dict) -> str:
         ):
             variant = "identity_unregularized"
         if config.get("method") == "tifo" and variant:
-            label += f"[{variant}]"
+            model_args = config.get("model_args", {})
+            qualifiers = [variant]
+            lr_scale = float(model_args.get("tifo_lr_scale", 1.0))
+            residual_alpha = float(model_args.get("tifo_residual_alpha", 1.0))
+            if lr_scale != 1.0:
+                qualifiers.append(f"lr={lr_scale:g}")
+            if residual_alpha != 1.0:
+                qualifiers.append(f"alpha={residual_alpha:g}")
+            label += f"[{','.join(qualifiers)}]"
         return label
     return "TimeEmb" if record["engine"] == "timeemb" else "TFPS"
 
@@ -48,6 +56,7 @@ def parse_record(record_path: Path) -> dict | None:
     epochs = [int(match.group("epoch")) for match in EPOCH_PATTERN.finditer(text)]
     final = metrics[-1]
     config = record["resolved_config"]
+    model_args = config.get("model_args", {})
     return {
         "protocol_id": record["protocol_id"],
         "run_id": record["run_id"],
@@ -56,6 +65,8 @@ def parse_record(record_path: Path) -> dict | None:
         "dataset": config["dataset"],
         "pred_len": int(config["pred_len"]),
         "seed": int(config["seed"]),
+        "tifo_lr_scale": model_args.get("tifo_lr_scale"),
+        "tifo_residual_alpha": model_args.get("tifo_residual_alpha"),
         "epochs_ran": max(epochs) if epochs else None,
         "mse": float(final.group("mse")),
         "mae": float(final.group("mae")),

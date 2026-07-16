@@ -2,7 +2,7 @@
 
 Updated: 2026-07-17
 
-Overall state: `representative_gate_in_progress; coverage_experiments_open`
+Overall state: `itransformer_h96_coverage_complete; patchtst_coverage_open`
 
 This is the control surface for deciding whether a manuscript claim can be
 retained. A manuscript value is not verified merely because the same rounded
@@ -42,7 +42,7 @@ particularly large mismatch (paper 0.427 versus local mean 0.532318).
 
 | Paper evidence | Backbones/methods | Local runnable status | Result provenance | Readiness | Next action |
 |---|---|---|---|---|---|
-| Main forecasting table | PatchTST/iTransformer Ori vs TIFO | Unified Ori/TIFO switch, historical operator recovery and mechanical seed aggregation implemented | iTransformer/ETTm2/H96: TIFO 0.181195 ± 0.000742 vs Ori 0.184665 ± 0.000829 MSE; 3/3 wins, 1.88% relative reduction. | one representative cell passed | Run PatchTST and expand datasets/horizons before replacing the full paper table. |
+| Main forecasting table | PatchTST/iTransformer Ori vs TIFO | Unified Ori/TIFO switch, historical operator recovery and mechanical seed aggregation implemented | iTransformer H96 is complete on seven datasets. Stable three-seed wins occur on ETTh1, ETTm2, Electricity and Weather; ETTh2/ETTm1 are mixed; Traffic is a documented failure. | iTransformer H96 complete | Run PatchTST and targeted horizons before replacing the full paper table. |
 | Normalization comparison | DLinear/iTransformer with Ori, RevIN, SAN, FAN, TIFO, TIFO+SAN | RevIN layer present; official FAN/SAN source pinned; unified integration missing | No complete local matched matrix. | needs_experiment | Build one runner and run representative gate cells before full matrix. |
 | Stationarity metric ablation | mu/sigma, alternatives | Current code implements mu/sigma only | Paper table not tied to an artifact ledger. | needs_experiment | Implement metric enum and paired seeds on ETTh1 plus a shift-heavy dataset. |
 | S versus random initialization | TIFO variants | No audited variant switch | Existing claims are not traceable to complete per-seed results. | needs_experiment | Match everything except initialization and report paired deltas. |
