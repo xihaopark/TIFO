@@ -90,10 +90,30 @@ def build_markdown(rows: list[dict]) -> str:
             f"{mean_std(mse)} | {mean_std(mae)} |"
         )
 
-    ori = {row["seed"]: row for row in rows if row["method"].endswith("+ORI")}
-    tifo_methods = sorted({row["method"] for row in rows if "+TIFO" in row["method"]})
-    for tifo_method in tifo_methods:
-        tifo = {row["seed"]: row for row in rows if row["method"] == tifo_method}
+    pair_keys = sorted(
+        {
+            (row["dataset"], row["pred_len"], row["method"])
+            for row in rows
+            if "+TIFO" in row["method"]
+        }
+    )
+    for dataset, pred_len, tifo_method in pair_keys:
+        backbone = tifo_method.split("+TIFO", 1)[0]
+        ori_method = f"{backbone}+ORI"
+        ori = {
+            row["seed"]: row
+            for row in rows
+            if row["dataset"] == dataset
+            and row["pred_len"] == pred_len
+            and row["method"] == ori_method
+        }
+        tifo = {
+            row["seed"]: row
+            for row in rows
+            if row["dataset"] == dataset
+            and row["pred_len"] == pred_len
+            and row["method"] == tifo_method
+        }
         paired_seeds = sorted(ori.keys() & tifo.keys())
         if not paired_seeds:
             continue
@@ -107,7 +127,7 @@ def build_markdown(rows: list[dict]) -> str:
         lines.extend(
             [
                 "",
-                f"## Paired effect: {tifo_method}",
+                f"## Paired effect: {dataset}/H{pred_len}/{tifo_method}",
                 "",
                 f"Matched seeds: {', '.join(map(str, paired_seeds))}",
                 "",

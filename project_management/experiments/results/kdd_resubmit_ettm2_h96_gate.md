@@ -9,7 +9,7 @@
 | ETTm2 | 96 | iTransformer+TIFO[identity_prior] | 3 | 0.184899 ± 0.001854 | 0.269309 ± 0.002842 |
 | ETTm2 | 96 | iTransformer+TIFO[identity_unregularized] | 3 | 0.187039 ± 0.001759 | 0.272709 ± 0.001624 |
 
-## Paired effect: iTransformer+TIFO[historical]
+## Paired effect: ETTm2/H96/iTransformer+TIFO[historical]
 
 Matched seeds: 2021, 2022, 2023
 
@@ -17,7 +17,7 @@ Matched seeds: 2021, 2022, 2023
 - Relative MSE reduction: 1.877667 ± 0.704346%
 - MAE delta (TIFO - Ori): -0.003915 ± 0.002773
 
-## Paired effect: iTransformer+TIFO[identity_prior]
+## Paired effect: ETTm2/H96/iTransformer+TIFO[identity_prior]
 
 Matched seeds: 2021, 2022, 2023
 
@@ -25,7 +25,7 @@ Matched seeds: 2021, 2022, 2023
 - Relative MSE reduction: -0.126525 ± 0.870027%
 - MAE delta (TIFO - Ori): -0.000331 ± 0.000713
 
-## Paired effect: iTransformer+TIFO[identity_unregularized]
+## Paired effect: ETTm2/H96/iTransformer+TIFO[identity_unregularized]
 
 Matched seeds: 2021, 2022, 2023
 

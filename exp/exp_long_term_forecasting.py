@@ -208,8 +208,6 @@ class Exp_Long_Term_Forecast(Exp_Basic):
 
         preds = []
         trues = []
-        saves = []
-        xs    = []
         folder_path = './test_results/' + setting + '/'
         if not os.path.exists(folder_path):
             os.makedirs(folder_path)
@@ -246,8 +244,6 @@ class Exp_Long_Term_Forecast(Exp_Basic):
 
                 outputs = outputs.detach().cpu().numpy()
                 batch_y = batch_y.detach().cpu().numpy()
-                save    = save.detach().cpu().numpy()
-                x       = batch_x.detach().cpu().numpy()
 
                 if test_data.scale and self.args.inverse:
                     shape = outputs.shape
@@ -256,16 +252,12 @@ class Exp_Long_Term_Forecast(Exp_Basic):
 
                 outputs = outputs[:, :, f_dim:]
                 batch_y = batch_y[:, :, f_dim:]
-                save    =    save[:, :, f_dim:]
-                x       =       x[:, :, f_dim:]
 
                 pred = outputs
                 true = batch_y
 
                 preds.append(pred)
                 trues.append(true)
-                saves.append(save)
-                xs.append(x)
                 # if i % 20 == 0:
                 #     input = batch_x.detach().cpu().numpy()
                 #     if test_data.scale and self.args.inverse:
@@ -277,13 +269,9 @@ class Exp_Long_Term_Forecast(Exp_Basic):
 
         preds = np.concatenate(preds, axis=0)
         trues = np.concatenate(trues, axis=0)
-        saves = np.concatenate(saves, axis=0)
-        xs    = np.concatenate(   xs, axis=0)
         print('test shape:', preds.shape, trues.shape)
         preds = preds.reshape(-1, preds.shape[-2], preds.shape[-1])
         trues = trues.reshape(-1, trues.shape[-2], trues.shape[-1])
-        saves = saves.reshape(-1, saves.shape[-2], saves.shape[-1])
-        xs    =    xs.reshape(-1,    xs.shape[-2],    xs.shape[-1])
         print('test shape:', preds.shape, trues.shape)
 
         # result save
@@ -318,10 +306,9 @@ class Exp_Long_Term_Forecast(Exp_Basic):
         f.close()
 
         np.save(folder_path + 'metrics.npy', np.array([mae, mse, rmse, mape, mspe]))
-        np.save(folder_path + 'pred.npy', preds)
-        np.save(folder_path + 'true.npy', trues)
-        np.save(folder_path + 'save.npy', saves)
-        np.save(folder_path + 'x.npy'   ,    xs)
+        if self.args.save_arrays:
+            np.save(folder_path + 'pred.npy', preds)
+            np.save(folder_path + 'true.npy', trues)
 
         write_run_manifest(
             self.args,

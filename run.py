@@ -165,6 +165,8 @@ if __name__ == '__main__':
     parser.add_argument('--extra_tag', type=str, default="", help="Anything extra")
     parser.add_argument('--skip_final_test', action='store_true',
                         help='validation-only tuning run; do not inspect the test split')
+    parser.add_argument('--save_arrays', action='store_true',
+                        help='save large prediction/target arrays in addition to metrics')
 
     args = parser.parse_args()
     fix_seed = args.random_seed

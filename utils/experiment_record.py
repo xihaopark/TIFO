@@ -73,8 +73,14 @@ def write_run_manifest(args: Any, setting: str, output_dir: str, metrics: dict[s
         "metrics": metrics,
         "artifacts": {
             "metrics": str((output / "metrics.npy").resolve()),
-            "predictions": str((output / "pred.npy").resolve()),
-            "targets": str((output / "true.npy").resolve()),
+            **(
+                {
+                    "predictions": str((output / "pred.npy").resolve()),
+                    "targets": str((output / "true.npy").resolve()),
+                }
+                if getattr(args, "save_arrays", False)
+                else {}
+            ),
         },
     }
     manifest_path = output / "run_manifest.json"
