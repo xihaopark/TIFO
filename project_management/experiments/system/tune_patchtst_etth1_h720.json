@@ -1,0 +1,31 @@
+{
+  "protocol_id": "kdd_resubmit_patchtst_etth1_h720_tune_v1",
+  "defaults": {
+    "python": "/mnt/data1/park/Time Series/Forecasting/TKDE/envs/fredformer-cu128/bin/python",
+    "dataset": "ETTh1",
+    "data_type": "ETTh1",
+    "root_path": "/home/park/TS/FredNormer/dataset/ETT-small",
+    "data_path": "ETTh1.csv",
+    "features": "M",
+    "seq_len": 96,
+    "label_len": 48,
+    "pred_len": 720,
+    "enc_in": 7,
+    "dec_in": 7,
+    "c_out": 7,
+    "train_epochs": 30,
+    "patience": 5,
+    "batch_size": 128,
+    "learning_rate": 0.0001,
+    "num_workers": 0,
+    "cpu_threads": 4
+  },
+  "runs": [
+    {"run_id": "tune_patchtst_etth1_h720_lr010_s2021", "engine": "native", "backbone": "PatchTST", "method": "tifo", "seed": 2021, "model_args": {"d_model": 512, "d_ff": 2048, "e_layers": 1, "n_heads": 16, "factor": 3, "patch_len": 16, "stride": 8, "filter_dim": 512, "tifo_variant": "historical", "tifo_dropout": 0.5, "tifo_lr_scale": 0.1, "skip_final_test": true}},
+    {"run_id": "tune_patchtst_etth1_h720_lr025_s2021", "engine": "native", "backbone": "PatchTST", "method": "tifo", "seed": 2021, "model_args": {"d_model": 512, "d_ff": 2048, "e_layers": 1, "n_heads": 16, "factor": 3, "patch_len": 16, "stride": 8, "filter_dim": 512, "tifo_variant": "historical", "tifo_dropout": 0.5, "tifo_lr_scale": 0.25, "skip_final_test": true}},
+    {"run_id": "tune_patchtst_etth1_h720_lr050_s2021", "engine": "native", "backbone": "PatchTST", "method": "tifo", "seed": 2021, "model_args": {"d_model": 512, "d_ff": 2048, "e_layers": 1, "n_heads": 16, "factor": 3, "patch_len": 16, "stride": 8, "filter_dim": 512, "tifo_variant": "historical", "tifo_dropout": 0.5, "tifo_lr_scale": 0.5, "skip_final_test": true}},
+    {"run_id": "tune_patchtst_etth1_h720_alpha025_s2021", "engine": "native", "backbone": "PatchTST", "method": "tifo", "seed": 2021, "model_args": {"d_model": 512, "d_ff": 2048, "e_layers": 1, "n_heads": 16, "factor": 3, "patch_len": 16, "stride": 8, "filter_dim": 512, "tifo_variant": "historical", "tifo_dropout": 0.5, "tifo_lr_scale": 0.25, "tifo_residual_alpha": 0.25, "skip_final_test": true}},
+    {"run_id": "tune_patchtst_etth1_h720_alpha050_s2021", "engine": "native", "backbone": "PatchTST", "method": "tifo", "seed": 2021, "model_args": {"d_model": 512, "d_ff": 2048, "e_layers": 1, "n_heads": 16, "factor": 3, "patch_len": 16, "stride": 8, "filter_dim": 512, "tifo_variant": "historical", "tifo_dropout": 0.5, "tifo_lr_scale": 0.25, "tifo_residual_alpha": 0.5, "skip_final_test": true}},
+    {"run_id": "tune_patchtst_etth1_h720_drop020_s2021", "engine": "native", "backbone": "PatchTST", "method": "tifo", "seed": 2021, "model_args": {"d_model": 512, "d_ff": 2048, "e_layers": 1, "n_heads": 16, "factor": 3, "patch_len": 16, "stride": 8, "filter_dim": 512, "tifo_variant": "historical", "tifo_dropout": 0.2, "tifo_lr_scale": 0.25, "skip_final_test": true}}
+  ]
+}
