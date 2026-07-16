@@ -21,3 +21,5 @@ The immutable official review export is stored outside this paper worktree at:
 Never overwrite that file. Verify experiment-backed claims against artifacts in `/home/park/TS/FredNormer` before writing them as completed results.
 
 Related evidence, experiment infrastructure, and prior reviewer-response work are available in the Fuji TKDE workspace at `/mnt/data1/park/Time Series/Forecasting/TKDE` and in historical Fuji Codex tasks. Follow the TKDE reuse and compatibility gate in the project skill before importing any result or claim.
+
+The live KDD resubmit control plane is `/home/park/TS/FredNormer/project_management/README.md`. Read it before changing experiments or manuscript claims; it links the verbatim review record, atomic comment tracker, paper–code–evidence matrix, Table 1 provenance audit, protocol proposal, and pinned baseline sources.

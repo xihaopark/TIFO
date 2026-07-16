@@ -13,8 +13,9 @@ Treat this as an official **Resubmit**, not a rejected-paper fresh submission.
 2. Read [references/reviewer-map.md](references/reviewer-map.md) before planning or editing any response-driven change.
 3. Read [references/submission-rules.md](references/submission-rules.md) before changing submission structure or declaring readiness.
 4. Read [references/tkde-reuse.md](references/tkde-reuse.md) before planning experiments, importing evidence, or revising claims that overlap FredNormer/Fredformer work.
-5. Inspect the live manuscript and current git status. Do not rely on an earlier report when the files can be checked.
-6. Preserve the immutable review PDF. Never edit or overwrite it.
+5. Read the live resubmit control plane at `/home/park/TS/FredNormer/project_management/README.md` and follow its links to the atomic reviewer inventory, paper–code–evidence matrix, Table 1 provenance audit, proposed protocol, and pinned baseline manifest.
+6. Inspect the live manuscript and both workspaces' current git status. Do not rely on an earlier report when the files can be checked.
+7. Preserve the immutable review PDF. Never edit or overwrite it.
 
 ## Source-of-truth order
 
@@ -42,6 +43,19 @@ Identify the mode before editing.
 Never treat the highlighted manuscript as submission-ready.
 
 ## Revision workflow
+
+### 0. Use the project control plane
+
+Do not reconstruct reviewer or experiment state from memory. The current files are:
+
+- verbatim reviews: `/home/park/TS/FredNormer/project_management/reviews/transcribed/openreview_decision_and_reviews_verbatim.md`;
+- atomic review tracker: `/home/park/TS/FredNormer/project_management/reviews/analysis/comment_inventory.md`;
+- experiment compatibility and gap matrix: `/home/park/TS/FredNormer/project_management/experiments/paper_code_evidence_matrix.md`;
+- main-table provenance audit: `/home/park/TS/FredNormer/project_management/experiments/table1_provenance_audit.md`;
+- proposed matched protocol: `/home/park/TS/FredNormer/project_management/experiments/protocol_contract.md`;
+- pinned baseline sources: `/home/park/TS/FredNormer/project_management/baselines/THIRD_PARTY_SOURCES.md`.
+
+Update these ledgers before promoting a result or marking a concern resolved.
 
 ### 1. Build an evidence ledger
 
