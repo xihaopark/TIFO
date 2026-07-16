@@ -55,8 +55,32 @@ class Exp_Long_Term_Forecast(Exp_Basic):
         return data_set, data_loader
 
     def _select_optimizer(self):
-        model_optim = optim.Adam(self.model.parameters(), lr=self.args.learning_rate)
-        return model_optim
+        lr_scale = float(getattr(self.args, 'tifo_lr_scale', 1.0))
+        if getattr(self.args, 'method', 'ori') != 'tifo' or lr_scale == 1.0:
+            return optim.Adam(self.model.parameters(), lr=self.args.learning_rate)
+
+        backbone_params = []
+        filter_params = []
+        for name, parameter in self.model.named_parameters():
+            if not parameter.requires_grad:
+                continue
+            if name.startswith('filter.') or '.filter.' in name:
+                filter_params.append(parameter)
+            else:
+                backbone_params.append(parameter)
+        if not filter_params:
+            raise RuntimeError('tifo_lr_scale was set but no TIFO filter parameters were found')
+        return optim.Adam(
+            [
+                {'params': backbone_params, 'lr': self.args.learning_rate, 'lr_scale': 1.0},
+                {
+                    'params': filter_params,
+                    'lr': self.args.learning_rate * lr_scale,
+                    'lr_scale': lr_scale,
+                },
+            ],
+            lr=self.args.learning_rate,
+        )
 
     def _select_criterion(self):
         criterion = nn.MSELoss()
