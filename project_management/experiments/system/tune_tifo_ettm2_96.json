@@ -20,9 +20,9 @@
     "num_workers": 0
   },
   "runs": [
-    {"run_id": "tune_ettm2_h96_tifo_f64_p0_s2022", "engine": "native", "backbone": "iTransformer", "method": "tifo", "seed": 2022, "model_args": {"d_model": 128, "d_ff": 128, "e_layers": 2, "n_heads": 8, "factor": 3, "filter_dim": 64, "tifo_prior_strength": 0.0, "skip_final_test": true}},
-    {"run_id": "tune_ettm2_h96_tifo_f64_p025_s2022", "engine": "native", "backbone": "iTransformer", "method": "tifo", "seed": 2022, "model_args": {"d_model": 128, "d_ff": 128, "e_layers": 2, "n_heads": 8, "factor": 3, "filter_dim": 64, "tifo_prior_strength": 0.25, "skip_final_test": true}},
-    {"run_id": "tune_ettm2_h96_tifo_f64_p05_s2022", "engine": "native", "backbone": "iTransformer", "method": "tifo", "seed": 2022, "model_args": {"d_model": 128, "d_ff": 128, "e_layers": 2, "n_heads": 8, "factor": 3, "filter_dim": 64, "tifo_prior_strength": 0.5, "skip_final_test": true}},
-    {"run_id": "tune_ettm2_h96_tifo_f512_p025_s2022", "engine": "native", "backbone": "iTransformer", "method": "tifo", "seed": 2022, "model_args": {"d_model": 128, "d_ff": 128, "e_layers": 2, "n_heads": 8, "factor": 3, "filter_dim": 512, "tifo_prior_strength": 0.25, "skip_final_test": true}}
+    {"run_id": "tune_ettm2_h96_tifo_f64_p0_s2022", "engine": "native", "backbone": "iTransformer", "method": "tifo", "seed": 2022, "model_args": {"d_model": 128, "d_ff": 128, "e_layers": 2, "n_heads": 8, "factor": 3, "filter_dim": 64, "tifo_variant": "identity_prior", "tifo_prior_strength": 0.0, "skip_final_test": true}},
+    {"run_id": "tune_ettm2_h96_tifo_f64_p025_s2022", "engine": "native", "backbone": "iTransformer", "method": "tifo", "seed": 2022, "model_args": {"d_model": 128, "d_ff": 128, "e_layers": 2, "n_heads": 8, "factor": 3, "filter_dim": 64, "tifo_variant": "identity_prior", "tifo_prior_strength": 0.25, "skip_final_test": true}},
+    {"run_id": "tune_ettm2_h96_tifo_f64_p05_s2022", "engine": "native", "backbone": "iTransformer", "method": "tifo", "seed": 2022, "model_args": {"d_model": 128, "d_ff": 128, "e_layers": 2, "n_heads": 8, "factor": 3, "filter_dim": 64, "tifo_variant": "identity_prior", "tifo_prior_strength": 0.5, "skip_final_test": true}},
+    {"run_id": "tune_ettm2_h96_tifo_f512_p025_s2022", "engine": "native", "backbone": "iTransformer", "method": "tifo", "seed": 2022, "model_args": {"d_model": 128, "d_ff": 128, "e_layers": 2, "n_heads": 8, "factor": 3, "filter_dim": 512, "tifo_variant": "identity_prior", "tifo_prior_strength": 0.25, "skip_final_test": true}}
   ]
 }

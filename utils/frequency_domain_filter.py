@@ -21,7 +21,10 @@ class GlobalMaskCalculator:
 
     def compute_global_statistics(self, loader):
         channels = self.args.enc_in
-        frequencies = self.args.seq_len // 2 + 1
+        variant = getattr(self.args, "tifo_variant", "historical")
+        frequencies = (
+            self.args.seq_len if variant == "historical" else self.args.seq_len // 2 + 1
+        )
         amp_sum = torch.zeros(frequencies, channels, device=self.device)
         amp2_sum = torch.zeros_like(amp_sum)
         sample_count = 0
@@ -29,10 +32,13 @@ class GlobalMaskCalculator:
         with torch.no_grad():
             for data in loader:
                 x = data[0].float().to(self.device)  # [B, L, C]
-                x = (x - x.mean(1, keepdim=True)) / torch.sqrt(
-                    x.var(1, keepdim=True, unbiased=False) + 1e-5
-                )
-                amplitude = torch.abs(torch.fft.rfft(x, dim=1))
+                if variant == "historical":
+                    amplitude = torch.abs(torch.fft.fft(x, dim=1))
+                else:
+                    x = (x - x.mean(1, keepdim=True)) / torch.sqrt(
+                        x.var(1, keepdim=True, unbiased=False) + 1e-5
+                    )
+                    amplitude = torch.abs(torch.fft.rfft(x, dim=1))
                 amp_sum += amplitude.sum(0)
                 amp2_sum += amplitude.square().sum(0)
                 sample_count += x.size(0)
@@ -59,8 +65,11 @@ class FrequencyDomainFilter(nn.Module):
         if global_mask_amp is None:
             raise ValueError("TIFO requires dataset-level stationarity statistics")
 
+        self.variant = getattr(args, "tifo_variant", "historical")
         frequencies, channels = global_mask_amp.shape
-        expected_frequencies = args.seq_len // 2 + 1
+        expected_frequencies = (
+            args.seq_len if self.variant == "historical" else args.seq_len // 2 + 1
+        )
         if frequencies != expected_frequencies or channels != args.enc_in:
             raise ValueError(
                 "invalid TIFO statistics shape: "
@@ -73,6 +82,22 @@ class FrequencyDomainFilter(nn.Module):
             "stationarity_score", global_mask_amp.detach().clone().float()
         )
         hidden_dim = int(getattr(args, "filter_dim", 512))
+
+        if self.variant == "historical":
+            dropout = float(getattr(args, "tifo_dropout", 0.5))
+
+            def historical_mlp():
+                return nn.Sequential(
+                    nn.Linear(frequencies, hidden_dim),
+                    nn.RReLU(),
+                    nn.Dropout(dropout),
+                    nn.Linear(hidden_dim, frequencies),
+                )
+
+            self.linear_r = historical_mlp()
+            self.linear_i = historical_mlp()
+            return
+
         prior_strength = float(getattr(args, "tifo_prior_strength", 0.0))
         if prior_strength < 0:
             raise ValueError("tifo_prior_strength must be non-negative")
@@ -97,6 +122,12 @@ class FrequencyDomainFilter(nn.Module):
         self.imag_weight_mlp = weight_mlp()
 
     def frequency_weights(self):
+        if self.variant == "historical":
+            score_by_channel = self.stationarity_score.transpose(0, 1)
+            return (
+                self.linear_r(score_by_channel).transpose(0, 1),
+                self.linear_i(score_by_channel).transpose(0, 1),
+            )
         score_by_channel = self.stationarity_score.transpose(0, 1)
         prior = self.score_prior.transpose(0, 1)
         real_weight = prior * 2.0 * torch.sigmoid(
@@ -112,12 +143,18 @@ class FrequencyDomainFilter(nn.Module):
             raise ValueError(
                 f"TIFO expected sequence length {self.seq_len}, got {x.size(1)}"
             )
-        spectrum = torch.fft.rfft(x, dim=1)
+        spectrum = (
+            torch.fft.fft(x, dim=1)
+            if self.variant == "historical"
+            else torch.fft.rfft(x, dim=1)
+        )
         real_weight, imag_weight = self.frequency_weights()
         weighted_spectrum = torch.complex(
             spectrum.real * real_weight,
             spectrum.imag * imag_weight,
         )
+        if self.variant == "historical":
+            return torch.fft.ifft(weighted_spectrum, n=self.seq_len, dim=1).real
         return torch.fft.irfft(weighted_spectrum, n=self.seq_len, dim=1)
 
 

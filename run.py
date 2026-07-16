@@ -21,6 +21,11 @@ if __name__ == '__main__':
     parser.add_argument('--filter_dim',     type=int, default=512)
     parser.add_argument('--tifo_prior_strength', type=float, default=0.0,
                         help='strength of the normalized stationarity-score prior in TIFO weights')
+    parser.add_argument('--tifo_variant', type=str, default='historical',
+                        choices=['historical', 'identity_prior'],
+                        help='TIFO operator; historical exactly matches the result-producing real/imag path')
+    parser.add_argument('--tifo_dropout', type=float, default=0.5,
+                        help='dropout inside the historical TIFO weight MLPs')
     parser.add_argument('--method', type=str, default='tifo', choices=['ori', 'tifo'],
                         help='representation method; ori disables TIFO and is the matched backbone control')
 
