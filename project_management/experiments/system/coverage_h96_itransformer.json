@@ -10,7 +10,8 @@
     "patience": 5,
     "batch_size": 32,
     "learning_rate": 0.0001,
-    "num_workers": 0
+    "num_workers": 0,
+    "cpu_threads": 4
   },
   "runs": [
     {"run_id": "coverage_h96_etth1_itransformer_ori_s2021", "engine": "native", "dataset": "ETTh1", "data_type": "ETTh1", "root_path": "/home/park/TS/FredNormer/dataset/ETT-small", "data_path": "ETTh1.csv", "enc_in": 7, "dec_in": 7, "c_out": 7, "backbone": "iTransformer", "method": "ori", "seed": 2021, "model_args": {"d_model": 128, "d_ff": 128, "e_layers": 2, "n_heads": 8, "factor": 3}},

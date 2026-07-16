@@ -118,6 +118,8 @@ if __name__ == '__main__':
                         help='the length of segmen-wise iteration of SegRNN')
 
     # optimization
+    parser.add_argument('--cpu_threads', type=int, default=4,
+                        help='PyTorch CPU intra/inter-op threads; keep small for concurrent GPU runs')
     parser.add_argument('--num_workers', type=int, default=10, help='data loader num workers')
     parser.add_argument('--itr', type=int, default=1, help='experiments times')
     parser.add_argument('--train_epochs', type=int, default=100, help='train epochs')
@@ -169,6 +171,10 @@ if __name__ == '__main__':
                         help='save large prediction/target arrays in addition to metrics')
 
     args = parser.parse_args()
+    if args.cpu_threads < 1:
+        parser.error('--cpu_threads must be at least 1')
+    torch.set_num_threads(args.cpu_threads)
+    torch.set_num_interop_threads(args.cpu_threads)
     fix_seed = args.random_seed
     random.seed(fix_seed)
     torch.manual_seed(fix_seed)

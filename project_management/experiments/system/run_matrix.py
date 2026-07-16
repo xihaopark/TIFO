@@ -48,6 +48,7 @@ COMMON_FLAGS = (
     "batch_size",
     "learning_rate",
     "num_workers",
+    "cpu_threads",
 )
 
 
@@ -249,6 +250,11 @@ def execute_run(
     record_path.write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")
     environment = os.environ.copy()
     environment["CUDA_VISIBLE_DEVICES"] = str(physical_gpu)
+    cpu_threads = str(config.get("cpu_threads", 4))
+    environment["OMP_NUM_THREADS"] = cpu_threads
+    environment["MKL_NUM_THREADS"] = cpu_threads
+    environment["OPENBLAS_NUM_THREADS"] = cpu_threads
+    environment["PYTHONUNBUFFERED"] = "1"
     log_path = run_dir / "run.log"
     with log_path.open("w", encoding="utf-8") as log_handle:
         completed = subprocess.run(
