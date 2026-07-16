@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from layers.Autoformer_EncDec import series_decomp
-from utils.frequency_domain_filter import FrequencyDomainFilter
+from utils.frequency_domain_filter import build_frequency_domain_filter
 
 class Model(nn.Module):
     """
@@ -27,9 +27,6 @@ class Model(nn.Module):
 
         self.global_mask = global_mask
         self.use_tifo = getattr(configs, 'method', 'tifo') == 'tifo'
-        self.filter = FrequencyDomainFilter(configs, self.global_mask) if self.use_tifo else None
-
-
         if self.individual:
             self.Linear_Seasonal = nn.ModuleList()
             self.Linear_Trend = nn.ModuleList()
@@ -56,6 +53,8 @@ class Model(nn.Module):
         if self.task_name == 'classification':
             self.projection = nn.Linear(
                 configs.enc_in * configs.seq_len, configs.num_class)
+
+        self.filter = build_frequency_domain_filter(configs, self.global_mask) if self.use_tifo else None
 
     def encoder(self, x):
         seasonal_init, trend_init = self.decompsition(x)
@@ -90,9 +89,6 @@ class Model(nn.Module):
         save = x_enc
 
         dec_out = self.encoder(x_enc)
-
-        if self.use_tifo:
-            dec_out = self.filter.inverse_filter(dec_out)
 
         # De-Normalization from Non-stationary Transformer
         dec_out = dec_out * (stdev[:, 0, :].unsqueeze(1).repeat(1, self.pred_len, 1))

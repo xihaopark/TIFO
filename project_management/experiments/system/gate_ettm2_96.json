@@ -1,6 +1,7 @@
 {
   "protocol_id": "kdd_resubmit_gate_v1",
   "defaults": {
+    "python": "/mnt/data1/park/Time Series/Forecasting/TKDE/envs/fredformer-cu128/bin/python",
     "dataset": "ETTm2",
     "data_type": "ETTm2",
     "root_path": "/home/park/TS/FredNormer/dataset/ETT-small",
@@ -20,17 +21,17 @@
     "gpu": 0
   },
   "runs": [
-    {"run_id": "gate_ettm2_h96_itransformer_ori_s2021", "engine": "native", "backbone": "iTransformer", "method": "ori", "seed": 2021, "model_args": {"d_model": 128, "d_ff": 128, "e_layers": 2, "n_heads": 8}},
-    {"run_id": "gate_ettm2_h96_itransformer_tifo_s2021", "engine": "native", "backbone": "iTransformer", "method": "tifo", "seed": 2021, "model_args": {"d_model": 128, "d_ff": 128, "e_layers": 2, "n_heads": 8}},
-    {"run_id": "gate_ettm2_h96_timeemb_s2021", "engine": "timeemb", "seed": 2021, "model_args": {"model": "TimeEmb", "d_model": 128, "d_ff": 128, "e_layers": 2, "n_heads": 8}},
-    {"run_id": "gate_ettm2_h96_tfps_s2021", "engine": "tfps", "seed": 2021, "model_args": {"model": "PatchTST_MoE_cluster", "d_model": 128, "d_ff": 128, "e_layers": 2, "n_heads": 8}},
-    {"run_id": "gate_ettm2_h96_itransformer_ori_s2022", "engine": "native", "backbone": "iTransformer", "method": "ori", "seed": 2022, "model_args": {"d_model": 128, "d_ff": 128, "e_layers": 2, "n_heads": 8}},
-    {"run_id": "gate_ettm2_h96_itransformer_tifo_s2022", "engine": "native", "backbone": "iTransformer", "method": "tifo", "seed": 2022, "model_args": {"d_model": 128, "d_ff": 128, "e_layers": 2, "n_heads": 8}},
-    {"run_id": "gate_ettm2_h96_timeemb_s2022", "engine": "timeemb", "seed": 2022, "model_args": {"model": "TimeEmb", "d_model": 128, "d_ff": 128, "e_layers": 2, "n_heads": 8}},
-    {"run_id": "gate_ettm2_h96_tfps_s2022", "engine": "tfps", "seed": 2022, "model_args": {"model": "PatchTST_MoE_cluster", "d_model": 128, "d_ff": 128, "e_layers": 2, "n_heads": 8}},
-    {"run_id": "gate_ettm2_h96_itransformer_ori_s2023", "engine": "native", "backbone": "iTransformer", "method": "ori", "seed": 2023, "model_args": {"d_model": 128, "d_ff": 128, "e_layers": 2, "n_heads": 8}},
-    {"run_id": "gate_ettm2_h96_itransformer_tifo_s2023", "engine": "native", "backbone": "iTransformer", "method": "tifo", "seed": 2023, "model_args": {"d_model": 128, "d_ff": 128, "e_layers": 2, "n_heads": 8}},
-    {"run_id": "gate_ettm2_h96_timeemb_s2023", "engine": "timeemb", "seed": 2023, "model_args": {"model": "TimeEmb", "d_model": 128, "d_ff": 128, "e_layers": 2, "n_heads": 8}},
-    {"run_id": "gate_ettm2_h96_tfps_s2023", "engine": "tfps", "seed": 2023, "model_args": {"model": "PatchTST_MoE_cluster", "d_model": 128, "d_ff": 128, "e_layers": 2, "n_heads": 8}}
+    {"run_id": "gate_ettm2_h96_itransformer_ori_s2021", "engine": "native", "backbone": "iTransformer", "method": "ori", "seed": 2021, "model_args": {"d_model": 128, "d_ff": 128, "e_layers": 2, "n_heads": 8, "factor": 3}},
+    {"run_id": "gate_ettm2_h96_itransformer_tifo_s2021", "engine": "native", "backbone": "iTransformer", "method": "tifo", "seed": 2021, "model_args": {"d_model": 128, "d_ff": 128, "e_layers": 2, "n_heads": 8, "factor": 3}},
+    {"run_id": "gate_ettm2_h96_timeemb_s2021", "engine": "timeemb", "seed": 2021, "batch_size": 256, "learning_rate": 0.005, "model_args": {"model": "TimeEmb", "use_hour_index": 1, "hour_length": 24, "rec_lambda": 0.25, "auxi_lambda": 0.75}},
+    {"run_id": "gate_ettm2_h96_tfps_s2021", "engine": "tfps", "seed": 2021, "train_epochs": 100, "patience": 20, "batch_size": 128, "learning_rate": 0.001, "model_args": {"model": "PatchTST_MoE_cluster", "d_model": 128, "d_ff": 256, "e_layers": 3, "n_heads": 16, "dropout": 0.2, "fc_dropout": 0.2, "head_dropout": 0, "patch_len": 16, "stride": 8, "T_num_expert": 2, "T_top_k": 1, "F_num_expert": 2, "F_top_k": 1, "beta": 0.1, "lradj": "TST", "pct_start": 0.4}},
+    {"run_id": "gate_ettm2_h96_itransformer_ori_s2022", "engine": "native", "backbone": "iTransformer", "method": "ori", "seed": 2022, "model_args": {"d_model": 128, "d_ff": 128, "e_layers": 2, "n_heads": 8, "factor": 3}},
+    {"run_id": "gate_ettm2_h96_itransformer_tifo_s2022", "engine": "native", "backbone": "iTransformer", "method": "tifo", "seed": 2022, "model_args": {"d_model": 128, "d_ff": 128, "e_layers": 2, "n_heads": 8, "factor": 3}},
+    {"run_id": "gate_ettm2_h96_timeemb_s2022", "engine": "timeemb", "seed": 2022, "batch_size": 256, "learning_rate": 0.005, "model_args": {"model": "TimeEmb", "use_hour_index": 1, "hour_length": 24, "rec_lambda": 0.25, "auxi_lambda": 0.75}},
+    {"run_id": "gate_ettm2_h96_tfps_s2022", "engine": "tfps", "seed": 2022, "train_epochs": 100, "patience": 20, "batch_size": 128, "learning_rate": 0.001, "model_args": {"model": "PatchTST_MoE_cluster", "d_model": 128, "d_ff": 256, "e_layers": 3, "n_heads": 16, "dropout": 0.2, "fc_dropout": 0.2, "head_dropout": 0, "patch_len": 16, "stride": 8, "T_num_expert": 2, "T_top_k": 1, "F_num_expert": 2, "F_top_k": 1, "beta": 0.1, "lradj": "TST", "pct_start": 0.4}},
+    {"run_id": "gate_ettm2_h96_itransformer_ori_s2023", "engine": "native", "backbone": "iTransformer", "method": "ori", "seed": 2023, "model_args": {"d_model": 128, "d_ff": 128, "e_layers": 2, "n_heads": 8, "factor": 3}},
+    {"run_id": "gate_ettm2_h96_itransformer_tifo_s2023", "engine": "native", "backbone": "iTransformer", "method": "tifo", "seed": 2023, "model_args": {"d_model": 128, "d_ff": 128, "e_layers": 2, "n_heads": 8, "factor": 3}},
+    {"run_id": "gate_ettm2_h96_timeemb_s2023", "engine": "timeemb", "seed": 2023, "batch_size": 256, "learning_rate": 0.005, "model_args": {"model": "TimeEmb", "use_hour_index": 1, "hour_length": 24, "rec_lambda": 0.25, "auxi_lambda": 0.75}},
+    {"run_id": "gate_ettm2_h96_tfps_s2023", "engine": "tfps", "seed": 2023, "train_epochs": 100, "patience": 20, "batch_size": 128, "learning_rate": 0.001, "model_args": {"model": "PatchTST_MoE_cluster", "d_model": 128, "d_ff": 256, "e_layers": 3, "n_heads": 16, "dropout": 0.2, "fc_dropout": 0.2, "head_dropout": 0, "patch_len": 16, "stride": 8, "T_num_expert": 2, "T_top_k": 1, "F_num_expert": 2, "F_top_k": 1, "beta": 0.1, "lradj": "TST", "pct_start": 0.4}}
   ]
 }

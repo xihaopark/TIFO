@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Validate and launch a reproducible experiment matrix.
 
-Dry-run is the default. Pass ``--execute`` to start jobs sequentially.
+Dry-run is the default. Pass ``--execute`` to start jobs. Multiple physical
+GPUs can be scheduled with ``--gpus`` and ``--max-parallel``.
 """
 
 from __future__ import annotations
@@ -13,6 +14,7 @@ import os
 import shlex
 import subprocess
 import sys
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -109,6 +111,10 @@ def validate(matrix: dict[str, Any]) -> list[dict[str, Any]]:
         if engine == "native" and config.get("method") not in {"ori", "tifo"}:
             raise ValueError(f"{run_id}: native method must be ori or tifo")
 
+        python = Path(str(config.get("python", sys.executable))).expanduser()
+        if not python.is_file() or not os.access(python, os.X_OK):
+            raise FileNotFoundError(f"{run_id}: Python executable not found: {python}")
+
         root_path = Path(str(config.get("root_path", ""))).expanduser()
         data_path = root_path / str(config.get("data_path", ""))
         if not data_path.is_file():
@@ -120,13 +126,16 @@ def validate(matrix: dict[str, Any]) -> list[dict[str, Any]]:
         config["dataset_sha256"] = sha256(data_path)
         config["workdir"] = str(workdir)
         config["entrypoint"] = str(entrypoint)
+        # Do not resolve a venv's python symlink: invoking its resolved system
+        # target bypasses the virtual environment and its installed packages.
+        config["python"] = str(python.absolute())
         resolved.append(config)
     return resolved
 
 
 def build_command(config: dict[str, Any], protocol_id: str) -> list[str]:
     engine = config["engine"]
-    command = [sys.executable, config["entrypoint"]]
+    command = [config["python"], config["entrypoint"]]
     command.extend(("--is_training", "1", "--model_id", config["run_id"]))
     command.extend(("--data", str(config.get("data_type", config["dataset"]))))
     command.extend(("--random_seed", str(config["seed"]), "--itr", "1"))
@@ -148,17 +157,21 @@ def build_command(config: dict[str, Any], protocol_id: str) -> list[str]:
     return command
 
 
-def preflight_entrypoints(resolved_runs: list[dict[str, Any]]) -> None:
-    """Fail early when an upstream checkout cannot import in this environment."""
-    checked: set[str] = set()
+def preflight_environment(resolved_runs: list[dict[str, Any]], physical_gpu: int) -> None:
+    """Fail early on imports or an incompatible CUDA/PyTorch build."""
+    checked: set[tuple[str, str]] = set()
     for config in resolved_runs:
         engine = config["engine"]
-        if engine in checked:
+        key = (engine, config["python"])
+        if key in checked:
             continue
-        checked.add(engine)
+        checked.add(key)
+        environment = os.environ.copy()
+        environment["CUDA_VISIBLE_DEVICES"] = str(physical_gpu)
         completed = subprocess.run(
-            [sys.executable, config["entrypoint"], "--help"],
+            [config["python"], config["entrypoint"], "--help"],
             cwd=config["workdir"],
+            env=environment,
             stdout=subprocess.DEVNULL,
             stderr=subprocess.PIPE,
             text=True,
@@ -169,6 +182,36 @@ def preflight_entrypoints(resolved_runs: list[dict[str, Any]]) -> None:
             detail = completed.stderr.strip().splitlines()[-1] if completed.stderr else "unknown error"
             raise RuntimeError(f"{engine} entrypoint preflight failed: {detail}")
         print(f"entrypoint preflight: {engine} ok")
+
+    checked_python: set[str] = set()
+    cuda_probe = (
+        "import torch; "
+        "assert torch.cuda.is_available(); "
+        "x=torch.randn(32,32,device='cuda',requires_grad=True); "
+        "x.square().mean().backward(); "
+        "print(torch.__version__, torch.cuda.get_device_name(0), "
+        "torch.cuda.get_device_capability(0))"
+    )
+    for config in resolved_runs:
+        python = config["python"]
+        if python in checked_python:
+            continue
+        checked_python.add(python)
+        environment = os.environ.copy()
+        environment["CUDA_VISIBLE_DEVICES"] = str(physical_gpu)
+        completed = subprocess.run(
+            [python, "-c", cuda_probe],
+            env=environment,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            timeout=60,
+            check=False,
+        )
+        if completed.returncode != 0:
+            detail = completed.stderr.strip().splitlines()[-1] if completed.stderr else "unknown error"
+            raise RuntimeError(f"CUDA preflight failed for {python}: {detail}")
+        print(f"CUDA preflight: {completed.stdout.strip()}")
 
 
 def launch_record(
@@ -194,10 +237,51 @@ def launch_record(
     }
 
 
+def execute_run(
+    config: dict[str, Any], protocol_id: str, command: list[str], physical_gpu: int
+) -> int:
+    run_dir = REPO_ROOT / "experiment_records" / config["run_id"]
+    run_dir.mkdir(parents=True, exist_ok=True)
+    effective_config = dict(config)
+    effective_config["gpu"] = physical_gpu
+    record_path = run_dir / "launch.json"
+    record = launch_record(effective_config, protocol_id, command, "running")
+    record_path.write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")
+    environment = os.environ.copy()
+    environment["CUDA_VISIBLE_DEVICES"] = str(physical_gpu)
+    log_path = run_dir / "run.log"
+    with log_path.open("w", encoding="utf-8") as log_handle:
+        completed = subprocess.run(
+            command,
+            cwd=config["workdir"],
+            env=environment,
+            stdout=log_handle,
+            stderr=subprocess.STDOUT,
+            check=False,
+        )
+    record["status"] = "completed" if completed.returncode == 0 else "failed"
+    record["returncode"] = completed.returncode
+    record["finished_at_utc"] = datetime.now(timezone.utc).isoformat()
+    record["log_file"] = str(log_path)
+    record_path.write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")
+    return completed.returncode
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("matrix", type=Path, help="JSON experiment matrix")
-    parser.add_argument("--execute", action="store_true", help="run jobs sequentially")
+    parser.add_argument("--execute", action="store_true", help="run jobs")
+    parser.add_argument(
+        "--gpus",
+        default=None,
+        help="comma-separated physical GPUs assigned round-robin (for example 0,1,2,3)",
+    )
+    parser.add_argument("--max-parallel", type=int, default=1, help="maximum concurrent jobs")
+    parser.add_argument(
+        "--only",
+        default=None,
+        help="comma-separated run_ids to select from the matrix",
+    )
     parser.add_argument(
         "--skip-entrypoint-check",
         action="store_true",
@@ -208,44 +292,59 @@ def main() -> int:
     matrix_path = args.matrix.resolve()
     matrix = json.loads(matrix_path.read_text(encoding="utf-8"))
     resolved_runs = validate(matrix)
+    if args.only:
+        selected_ids = {item.strip() for item in args.only.split(",") if item.strip()}
+        known_ids = {config["run_id"] for config in resolved_runs}
+        missing_ids = selected_ids - known_ids
+        if missing_ids:
+            raise ValueError(f"unknown --only run_ids: {sorted(missing_ids)}")
+        resolved_runs = [config for config in resolved_runs if config["run_id"] in selected_ids]
+        if not resolved_runs:
+            raise ValueError("--only selected no runs")
     protocol_id = matrix["protocol_id"]
+    if args.max_parallel < 1:
+        raise ValueError("--max-parallel must be at least 1")
+    if args.gpus:
+        gpu_pool = [int(item.strip()) for item in args.gpus.split(",") if item.strip()]
+        if not gpu_pool:
+            raise ValueError("--gpus did not contain a GPU id")
+    else:
+        gpu_pool = [int(config.get("gpu", 0)) for config in resolved_runs]
     print(f"validated {len(resolved_runs)} runs for protocol {protocol_id}")
     if not args.skip_entrypoint_check:
-        preflight_entrypoints(resolved_runs)
+        preflight_environment(resolved_runs, gpu_pool[0])
 
-    records_root = REPO_ROOT / "experiment_records"
-    for config in resolved_runs:
+    jobs = []
+    for index, config in enumerate(resolved_runs):
         command = build_command(config, protocol_id)
-        print(f"\n[{config['run_id']}] cwd={config['workdir']}")
+        physical_gpu = gpu_pool[index % len(gpu_pool)]
+        print(f"\n[{config['run_id']}] gpu={physical_gpu} cwd={config['workdir']}")
         print(shlex.join(command))
+        jobs.append((config, command, physical_gpu))
         if not args.execute:
             continue
+    if not args.execute:
+        return 0
 
-        run_dir = records_root / config["run_id"]
-        run_dir.mkdir(parents=True, exist_ok=True)
-        record_path = run_dir / "launch.json"
-        record = launch_record(config, protocol_id, command, "running")
-        record_path.write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")
-        environment = os.environ.copy()
-        environment["CUDA_VISIBLE_DEVICES"] = str(config.get("gpu", 0))
-        log_path = run_dir / "run.log"
-        with log_path.open("w", encoding="utf-8") as log_handle:
-            completed = subprocess.run(
-                command,
-                cwd=config["workdir"],
-                env=environment,
-                stdout=log_handle,
-                stderr=subprocess.STDOUT,
-                check=False,
+    failures = []
+    with ThreadPoolExecutor(max_workers=min(args.max_parallel, len(jobs))) as executor:
+        future_to_job = {
+            executor.submit(execute_run, config, protocol_id, command, gpu): (config, gpu)
+            for config, command, gpu in jobs
+        }
+        for future in as_completed(future_to_job):
+            config, gpu = future_to_job[future]
+            returncode = future.result()
+            print(f"finished {config['run_id']} on GPU {gpu}: returncode={returncode}")
+            if returncode != 0:
+                failures.append((config["run_id"], returncode))
+    if failures:
+        for run_id, returncode in failures:
+            print(
+                f"run failed ({returncode}); see {REPO_ROOT / 'experiment_records' / run_id / 'run.log'}",
+                file=sys.stderr,
             )
-        record["status"] = "completed" if completed.returncode == 0 else "failed"
-        record["returncode"] = completed.returncode
-        record["finished_at_utc"] = datetime.now(timezone.utc).isoformat()
-        record["log_file"] = str(log_path)
-        record_path.write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")
-        if completed.returncode != 0:
-            print(f"run failed; see {log_path}", file=sys.stderr)
-            return completed.returncode
+        return failures[0][1]
     return 0
 
 

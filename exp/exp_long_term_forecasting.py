@@ -9,6 +9,7 @@ import os
 import time
 import warnings
 import numpy as np
+import random
 from utils.dtw_metric import dtw,accelerated_dtw
 from utils.augmentation import run_augmentation,run_augmentation_single
 from utils.frequency_domain_filter import run_filter
@@ -22,8 +23,21 @@ class Exp_Long_Term_Forecast(Exp_Basic):
         #self.filter, self.global_mask, self.local_mask = None, None, None
 
     def _compute_global_mask(self):
-        train_data, train_loader = self._get_data(flag='train')
-        self.global_mask = run_filter(self.args, train_loader)
+        python_state = random.getstate()
+        numpy_state = np.random.get_state()
+        torch_state = torch.get_rng_state()
+        cuda_states = torch.cuda.get_rng_state_all() if torch.cuda.is_available() else None
+        try:
+            train_data, train_loader = data_provider(
+                self.args, flag='train', shuffle_override=False
+            )
+            self.global_mask = run_filter(self.args, train_loader, self.device)
+        finally:
+            random.setstate(python_state)
+            np.random.set_state(numpy_state)
+            torch.set_rng_state(torch_state)
+            if cuda_states is not None:
+                torch.cuda.set_rng_state_all(cuda_states)
         print("global mask done!!")
 
     def _build_model(self):

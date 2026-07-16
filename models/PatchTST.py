@@ -4,7 +4,7 @@ from layers.Transformer_EncDec import Encoder, EncoderLayer
 from layers.SelfAttention_Family import FullAttention, AttentionLayer
 from layers.Embed import PatchEmbedding
 
-from utils.frequency_domain_filter import FrequencyDomainFilter
+from utils.frequency_domain_filter import build_frequency_domain_filter
 
 class Transpose(nn.Module):
     def __init__(self, *dims, contiguous=False):
@@ -45,7 +45,6 @@ class Model(nn.Module):
         stride = configs.stride
         self.global_mask = global_mask
         self.use_tifo = getattr(configs, 'method', 'tifo') == 'tifo'
-        self.filter = FrequencyDomainFilter(configs, self.global_mask) if self.use_tifo else None
         self.task_name = configs.task_name
         self.seq_len = configs.seq_len
         self.pred_len = configs.pred_len
@@ -86,6 +85,8 @@ class Model(nn.Module):
             self.projection = nn.Linear(
                 self.head_nf * configs.enc_in, configs.num_class)
 
+        self.filter = build_frequency_domain_filter(configs, self.global_mask) if self.use_tifo else None
+
     def forecast(self, x_enc, x_mark_enc, x_dec, x_mark_dec):
         # Normalization from Non-stationary Transformer
         means = x_enc.mean(1, keepdim=True).detach()
@@ -114,9 +115,6 @@ class Model(nn.Module):
         # Decoder
         dec_out = self.head(enc_out)  # z: [bs x nvars x target_window]
         dec_out = dec_out.permute(0, 2, 1)
-
-        if self.use_tifo:
-            dec_out = self.filter.inverse_filter(dec_out)
 
         # De-Normalization from Non-stationary Transformer
         dec_out = dec_out * (stdev[:, 0, :].unsqueeze(1).repeat(1, self.pred_len, 1))
