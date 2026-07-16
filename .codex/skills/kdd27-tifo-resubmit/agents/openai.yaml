@@ -1,0 +1,4 @@
+interface:
+  display_name: "KDD 2027 TIFO Resubmit"
+  short_description: "Guide the TIFO KDD 2027 resubmission safely"
+  default_prompt: "Use $kdd27-tifo-resubmit to plan, revise, or preflight the TIFO KDD 2027 Cycle 1 resubmission."
