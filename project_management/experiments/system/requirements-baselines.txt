@@ -1,0 +1,3 @@
+# Compatibility overlay for pinned external baseline checkouts.
+# Their upstream requirements files omit this unconditional TFPS import.
+thop==0.1.1.post2209072238

@@ -18,7 +18,8 @@ inspectable evidence.
 5. Use `evidence_ledger.md` for concern → action → experiment → paper → evidence
    promotion state.
 6. Use `baselines/THIRD_PARTY_SOURCES.md` for pinned upstream code.
-7. Follow the paper-side agent skill at
+7. Use `experiments/system/README.md` and its canonical JSON matrix for all new runs.
+8. Follow the paper-side agent skill at
    `/home/park/TS/FredNormer_overleaf/.codex/skills/kdd27-tifo-resubmit/SKILL.md`.
 
 ## Source-of-truth chain
@@ -50,9 +51,9 @@ not a result database, and a result directory name is not a complete config.
 | reviewer triage | complete initial split | readiness must be updated as evidence arrives |
 | historical result inventory | audited | most cells are single-run and Table 1 provenance does not match |
 | protocol | proposed, not frozen | paper/code split and input-length contradictions |
-| baseline sources | pinned/source-only | adapters and matched smoke tests not implemented |
-| matched Ori/TIFO experiments | not runnable | no clean disable-TIFO method switch |
-| recent baselines | not selected | protocol and compute budget must be frozen first |
+| baseline sources | selected and smoke-tested | TimeEmb/TFPS test-isolation adapters remain |
+| matched Ori/TIFO experiments | gate runnable | no new paired-seed evidence yet |
+| recent baselines | TimeEmb/TFPS selected | no new matched metrics yet |
 | manuscript | highlighted draft with gaps | placeholders, unsupported claims and internal red markup |
 | submission | not ready | scientific and formatting gates remain open |
 

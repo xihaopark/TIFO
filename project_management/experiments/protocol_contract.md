@@ -1,6 +1,6 @@
 # Proposed matched experiment contract
 
-Status: `proposal_for_freeze`
+Status: `gate_v1_implemented; full_contract_not_frozen`
 
 Purpose: provide one auditable task definition for Ori, TIFO, normalization
 baselines, closest methods and recent forecasting models.
@@ -58,13 +58,24 @@ Every new run must record:
 
 ## Freeze blockers
 
-Before this proposal becomes `frozen_v1`:
+Before the full protocol becomes `frozen_v1`:
 
 1. Confirm whether the authors want to preserve DLinear's backbone-specific
    length 336 or standardize it to 96 and rerun all DLinear comparisons.
-2. Implement and smoke-test the Ori/TIFO method switch.
-3. Decide a uniform search budget for module baselines and model baselines.
-4. Select recent 2025–2026 baselines by relevance and runnable official code.
+2. Decide a uniform search/tuning budget for module baselines and model
+   baselines. The representative ETTm2 gate is provisionally fixed at 30 epochs,
+   patience 5, batch size 32 and learning rate 1e-4 for pipeline validation; it
+   is not yet the final paper-wide optimization budget.
+
+Completed prerequisites: the Ori/TIFO switch and all three native backbone
+forward paths are smoke-tested; TimeEmb and TFPS (NeurIPS 2025) are selected,
+pinned and forward-smoke-tested; the canonical 12-run ETTm2/96/three-seed gate
+dry-runs successfully.
+
+External-baseline blocker: the pinned TimeEmb and TFPS trainers evaluate the
+test split each epoch. Before evidence execution, implement a recorded adapter
+that removes this call while keeping validation-based early stopping and a
+single final test evaluation.
 
 Until those decisions are recorded, new exploratory runs must be labeled
 `supporting` and cannot replace main-table evidence.

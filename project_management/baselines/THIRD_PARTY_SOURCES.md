@@ -9,6 +9,10 @@ exact checkouts. Do not cite or import results merely because code is present.
 | `third_party/Time-Series-Library` | <https://github.com/thuml/Time-Series-Library> | `4e938a1767106324dd753b2a44832bf870a0252e` | MIT | Canonical loader/model implementation pool and protocol reference | source_only |
 | `third_party/FAN-official` | <https://github.com/icannotnamemyself/FAN> | `838e1b002aa0e8cbc3889dfb69967c40c0c15761` | Apache-2.0 | Official FAN, SAN and RevIN implementations | source_only |
 | `third_party/FilterNet-official` | <https://github.com/aikunyi/FilterNet> | `cdb321c4e338e0c07b45cee92f54b3c5bd5a809e` | Apache-2.0 | Closest-method code inspection and matched baseline candidate | source_only |
+| `third_party/DDN-official` | <https://github.com/Hank0626/DDN> | `72b8d9c595ca81e70500919689f8715ed133e6d2` | MIT | NeurIPS 2024 direct normalization backup | source_only |
+| `third_party/PIR-official` | <https://github.com/icantnamemyself/PIR> | `fc372bb02090da887d4a20b614a6cfecbfd813d0` | MIT | NeurIPS 2025 post-hoc robustness backup | source_only |
+| `third_party/TimeEmb-official` | <https://github.com/showmeon/TimeEmb> | `9adf3fba801b34642e7191b45e08aff224b26e67` | no license file found | Selected NeurIPS 2025 recent non-stationary forecasting baseline | smoke_tested; license_review_required |
+| `third_party/TFPS-official` | <https://github.com/syrGitHub/TFPS> | `83a11827e27e6617e8c8a8771f0a1dd7e10976a5` | no license file found | Selected NeurIPS 2025 patch-level distribution-shift baseline | smoke_tested; license_review_required |
 
 ## Use policy
 
@@ -25,10 +29,17 @@ exact checkouts. Do not cite or import results merely because code is present.
 - TSLib remains useful as an implementation source, but its current README
   cautions that older benchmark collections may no longer represent current
   state of the art. Baseline selection still requires a paper-level rationale.
+- TimeEmb and TFPS do not currently contain a repository license file. They may
+  be executed as pinned upstream checkouts for research comparison, but their
+  source must not be copied into this repository without permission review.
 
 ## Integration states
 
 `source_only` → `adapter_implemented` → `smoke_tested` → `matched_gate_passed` →
 `full_matrix_verified`.
 
-No source above has progressed beyond `source_only` yet.
+TimeEmb and TFPS have passed import, argument-parser and CPU forward smoke tests
+in the current shared environment. This does not constitute matched experiment
+evidence; both remain below `matched_gate_passed`. Both official training loops
+evaluate test loss each epoch. Their values must not be promoted until a
+recorded adapter removes that evaluation and leaves selection validation-only.

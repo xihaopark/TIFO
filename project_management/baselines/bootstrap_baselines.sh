@@ -35,3 +35,23 @@ checkout_repo \
   "FilterNet-official" \
   "https://github.com/aikunyi/FilterNet.git" \
   "cdb321c4e338e0c07b45cee92f54b3c5bd5a809e"
+
+checkout_repo \
+  "DDN-official" \
+  "https://github.com/Hank0626/DDN.git" \
+  "72b8d9c595ca81e70500919689f8715ed133e6d2"
+
+checkout_repo \
+  "PIR-official" \
+  "https://github.com/icantnamemyself/PIR.git" \
+  "fc372bb02090da887d4a20b614a6cfecbfd813d0"
+
+checkout_repo \
+  "TimeEmb-official" \
+  "https://github.com/showmeon/TimeEmb.git" \
+  "9adf3fba801b34642e7191b45e08aff224b26e67"
+
+checkout_repo \
+  "TFPS-official" \
+  "https://github.com/syrGitHub/TFPS.git" \
+  "83a11827e27e6617e8c8a8771f0a1dd7e10976a5"

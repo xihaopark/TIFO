@@ -16,9 +16,14 @@ logs/
 results/
 test_results/
 result_*.txt
+experiment_records/
 
 # Reproducibly fetched upstream baselines (see project_management/baselines/)
 third_party/
+
+# Legacy unversioned launch-script snapshot; canonical runs use the JSON matrix.
+scripts/
+* copy.py
 
 # Editor and temporary files
 .idea/
