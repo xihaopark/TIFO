@@ -1,8 +1,8 @@
 # KDD resubmit evidence ledger
 
-Updated: 2026-07-16
+Updated: 2026-07-17
 
-Status: `foundation_ready; scientific_gates_open`
+Status: `representative_gate_passed; scientific_coverage_open`
 
 This ledger is the cross-workspace link from reviewer concern to planned action,
 experiment, manuscript target and inspectable evidence. `Planned` means neither
@@ -10,15 +10,15 @@ the experiment nor the manuscript response has been completed.
 
 | Ledger ID | Concern routes / atomic comments | Action | Experiment or audit ID | Paper target | Current evidence | Readiness |
 |---|---|---|---|---|---|---|
-| EL-TH-01 | TH-1; PC.1, R1.1, R5.3 | Preserve the author-frozen theory; audit code/method consistency and flag any contradiction for explicit author decision. | AUDIT-THEORY-CODE-01 | Sec. 3.2 `sec:Theoretical Analysis`; method equations | `utils/frequency_domain_filter.py`; reviewer inventory | frozen_pending_audit |
+| EL-TH-01 | TH-1; PC.1, R1.1, R5.3 | Preserve the author-frozen theory; audit code/method consistency and flag any contradiction for explicit author decision. | AUDIT-THEORY-CODE-01 | Sec. 3.2 `sec:Theoretical Analysis`; method equations | Historical checkpoint replay identifies the exact result-producing raw-FFT, two-MLP, input-only operator; prediction inverse filtering is disproved by saved predictions. | frozen_code_path_verified |
 | EL-TH-02 | TH-2; R1.2, R3.1 | Define mu/sigma, assumptions, failure cases and compare alternative stability scores. | EXP-METRIC-ETTH1-01 | Sec. 3.1; Appendix “Ablation Study on Stationarity Metrics” | mu/sigma implementation exists; table provenance missing | needs_experiment |
 | EL-TH-03 | TH-3; R2.5, R3.3 | Restrict invariance to the represented training distribution and state OOD limits. | EXP-SUPPORT-SHIFT-01 | Sec. 2.3, theory assumptions, limitations/conclusion | reviewer concern only | needs_experiment |
 | EL-MT-01 | MT-1; PC.2, R1.3, R5.1 | Build exact comparison with RevIN/SAN/FAN/FilterNet and define complementarity. | AUDIT-CLOSEST-01; EXP-FILTERNET-01 | Background Sec. 2.2; Related Works; experiment settings | official sources pinned in `baselines/` | needs_experiment |
-| EL-MT-02 | MT-2; R4.1, R4.2 | Make Figure 1, tensor dimensions, equations, algorithm and code describe one operator. | AUDIT-METHOD-MAP-01 | Sec. 3.1; `fig:model`; Algorithm 1 | code confirms one complex mask, no explicit f_s/f_n split | draft |
+| EL-MT-02 | MT-2; R4.1, R4.2 | Make Figure 1, tensor dimensions, equations, algorithm and code describe one operator. | AUDIT-METHOD-MAP-01 | Sec. 3.1; `fig:model`; Algorithm 1 | Code now uses full FFT statistics, independent real/imag MLP weights and iFFT input transformation, with no post-forecast inverse. | code_aligned_paper_audit_open |
 | EL-MT-03 | MT-3; R2.3 | Define TIFO+SAN composition/order and test whether it is additive; otherwise remove TIFO*. | EXP-COMPOSE-01 | Table `results of other methods`; setup text | official SAN source pinned; no local integration | needs_experiment |
 | EL-MT-04 | MT-4; R3.4 | Compare S initialization with random initialization using paired seeds and report variance. | EXP-INIT-01 | Appendix “More Experiments” / metric ablation | historical prose only | needs_experiment |
-| EL-EX-01 | EX-1; R1.5, R2.1 | Run the unified Ori/TIFO switch, reproduce headline cells and include original backbone rows. | EXP-GATE-ETTM2-01 | Table `1st_results`; Table `results of other methods` | Switch, manifests and 3-seed ETTm2 matrix implemented; no new metrics yet | gate_runnable |
-| EL-EX-02 | EX-2; PC.3, R1.4, R5.4 | Run NeurIPS 2025 TimeEmb and TFPS under the same declared task/budget; retain PIR/DDN as backups. | EXP-RECENT-01 | Experiment settings, main/recent-baseline table | Official commits pinned; unified gate dry-runs; forward smoke passes; test-isolation adapter missing | adapter_required |
+| EL-EX-01 | EX-1; R1.5, R2.1 | Run the unified Ori/TIFO switch, reproduce headline cells and include original backbone rows. | EXP-GATE-ETTM2-01 | Table `1st_results`; Table `results of other methods` | iTransformer ETTm2/H96: TIFO 0.181195 ± 0.000742 vs Ori 0.184665 ± 0.000829 MSE, seeds 2021/2022/2023, 3/3 wins. | representative_cell_verified |
+| EL-EX-02 | EX-2; PC.3, R1.4, R5.4 | Run NeurIPS 2025 TimeEmb and TFPS under the same declared task/budget; retain PIR/DDN as backups. | EXP-RECENT-01 | Experiment settings, main/recent-baseline table | Recorded validation-only adapters applied. ETTm2/H96 three-seed MSE: TimeEmb 0.164518 ± 0.000304; TFPS 0.172818 ± 0.001181. | representative_cell_verified |
 | EL-EX-03 | EX-3; R5.2, R5.5 | Directly measure train/test spectral discrepancy and learned-weight alignment. | EXP-SPECTRAL-EVIDENCE-01 | Fig. `shift_radar`; Fig. `freq_results2`; analysis appendix | existing PDFs lack generator/config provenance | needs_experiment |
 | EL-EX-04 | EX-4; R3.5 | Recover or rerun window, resolution, reconstruction, phase and EMA ablations. | EXP-FFT-ABLATION-01 | Appendix “More Experiments”, current Tables X/Y/Z/W/V | unverified table bodies; EMA bolding error known | needs_experiment |
 | EL-EX-05 | EX-5; R4.4 | Keep beyond-forecasting scope as future work unless a clean task experiment is completed. | EXP-GENERALITY-OPTIONAL-01 | Discussion/Conclusion | no valid evidence | optional_needs_experiment |

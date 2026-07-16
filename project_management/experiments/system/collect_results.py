@@ -22,7 +22,17 @@ EPOCH_PATTERN = re.compile(r"Epoch:\s*(?P<epoch>\d+),\s*Steps:")
 def method_label(record: dict) -> str:
     config = record["resolved_config"]
     if record["engine"] == "native":
-        return f"{config['backbone']}+{config['method'].upper()}"
+        label = f"{config['backbone']}+{config['method'].upper()}"
+        variant = config.get("model_args", {}).get("tifo_variant")
+        if (
+            config.get("method") == "tifo"
+            and not variant
+            and record.get("protocol_id") == "kdd_resubmit_gate_v1"
+        ):
+            variant = "identity_unregularized"
+        if config.get("method") == "tifo" and variant:
+            label += f"[{variant}]"
+        return label
     return "TimeEmb" if record["engine"] == "timeemb" else "TFPS"
 
 
@@ -81,20 +91,28 @@ def build_markdown(rows: list[dict]) -> str:
         )
 
     ori = {row["seed"]: row for row in rows if row["method"].endswith("+ORI")}
-    tifo = {row["seed"]: row for row in rows if row["method"].endswith("+TIFO")}
-    paired_seeds = sorted(ori.keys() & tifo.keys())
-    if paired_seeds:
+    tifo_methods = sorted({row["method"] for row in rows if "+TIFO" in row["method"]})
+    for tifo_method in tifo_methods:
+        tifo = {row["seed"]: row for row in rows if row["method"] == tifo_method}
+        paired_seeds = sorted(ori.keys() & tifo.keys())
+        if not paired_seeds:
+            continue
         mse_delta = [tifo[seed]["mse"] - ori[seed]["mse"] for seed in paired_seeds]
         mae_delta = [tifo[seed]["mae"] - ori[seed]["mae"] for seed in paired_seeds]
         wins = sum(delta < 0 for delta in mse_delta)
+        relative = [
+            (ori[seed]["mse"] - tifo[seed]["mse"]) / ori[seed]["mse"] * 100
+            for seed in paired_seeds
+        ]
         lines.extend(
             [
                 "",
-                "## Paired TIFO effect",
+                f"## Paired effect: {tifo_method}",
                 "",
                 f"Matched seeds: {', '.join(map(str, paired_seeds))}",
                 "",
                 f"- MSE delta (TIFO - Ori): {mean_std(mse_delta)}; wins: {wins}/{len(paired_seeds)}",
+                f"- Relative MSE reduction: {mean_std(relative)}%",
                 f"- MAE delta (TIFO - Ori): {mean_std(mae_delta)}",
             ]
         )
@@ -103,7 +121,12 @@ def build_markdown(rows: list[dict]) -> str:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--protocol", required=True, help="protocol_id to collect")
+    parser.add_argument(
+        "--protocol",
+        required=True,
+        help="one protocol_id or a comma-separated set to combine",
+    )
+    parser.add_argument("--name", default=None, help="output stem for a combined report")
     parser.add_argument(
         "--output-dir",
         type=Path,
@@ -111,19 +134,20 @@ def main() -> int:
     )
     args = parser.parse_args()
 
+    protocols = {item.strip() for item in args.protocol.split(",") if item.strip()}
     rows = []
     for record_path in sorted((REPO_ROOT / "experiment_records").glob("*/launch.json")):
         record = json.loads(record_path.read_text(encoding="utf-8"))
-        if record.get("protocol_id") != args.protocol:
+        if record.get("protocol_id") not in protocols:
             continue
         row = parse_record(record_path)
         if row is not None:
             rows.append(row)
     if not rows:
-        raise ValueError(f"no completed records found for protocol {args.protocol}")
+        raise ValueError(f"no completed records found for protocols {sorted(protocols)}")
 
     args.output_dir.mkdir(parents=True, exist_ok=True)
-    stem = args.protocol
+    stem = args.name or (next(iter(protocols)) if len(protocols) == 1 else "combined_results")
     json_path = args.output_dir / f"{stem}.json"
     csv_path = args.output_dir / f"{stem}.csv"
     markdown_path = args.output_dir / f"{stem}.md"

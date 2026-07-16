@@ -50,14 +50,14 @@ not a result database, and a result directory name is not a complete config.
 | official reviews | verified transcription | OpenReview live text should still be compared if an export becomes available |
 | reviewer triage | complete initial split | readiness must be updated as evidence arrives |
 | historical result inventory | audited | most cells are single-run and Table 1 provenance does not match |
-| protocol | proposed, not frozen | paper/code split and input-length contradictions |
-| baseline sources | selected and smoke-tested | TimeEmb/TFPS test-isolation adapters remain |
-| matched Ori/TIFO experiments | gate runnable | no new paired-seed evidence yet |
-| recent baselines | TimeEmb/TFPS selected | no new matched metrics yet |
+| protocol | representative gate frozen | full-table split and input-length contradictions remain |
+| baseline sources | pinned, patched and smoke-tested | expand only after the representative gate is frozen |
+| matched Ori/TIFO experiments | iTransformer ETTm2/H96 gate passed | PatchTST and broader coverage still required |
+| recent baselines | TimeEmb and TFPS three-seed gate complete | broader dataset/horizon coverage remains |
 | manuscript | highlighted draft with gaps | placeholders, unsupported claims and internal red markup |
 | submission | not ready | scientific and formatting gates remain open |
 
-Overall readiness: `needs_experiment`.
+Overall readiness: `representative_gate_passed; coverage_experiments_open`.
 
 ## Operating rules
 

@@ -16,7 +16,7 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(REPO_ROOT))
 
 from data_provider.data_factory import data_provider  # noqa: E402
-from models import iTransformer  # noqa: E402
+from models import DLinear, PatchTST, iTransformer  # noqa: E402
 from utils.frequency_domain_filter import (  # noqa: E402
     FrequencyDomainFilter,
     run_filter,
@@ -63,6 +63,9 @@ def make_args(method: str, tifo_variant: str = "identity_prior") -> SimpleNamesp
         dropout=0.0,
         activation="gelu",
         output_attention=False,
+        moving_avg=25,
+        patch_len=16,
+        stride=8,
     )
 
 
@@ -131,10 +134,7 @@ def main() -> int:
         raise AssertionError(
             f"invalid historical statistics: shape={tuple(historical_mask.shape)}"
         )
-    seed_everything(2021)
     _, train_loader = data_provider(historical_args, "train")
-    model = iTransformer.Model(historical_args, historical_mask).float().to(device)
-    optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
     batch_x, batch_y, batch_x_mark, batch_y_mark = next(iter(train_loader))
     batch_x = batch_x.float().to(device)
     batch_y = batch_y.float().to(device)
@@ -147,16 +147,25 @@ def main() -> int:
         ],
         dim=1,
     )
-    optimizer.zero_grad()
-    output, _ = model(batch_x, batch_x_mark, dec_inp, batch_y_mark)
-    loss = torch.nn.functional.mse_loss(
-        output, batch_y[:, -historical_args.pred_len :]
-    )
-    loss.backward()
-    optimizer.step()
-    if not torch.isfinite(loss):
-        raise AssertionError("one-step ETTm2 training loss is not finite")
-    print(f"historical TIFO ETTm2 optimizer step ok: loss={loss.item():.6f}")
+    for model_module in (DLinear, PatchTST, iTransformer):
+        seed_everything(2021)
+        model = model_module.Model(historical_args, historical_mask).float().to(device)
+        optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
+        optimizer.zero_grad()
+        output, _ = model(batch_x, batch_x_mark, dec_inp, batch_y_mark)
+        loss = torch.nn.functional.mse_loss(
+            output, batch_y[:, -historical_args.pred_len :]
+        )
+        loss.backward()
+        optimizer.step()
+        if not torch.isfinite(loss):
+            raise AssertionError(
+                f"{model_module.__name__} one-step ETTm2 loss is not finite"
+            )
+        print(
+            f"historical TIFO {model_module.__name__} optimizer step ok: "
+            f"loss={loss.item():.6f}"
+        )
     return 0
 
 

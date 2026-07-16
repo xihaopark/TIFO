@@ -15,11 +15,21 @@ The launcher defaults to dry-run. It validates unique run IDs and data paths,
 preflights each unique entrypoint, prints the exact commands, and only starts
 jobs with `--execute`.
 
-The two upstream repositories declare old, minimal dependency lists. The
-current shared environment uses PyTorch 2.5; compatibility must therefore pass
-the representative gate before any external result is promoted. TFPS also
-imports `thop` without declaring it; the workspace environment pins
-`thop==0.1.1.post2209072238` for that import.
+The canonical Blackwell-capable interpreter is:
+
+```text
+/mnt/data1/park/Time Series/Forecasting/TKDE/envs/fredformer-cu128/bin/python
+```
+
+It provides PyTorch 2.11.0+cu128 with `sm_120` kernels. The previous default
+PyTorch 2.5.0+cu124 environment imports successfully but cannot execute kernels
+on the RTX PRO 6000 Blackwell GPUs. The launcher performs a real CUDA backward
+probe so an import-only false positive cannot start a matrix.
+
+TimeEmb and TFPS require the recorded patches under `baseline_patches/`. They
+remove per-epoch test evaluation while retaining validation early stopping and
+replace the NumPy-2-incompatible `np.Inf` spelling. The official upstream
+commits remain pinned and the patches are separately inspectable.
 
 ```bash
 python -m pip install -r \
@@ -30,9 +40,14 @@ python -m pip install -r \
 python project_management/experiments/system/run_matrix.py \
   project_management/experiments/system/gate_ettm2_96.json
 
-python project_management/experiments/system/run_matrix.py \
-  project_management/experiments/system/gate_ettm2_96.json --execute
+/mnt/data1/park/Time\ Series/Forecasting/TKDE/envs/fredformer-cu128/bin/python \
+  project_management/experiments/system/run_matrix.py \
+  project_management/experiments/system/gate_ettm2_96.json \
+  --execute --gpus 0,1,2,3,4,5,6,7 --max-parallel 8
 ```
+
+Jobs are serialized per physical GPU. Use `--only run_id_a,run_id_b` to rerun
+a selected subset without editing the frozen matrix.
 
 Use `--skip-entrypoint-check` only for inspecting commands on a machine where
 the training environment has intentionally not been installed.
@@ -50,8 +65,24 @@ data SHA-256, source revision, dirty-state snapshot and metrics.
 - Validation selection and maximum training budget must be declared before an
   evidence run.
 - Native training does not evaluate the test split during epoch selection.
-  TimeEmb and TFPS upstream trainers currently do; their direct launcher rows
-  are pipeline gates only until a reproducible test-isolation adapter is
-  implemented without silently modifying the pinned sources.
+  TimeEmb and TFPS now use recorded validation-only patches; test is evaluated
+  once after the best validation checkpoint is restored.
 - Dry-run success is not experiment evidence.
 - The initial matrix is a representative gate, not the final 7 × 4 sweep.
+
+## Checks and aggregation
+
+```bash
+/mnt/data1/park/Time\ Series/Forecasting/TKDE/envs/fredformer-cu128/bin/python \
+  project_management/experiments/system/test_native_gate.py
+
+/mnt/data1/park/Time\ Series/Forecasting/TKDE/envs/fredformer-cu128/bin/python \
+  project_management/experiments/system/collect_results.py \
+  --protocol kdd_resubmit_gate_v1,kdd_resubmit_tifo_historical_v2 \
+  --name kdd_resubmit_ettm2_h96_gate
+```
+
+The native test verifies full-train-set statistics, real-valued output, finite
+gradients, Ori/TIFO backbone initialization parity and a real ETTm2 optimizer
+step. The collector parses only completed final-test records and reports both
+per-method seed statistics and matched TIFO-minus-Ori deltas.
