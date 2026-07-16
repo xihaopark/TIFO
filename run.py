@@ -19,6 +19,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='TimesNet')
 
     parser.add_argument('--filter_dim',     type=int, default=512)
+    parser.add_argument('--tifo_prior_strength', type=float, default=0.0,
+                        help='strength of the normalized stationarity-score prior in TIFO weights')
     parser.add_argument('--method', type=str, default='tifo', choices=['ori', 'tifo'],
                         help='representation method; ori disables TIFO and is the matched backbone control')
 
@@ -156,6 +158,8 @@ if __name__ == '__main__':
     parser.add_argument('--discdtw', default=False, action="store_true", help="Discrimitive DTW warp preset augmentation")
     parser.add_argument('--discsdtw', default=False, action="store_true", help="Discrimitive shapeDTW warp preset augmentation")
     parser.add_argument('--extra_tag', type=str, default="", help="Anything extra")
+    parser.add_argument('--skip_final_test', action='store_true',
+                        help='validation-only tuning run; do not inspect the test split')
 
     args = parser.parse_args()
     fix_seed = args.random_seed
@@ -221,8 +225,9 @@ if __name__ == '__main__':
             print('>>>>>>>start training : {}>>>>>>>>>>>>>>>>>>>>>>>>>>'.format(setting))
             exp.train(setting)
 
-            print('>>>>>>>testing : {}<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<'.format(setting))
-            exp.test(setting)
+            if not args.skip_final_test:
+                print('>>>>>>>testing : {}<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<'.format(setting))
+                exp.test(setting)
             torch.cuda.empty_cache()
     else:
         ii = 0

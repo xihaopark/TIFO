@@ -73,6 +73,14 @@ class FrequencyDomainFilter(nn.Module):
             "stationarity_score", global_mask_amp.detach().clone().float()
         )
         hidden_dim = int(getattr(args, "filter_dim", 512))
+        prior_strength = float(getattr(args, "tifo_prior_strength", 0.0))
+        if prior_strength < 0:
+            raise ValueError("tifo_prior_strength must be non-negative")
+        normalized_score = self.stationarity_score / self.stationarity_score.mean(
+            dim=0, keepdim=True
+        ).clamp_min(1e-5)
+        score_prior = normalized_score.clamp_min(1e-4).pow(prior_strength)
+        self.register_buffer("score_prior", score_prior.clamp(0.25, 4.0))
 
         def weight_mlp():
             network = nn.Sequential(
@@ -90,8 +98,13 @@ class FrequencyDomainFilter(nn.Module):
 
     def frequency_weights(self):
         score_by_channel = self.stationarity_score.transpose(0, 1)
-        real_weight = 2.0 * torch.sigmoid(self.real_weight_mlp(score_by_channel))
-        imag_weight = 2.0 * torch.sigmoid(self.imag_weight_mlp(score_by_channel))
+        prior = self.score_prior.transpose(0, 1)
+        real_weight = prior * 2.0 * torch.sigmoid(
+            self.real_weight_mlp(score_by_channel)
+        )
+        imag_weight = prior * 2.0 * torch.sigmoid(
+            self.imag_weight_mlp(score_by_channel)
+        )
         return real_weight.transpose(0, 1), imag_weight.transpose(0, 1)
 
     def forward(self, x):
