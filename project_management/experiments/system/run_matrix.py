@@ -267,6 +267,21 @@ def execute_run(
     return completed.returncode
 
 
+def execute_gpu_queue(
+    physical_gpu: int,
+    jobs: list[tuple[dict[str, Any], list[str]]],
+    protocol_id: str,
+) -> list[tuple[str, int]]:
+    """Run one FIFO queue per GPU so two jobs never share a physical device."""
+
+    results = []
+    for config, command in jobs:
+        returncode = execute_run(config, protocol_id, command, physical_gpu)
+        print(f"finished {config['run_id']} on GPU {physical_gpu}: returncode={returncode}")
+        results.append((config["run_id"], returncode))
+    return results
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("matrix", type=Path, help="JSON experiment matrix")
@@ -326,18 +341,20 @@ def main() -> int:
     if not args.execute:
         return 0
 
+    gpu_queues: dict[int, list[tuple[dict[str, Any], list[str]]]] = {}
+    for config, command, gpu in jobs:
+        gpu_queues.setdefault(gpu, []).append((config, command))
+
     failures = []
-    with ThreadPoolExecutor(max_workers=min(args.max_parallel, len(jobs))) as executor:
-        future_to_job = {
-            executor.submit(execute_run, config, protocol_id, command, gpu): (config, gpu)
-            for config, command, gpu in jobs
+    with ThreadPoolExecutor(max_workers=min(args.max_parallel, len(gpu_queues))) as executor:
+        futures = {
+            executor.submit(execute_gpu_queue, gpu, gpu_jobs, protocol_id): gpu
+            for gpu, gpu_jobs in gpu_queues.items()
         }
-        for future in as_completed(future_to_job):
-            config, gpu = future_to_job[future]
-            returncode = future.result()
-            print(f"finished {config['run_id']} on GPU {gpu}: returncode={returncode}")
-            if returncode != 0:
-                failures.append((config["run_id"], returncode))
+        for future in as_completed(futures):
+            for run_id, returncode in future.result():
+                if returncode != 0:
+                    failures.append((run_id, returncode))
     if failures:
         for run_id, returncode in failures:
             print(
