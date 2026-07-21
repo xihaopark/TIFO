@@ -23,7 +23,8 @@ git -C third_party/WDAN-official apply \
   ../../project_management/experiments/system/baseline_patches/wdan-matched-runner.patch
 ```
 
-The CN patch exposes the random seed, removes per-epoch test evaluation and
-limits eager imports to the non-Mamba baselines used here. The WDAN patch uses
+The CN patch exposes the random seed, removes per-epoch test evaluation, adds a
+validation-only tuning switch, and limits eager imports to the non-Mamba
+baselines used here. The WDAN patch uses
 the canonical dataset root supplied through `TIFO_DATA_ROOT`, adds the Traffic
 dataset configuration and logs final metrics at evidence-grade precision.
