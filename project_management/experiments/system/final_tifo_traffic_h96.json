@@ -1,0 +1,34 @@
+{
+  "protocol_id": "kdd_resubmit_tifo_final_h96_v1",
+  "selection_evidence": "Validation-only winner from kdd_resubmit_tifo_weak_h96_round2_v1 after comparison with the low-alpha identity-fallback gate; no test metric was used for selection.",
+  "defaults": {
+    "python": "/mnt/data1/park/Time Series/Forecasting/TKDE/envs/fredformer-cu128/bin/python",
+    "features": "M",
+    "seq_len": 96,
+    "label_len": 48,
+    "pred_len": 96,
+    "train_epochs": 30,
+    "patience": 3,
+    "batch_size": 16,
+    "learning_rate": 0.001,
+    "num_workers": 0,
+    "cpu_threads": 4
+  },
+  "runs": [
+    {
+      "dataset": "Traffic", "data_type": "custom", "root_path": "/home/park/TS/FredNormer/dataset/traffic", "data_path": "traffic.csv", "enc_in": 862, "dec_in": 862, "c_out": 862,
+      "seed": 2021, "run_id": "final_traffic_h96_tifo_zpad150_s2021", "engine": "native", "backbone": "iTransformer", "method": "tifo",
+      "model_args": {"d_model": 512, "d_ff": 512, "e_layers": 4, "n_heads": 8, "factor": 3, "filter_dim": 512, "tifo_variant": "historical", "tifo_dropout": 0.5, "tifo_lr_scale": 0.25, "tifo_residual_alpha": 0.5, "tifo_zero_pad_ratio": 1.5}
+    },
+    {
+      "dataset": "Traffic", "data_type": "custom", "root_path": "/home/park/TS/FredNormer/dataset/traffic", "data_path": "traffic.csv", "enc_in": 862, "dec_in": 862, "c_out": 862,
+      "seed": 2022, "run_id": "final_traffic_h96_tifo_zpad150_s2022", "engine": "native", "backbone": "iTransformer", "method": "tifo",
+      "model_args": {"d_model": 512, "d_ff": 512, "e_layers": 4, "n_heads": 8, "factor": 3, "filter_dim": 512, "tifo_variant": "historical", "tifo_dropout": 0.5, "tifo_lr_scale": 0.25, "tifo_residual_alpha": 0.5, "tifo_zero_pad_ratio": 1.5}
+    },
+    {
+      "dataset": "Traffic", "data_type": "custom", "root_path": "/home/park/TS/FredNormer/dataset/traffic", "data_path": "traffic.csv", "enc_in": 862, "dec_in": 862, "c_out": 862,
+      "seed": 2023, "run_id": "final_traffic_h96_tifo_zpad150_s2023", "engine": "native", "backbone": "iTransformer", "method": "tifo",
+      "model_args": {"d_model": 512, "d_ff": 512, "e_layers": 4, "n_heads": 8, "factor": 3, "filter_dim": 512, "tifo_variant": "historical", "tifo_dropout": 0.5, "tifo_lr_scale": 0.25, "tifo_residual_alpha": 0.5, "tifo_zero_pad_ratio": 1.5}
+    }
+  ]
+}
