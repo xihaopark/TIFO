@@ -1,0 +1,10 @@
+# Local LaTeX build artifacts
+sample-sigconf.aux
+sample-sigconf.bbl
+sample-sigconf.blg
+sample-sigconf.fdb_latexmk
+sample-sigconf.fls
+sample-sigconf.log
+sample-sigconf.out
+sample-sigconf.pdf
+sample-sigconf.ptc
