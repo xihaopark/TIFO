@@ -52,6 +52,8 @@ def main() -> None:
     ]
     tex = ["% Generated mechanically from completed three-seed artifacts."]
     wins = {method: 0 for method in ("Ori", "ACN", "WDAN", "TIFO")}
+    improves = {method: 0 for method in ("ACN", "WDAN", "TIFO")}
+    worst_relative = {method: float("inf") for method in improves}
 
     for dataset in DATASETS:
         groups = {
@@ -70,8 +72,14 @@ def main() -> None:
         mae = {name: stats(rows, "mae") for name, rows in groups.items()}
         best_mse = min(value[0] for value in mse.values())
         best_mae = min(value[0] for value in mae.values())
+        second_mse = sorted(value[0] for value in mse.values())[1]
+        second_mae = sorted(value[0] for value in mae.values())[1]
         for name in groups:
             wins[name] += int(mse[name][0] == best_mse)
+        for name in improves:
+            relative = (mse["Ori"][0] - mse[name][0]) / mse["Ori"][0] * 100.0
+            improves[name] += int(relative > 0)
+            worst_relative[name] = min(worst_relative[name], relative)
         markdown.append(
             f"| {dataset} | {mse['Ori'][0]:.6f} / {mae['Ori'][0]:.6f} | "
             f"{mse['ACN'][0]:.6f} / {mae['ACN'][0]:.6f} | "
@@ -83,12 +91,22 @@ def main() -> None:
             mse_cell, mae_cell = fmt(mse[name]), fmt(mae[name])
             if mse[name][0] == best_mse:
                 mse_cell = f"\\textbf{{{mse_cell}}}"
+            elif mse[name][0] == second_mse:
+                mse_cell = f"\\uline{{{mse_cell}}}"
             if mae[name][0] == best_mae:
                 mae_cell = f"\\textbf{{{mae_cell}}}"
+            elif mae[name][0] == second_mae:
+                mae_cell = f"\\uline{{{mae_cell}}}"
             cells.extend((mse_cell, mae_cell))
         tex.append(f"{dataset} & " + " & ".join(cells) + r" \\")
 
-    markdown.extend(("", "MSE wins: " + ", ".join(f"{key}={value}" for key, value in wins.items())))
+    markdown.extend((
+        "",
+        "MSE wins: " + ", ".join(f"{key}={value}" for key, value in wins.items()),
+        "Improves Ori (MSE): " + ", ".join(f"{key}={value}/7" for key, value in improves.items()),
+        "Worst relative MSE change: "
+        + ", ".join(f"{key}={value:+.1f}%" for key, value in worst_relative.items()),
+    ))
     (RESULTS / "plugin_comparison_h96.md").write_text("\n".join(markdown) + "\n", encoding="utf-8")
     (RESULTS / "plugin_comparison_h96_rows.tex").write_text("\n".join(tex) + "\n", encoding="utf-8")
     print(f"wrote {RESULTS / 'plugin_comparison_h96.md'}")
