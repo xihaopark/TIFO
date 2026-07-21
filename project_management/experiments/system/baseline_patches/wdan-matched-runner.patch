@@ -1,3 +1,32 @@
+diff --git a/run.py b/run.py
+index 0b8e913..db4c63b 100644
+--- a/run.py
++++ b/run.py
+@@ -31,6 +31,8 @@ parser.add_argument('--server_name', type=str, default='Local', help='server nam
+ parser.add_argument('--save_and_log', action='store_true', default=False, help='save and log')
+ parser.add_argument('--save_tb', action='store_true', default=False, help='save tensorboard')
+ parser.add_argument('--exp_id', type=str, default='', help='experiment id')
++parser.add_argument('--skip_final_test', action='store_true',
++                    help='validation-only tuning run; do not inspect the test split')
+ 
+ # --- data config
+ parser.add_argument('--seq_len', type=int, default=720, help='seq_len')
+@@ -159,10 +161,11 @@ def single_train():
+         spv_config = generate_spv_config(args)
+         spv = spv_generator(**spv_config)
+         val_loss = spv.train()
+-        test_ret = spv.test(message=f's{args.fix_seed}_itr{ii}')['loss']
+-
+-        save_results_csv(val_loss, test_ret,
+-                         run_id=spv.get_run_id(), itr=ii, file_path=file_path)
++        print(f"Best Validation MSE: {val_loss:.8f}")
++        if not args.skip_final_test:
++            test_ret = spv.test(message=f's{args.fix_seed}_itr{ii}')['loss']
++            save_results_csv(val_loss, test_ret,
++                             run_id=spv.get_run_id(), itr=ii, file_path=file_path)
+ 
+ 
+ if __name__ == '__main__':
 diff --git a/nns/spv/base_mts_spv.py b/nns/spv/base_mts_spv.py
 index 59d066f..1a17408 100644
 --- a/nns/spv/base_mts_spv.py
