@@ -30,6 +30,8 @@ if __name__ == '__main__':
                         help='TIFO filter learning-rate multiplier relative to the backbone')
     parser.add_argument('--tifo_residual_alpha', type=float, default=1.0,
                         help='blend strength from the identity input to the TIFO-filtered input')
+    parser.add_argument('--tifo_zero_pad_ratio', type=float, default=0.0,
+                        help='right-side zero padding as a fraction of seq_len; statistics and weights use the padded FFT grid')
     parser.add_argument('--method', type=str, default='tifo', choices=['ori', 'tifo'],
                         help='representation method; ori disables TIFO and is the matched backbone control')
 
@@ -181,6 +183,8 @@ if __name__ == '__main__':
         parser.error('--tifo_lr_scale must be positive')
     if not 0 <= args.tifo_residual_alpha <= 1:
         parser.error('--tifo_residual_alpha must be in [0, 1]')
+    if args.tifo_zero_pad_ratio < 0:
+        parser.error('--tifo_zero_pad_ratio must be non-negative')
     torch.set_num_threads(args.cpu_threads)
     torch.set_num_interop_threads(args.cpu_threads)
     fix_seed = args.random_seed

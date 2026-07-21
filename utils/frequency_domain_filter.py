@@ -12,6 +12,15 @@ import torch
 import torch.nn as nn
 
 
+def _tifo_fft_size(args) -> int:
+    """Return the FFT size after optional right-side zero padding."""
+
+    ratio = float(getattr(args, "tifo_zero_pad_ratio", 0.0))
+    if ratio < 0:
+        raise ValueError("tifo_zero_pad_ratio must be non-negative")
+    return int(args.seq_len) + int(int(args.seq_len) * ratio)
+
+
 class GlobalMaskCalculator:
     """Compute S(k, c) = mean_i A_i(k, c) / std_i A_i(k, c)."""
 
@@ -22,8 +31,9 @@ class GlobalMaskCalculator:
     def compute_global_statistics(self, loader):
         channels = self.args.enc_in
         variant = getattr(self.args, "tifo_variant", "historical")
+        fft_size = _tifo_fft_size(self.args)
         frequencies = (
-            self.args.seq_len if variant == "historical" else self.args.seq_len // 2 + 1
+            fft_size if variant == "historical" else fft_size // 2 + 1
         )
         amp_sum = torch.zeros(frequencies, channels, device=self.device)
         amp2_sum = torch.zeros_like(amp_sum)
@@ -33,12 +43,12 @@ class GlobalMaskCalculator:
             for data in loader:
                 x = data[0].float().to(self.device)  # [B, L, C]
                 if variant == "historical":
-                    amplitude = torch.abs(torch.fft.fft(x, dim=1))
+                    amplitude = torch.abs(torch.fft.fft(x, n=fft_size, dim=1))
                 else:
                     x = (x - x.mean(1, keepdim=True)) / torch.sqrt(
                         x.var(1, keepdim=True, unbiased=False) + 1e-5
                     )
-                    amplitude = torch.abs(torch.fft.rfft(x, dim=1))
+                    amplitude = torch.abs(torch.fft.rfft(x, n=fft_size, dim=1))
                 amp_sum += amplitude.sum(0)
                 amp2_sum += amplitude.square().sum(0)
                 sample_count += x.size(0)
@@ -66,9 +76,12 @@ class FrequencyDomainFilter(nn.Module):
             raise ValueError("TIFO requires dataset-level stationarity statistics")
 
         self.variant = getattr(args, "tifo_variant", "historical")
+        self.fft_size = _tifo_fft_size(args)
         frequencies, channels = global_mask_amp.shape
         expected_frequencies = (
-            args.seq_len if self.variant == "historical" else args.seq_len // 2 + 1
+            self.fft_size
+            if self.variant == "historical"
+            else self.fft_size // 2 + 1
         )
         if frequencies != expected_frequencies or channels != args.enc_in:
             raise ValueError(
@@ -149,9 +162,9 @@ class FrequencyDomainFilter(nn.Module):
         if self.residual_alpha == 0.0:
             return x
         spectrum = (
-            torch.fft.fft(x, dim=1)
+            torch.fft.fft(x, n=self.fft_size, dim=1)
             if self.variant == "historical"
-            else torch.fft.rfft(x, dim=1)
+            else torch.fft.rfft(x, n=self.fft_size, dim=1)
         )
         real_weight, imag_weight = self.frequency_weights()
         weighted_spectrum = torch.complex(
@@ -159,9 +172,12 @@ class FrequencyDomainFilter(nn.Module):
             spectrum.imag * imag_weight,
         )
         if self.variant == "historical":
-            filtered = torch.fft.ifft(weighted_spectrum, n=self.seq_len, dim=1).real
+            filtered = torch.fft.ifft(
+                weighted_spectrum, n=self.fft_size, dim=1
+            ).real
         else:
-            filtered = torch.fft.irfft(weighted_spectrum, n=self.seq_len, dim=1)
+            filtered = torch.fft.irfft(weighted_spectrum, n=self.fft_size, dim=1)
+        filtered = filtered[:, : self.seq_len, :]
         if self.residual_alpha == 1.0:
             return filtered
         return x + self.residual_alpha * (filtered - x)

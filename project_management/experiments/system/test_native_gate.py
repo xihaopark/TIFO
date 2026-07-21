@@ -31,7 +31,12 @@ def seed_everything(seed: int) -> None:
         torch.cuda.manual_seed_all(seed)
 
 
-def make_args(method: str, tifo_variant: str = "identity_prior") -> SimpleNamespace:
+def make_args(
+    method: str,
+    tifo_variant: str = "identity_prior",
+    tifo_zero_pad_ratio: float = 0.0,
+    tifo_residual_alpha: float = 1.0,
+) -> SimpleNamespace:
     return SimpleNamespace(
         task_name="long_term_forecast",
         data="ETTm2",
@@ -54,6 +59,8 @@ def make_args(method: str, tifo_variant: str = "identity_prior") -> SimpleNamesp
         method=method,
         tifo_variant=tifo_variant,
         tifo_dropout=0.5,
+        tifo_zero_pad_ratio=tifo_zero_pad_ratio,
+        tifo_residual_alpha=tifo_residual_alpha,
         filter_dim=64,
         d_model=32,
         d_ff=32,
@@ -87,6 +94,52 @@ def assert_paired_initialization(mask: torch.Tensor) -> None:
     torch.testing.assert_close(ori_next_random, tifo_next_random, rtol=0, atol=0)
 
 
+def assert_yamabuki_candidates(device: torch.device) -> None:
+    """Check the alpha-shrinkage and zero-padding candidates imported from server 25."""
+
+    padded_args = make_args(
+        "tifo", "historical", tifo_zero_pad_ratio=1.0
+    )
+    synthetic_loader = [
+        (torch.randn(3, padded_args.seq_len, padded_args.enc_in),)
+        for _ in range(2)
+    ]
+    padded_mask = run_filter(padded_args, synthetic_loader, device)
+    expected_mask_shape = (padded_args.seq_len * 2, padded_args.enc_in)
+    if padded_mask.shape != expected_mask_shape or not torch.isfinite(padded_mask).all():
+        raise AssertionError(
+            "zero-padded TIFO returned invalid statistics: "
+            f"shape={tuple(padded_mask.shape)} expected={expected_mask_shape}"
+        )
+    padded_filter = FrequencyDomainFilter(padded_args, padded_mask).to(device)
+    x = torch.randn(
+        2, padded_args.seq_len, padded_args.enc_in, device=device, requires_grad=True
+    )
+    output = padded_filter(x)
+    if output.shape != x.shape or not torch.isfinite(output).all():
+        raise AssertionError("zero-padded TIFO returned an invalid output")
+    output.square().mean().backward()
+    if not any(
+        parameter.grad is not None and torch.isfinite(parameter.grad).all()
+        for parameter in padded_filter.parameters()
+        if parameter.requires_grad
+    ):
+        raise AssertionError("zero-padded TIFO did not produce finite gradients")
+
+    identity_args = make_args(
+        "tifo",
+        "historical",
+        tifo_zero_pad_ratio=1.0,
+        tifo_residual_alpha=0.0,
+    )
+    identity_filter = FrequencyDomainFilter(identity_args, padded_mask).to(device)
+    identity_input = torch.randn_like(x.detach())
+    torch.testing.assert_close(
+        identity_filter(identity_input), identity_input, rtol=0, atol=0
+    )
+    print("server-25 candidates ok: padded FFT shape/gradient and alpha=0 identity")
+
+
 def main() -> int:
     if not torch.cuda.is_available():
         raise RuntimeError("native gate requires CUDA")
@@ -98,6 +151,7 @@ def main() -> int:
         f"cuda ok: {torch.cuda.get_device_name(device)} capability={capability} "
         f"torch={torch.__version__}"
     )
+    assert_yamabuki_candidates(device)
 
     args = make_args("tifo")
     _, mask_loader = data_provider(args, "train", shuffle_override=False)

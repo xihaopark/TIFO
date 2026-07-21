@@ -89,5 +89,9 @@ extension is `baseline_etth1_96.json`: TimeEmb and TFPS on ETTh1/H96 with seeds
 
 The native test verifies full-train-set statistics, real-valued output, finite
 gradients, Ori/TIFO backbone initialization parity and a real ETTm2 optimizer
-step. The collector parses only completed final-test records and reports both
+step. It also checks the server-25 candidate controls: `tifo_residual_alpha`
+(the imported alpha-shrinkage design) and `tifo_zero_pad_ratio` (a corrected
+zero-padding design whose statistics and learned weights use the same padded
+FFT grid). Both options preserve the historical default at `1.0` and `0.0`,
+respectively. The collector parses only completed final-test records and reports both
 per-method seed statistics and matched TIFO-minus-Ori deltas.
