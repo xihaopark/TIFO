@@ -10,6 +10,8 @@ canonical JSON matrix. It does not merge upstream source trees.
 | `native` | `/home/park/TS/FredNormer/run.py` | matched Ori/TIFO backbone experiments |
 | `timeemb` | pinned TimeEmb checkout | selected NeurIPS 2025 model baseline |
 | `tfps` | pinned TFPS checkout | selected NeurIPS 2025 distribution-shift baseline |
+| `acn` | pinned Channel Normalization checkout | ICML 2025 adaptive channel-normalization plug-in |
+| `wdan` | pinned WDAN checkout | 2025 wavelet adaptive-normalization plug-in |
 
 The launcher defaults to dry-run. It validates unique run IDs and data paths,
 preflights each unique entrypoint, prints the exact commands, and only starts
@@ -47,7 +49,8 @@ python project_management/experiments/system/run_matrix.py \
 ```
 
 Jobs are serialized per physical GPU. Use `--only run_id_a,run_id_b` to rerun
-a selected subset without editing the frozen matrix.
+a selected subset without editing the frozen matrix. Use `--skip-completed` to
+resume a matrix without overwriting completed evidence records.
 
 Use `--skip-entrypoint-check` only for inspecting commands on a machine where
 the training environment has intentionally not been installed.
@@ -62,6 +65,15 @@ dirty status, tracked-diff hash and status entries. The minimal recent-baseline
 extension is `baseline_etth1_96.json`: TimeEmb and TFPS on ETTh1/H96 with seeds
 2021/2022/2023, complementing the completed ETTm2/H96 gate.
 
+The paper-facing plug-in matrix is `plugin_baselines_h96_itransformer.json`
+(protocol v2): ACN and WDAN on all seven datasets at H96 and seeds
+2021/2022/2023. ACN uses the official H96 temperatures; Traffic temperature
+0.1 is frozen by `tune_acn_traffic_temperature.json`. WDAN uses the official
+dataset-specific H96 statistics-network settings; Traffic uses the ECL-style
+candidate frozen by `tune_wdan_traffic_config.json`. The earlier v1 launch
+records used generic defaults and are retained as discarded audit evidence,
+not paper results.
+
 ## Fairness boundary
 
 - Dataset split, features, lengths, horizon, seed set and metric definitions are
@@ -72,6 +84,8 @@ extension is `baseline_etth1_96.json`: TimeEmb and TFPS on ETTh1/H96 with seeds
 - Native training does not evaluate the test split during epoch selection.
   TimeEmb and TFPS now use recorded validation-only patches; test is evaluated
   once after the best validation checkpoint is restored.
+- ACN and WDAN tuning gates expose the same validation-only behavior. Their
+  final v2 matrix evaluates the test split once after the configuration is frozen.
 - Dry-run success is not experiment evidence.
 - The initial matrix is a representative gate, not the final 7 × 4 sweep.
 

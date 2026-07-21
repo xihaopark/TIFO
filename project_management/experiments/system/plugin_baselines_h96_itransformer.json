@@ -1,5 +1,5 @@
 {
-  "protocol_id": "kdd_resubmit_plugin_baselines_h96_v1",
+  "protocol_id": "kdd_resubmit_plugin_baselines_h96_v2",
   "defaults": {
     "python": "/mnt/data1/park/Time Series/Forecasting/TKDE/envs/fredformer-cu128/bin/python",
     "features": "M",
@@ -23,14 +23,15 @@
       "dec_in": 7,
       "c_out": 7,
       "seed": 2021,
-      "run_id": "plugin_h96_etth1_acn_s2021",
+      "run_id": "plugin_h96_etth1_acn_t0p5_s2021",
       "engine": "acn",
       "model_args": {
         "d_model": 128,
         "d_ff": 128,
         "e_layers": 2,
         "n_heads": 8,
-        "factor": 3
+        "factor": 3,
+        "temperature": 0.5
       }
     },
     {
@@ -42,58 +43,7 @@
       "dec_in": 7,
       "c_out": 7,
       "seed": 2021,
-      "run_id": "plugin_h96_etth1_wdan_s2021",
-      "engine": "wdan",
-      "model_args": {
-        "d_model": 128,
-        "d_ff": 128,
-        "e_layers": 2,
-        "n_heads": 8,
-        "factor": 3,
-        "enc_in": 7,
-        "dec_in": 7,
-        "c_out": 7,
-        "stats_dwt_levels": 2,
-        "stats_window_len": 12,
-        "stats_d_model": 128,
-        "stats_d_ff": 128,
-        "stats_ffn_layers": 0,
-        "stats_dropout": 0.1,
-        "base_stats_lr": 0.0001,
-        "stats_strategy": "stats_bb_union",
-        "twice_epoch": 0,
-        "loss_type": "mse"
-      }
-    },
-    {
-      "dataset": "ETTh1",
-      "data_type": "ETTh1",
-      "root_path": "/home/park/TS/FredNormer/dataset/ETT-small",
-      "data_path": "ETTh1.csv",
-      "enc_in": 7,
-      "dec_in": 7,
-      "c_out": 7,
-      "seed": 2022,
-      "run_id": "plugin_h96_etth1_acn_s2022",
-      "engine": "acn",
-      "model_args": {
-        "d_model": 128,
-        "d_ff": 128,
-        "e_layers": 2,
-        "n_heads": 8,
-        "factor": 3
-      }
-    },
-    {
-      "dataset": "ETTh1",
-      "data_type": "ETTh1",
-      "root_path": "/home/park/TS/FredNormer/dataset/ETT-small",
-      "data_path": "ETTh1.csv",
-      "enc_in": 7,
-      "dec_in": 7,
-      "c_out": 7,
-      "seed": 2022,
-      "run_id": "plugin_h96_etth1_wdan_s2022",
+      "run_id": "plugin_h96_etth1_wdan_officialh96_s2021",
       "engine": "wdan",
       "model_args": {
         "d_model": 128,
@@ -124,15 +74,48 @@
       "enc_in": 7,
       "dec_in": 7,
       "c_out": 7,
-      "seed": 2023,
-      "run_id": "plugin_h96_etth1_acn_s2023",
+      "seed": 2022,
+      "run_id": "plugin_h96_etth1_acn_t0p5_s2022",
       "engine": "acn",
       "model_args": {
         "d_model": 128,
         "d_ff": 128,
         "e_layers": 2,
         "n_heads": 8,
-        "factor": 3
+        "factor": 3,
+        "temperature": 0.5
+      }
+    },
+    {
+      "dataset": "ETTh1",
+      "data_type": "ETTh1",
+      "root_path": "/home/park/TS/FredNormer/dataset/ETT-small",
+      "data_path": "ETTh1.csv",
+      "enc_in": 7,
+      "dec_in": 7,
+      "c_out": 7,
+      "seed": 2022,
+      "run_id": "plugin_h96_etth1_wdan_officialh96_s2022",
+      "engine": "wdan",
+      "model_args": {
+        "d_model": 128,
+        "d_ff": 128,
+        "e_layers": 2,
+        "n_heads": 8,
+        "factor": 3,
+        "enc_in": 7,
+        "dec_in": 7,
+        "c_out": 7,
+        "stats_dwt_levels": 2,
+        "stats_window_len": 12,
+        "stats_d_model": 128,
+        "stats_d_ff": 128,
+        "stats_ffn_layers": 0,
+        "stats_dropout": 0.1,
+        "base_stats_lr": 0.0001,
+        "stats_strategy": "stats_bb_union",
+        "twice_epoch": 0,
+        "loss_type": "mse"
       }
     },
     {
@@ -144,7 +127,27 @@
       "dec_in": 7,
       "c_out": 7,
       "seed": 2023,
-      "run_id": "plugin_h96_etth1_wdan_s2023",
+      "run_id": "plugin_h96_etth1_acn_t0p5_s2023",
+      "engine": "acn",
+      "model_args": {
+        "d_model": 128,
+        "d_ff": 128,
+        "e_layers": 2,
+        "n_heads": 8,
+        "factor": 3,
+        "temperature": 0.5
+      }
+    },
+    {
+      "dataset": "ETTh1",
+      "data_type": "ETTh1",
+      "root_path": "/home/park/TS/FredNormer/dataset/ETT-small",
+      "data_path": "ETTh1.csv",
+      "enc_in": 7,
+      "dec_in": 7,
+      "c_out": 7,
+      "seed": 2023,
+      "run_id": "plugin_h96_etth1_wdan_officialh96_s2023",
       "engine": "wdan",
       "model_args": {
         "d_model": 128,
@@ -176,14 +179,15 @@
       "dec_in": 7,
       "c_out": 7,
       "seed": 2021,
-      "run_id": "plugin_h96_etth2_acn_s2021",
+      "run_id": "plugin_h96_etth2_acn_t0p05_s2021",
       "engine": "acn",
       "model_args": {
         "d_model": 128,
         "d_ff": 128,
         "e_layers": 2,
         "n_heads": 8,
-        "factor": 3
+        "factor": 3,
+        "temperature": 0.05
       }
     },
     {
@@ -195,7 +199,7 @@
       "dec_in": 7,
       "c_out": 7,
       "seed": 2021,
-      "run_id": "plugin_h96_etth2_wdan_s2021",
+      "run_id": "plugin_h96_etth2_wdan_officialh96_s2021",
       "engine": "wdan",
       "model_args": {
         "d_model": 128,
@@ -207,7 +211,7 @@
         "dec_in": 7,
         "c_out": 7,
         "stats_dwt_levels": 2,
-        "stats_window_len": 12,
+        "stats_window_len": 5,
         "stats_d_model": 128,
         "stats_d_ff": 128,
         "stats_ffn_layers": 0,
@@ -227,14 +231,15 @@
       "dec_in": 7,
       "c_out": 7,
       "seed": 2022,
-      "run_id": "plugin_h96_etth2_acn_s2022",
+      "run_id": "plugin_h96_etth2_acn_t0p05_s2022",
       "engine": "acn",
       "model_args": {
         "d_model": 128,
         "d_ff": 128,
         "e_layers": 2,
         "n_heads": 8,
-        "factor": 3
+        "factor": 3,
+        "temperature": 0.05
       }
     },
     {
@@ -246,7 +251,7 @@
       "dec_in": 7,
       "c_out": 7,
       "seed": 2022,
-      "run_id": "plugin_h96_etth2_wdan_s2022",
+      "run_id": "plugin_h96_etth2_wdan_officialh96_s2022",
       "engine": "wdan",
       "model_args": {
         "d_model": 128,
@@ -258,7 +263,7 @@
         "dec_in": 7,
         "c_out": 7,
         "stats_dwt_levels": 2,
-        "stats_window_len": 12,
+        "stats_window_len": 5,
         "stats_d_model": 128,
         "stats_d_ff": 128,
         "stats_ffn_layers": 0,
@@ -278,14 +283,15 @@
       "dec_in": 7,
       "c_out": 7,
       "seed": 2023,
-      "run_id": "plugin_h96_etth2_acn_s2023",
+      "run_id": "plugin_h96_etth2_acn_t0p05_s2023",
       "engine": "acn",
       "model_args": {
         "d_model": 128,
         "d_ff": 128,
         "e_layers": 2,
         "n_heads": 8,
-        "factor": 3
+        "factor": 3,
+        "temperature": 0.05
       }
     },
     {
@@ -297,7 +303,7 @@
       "dec_in": 7,
       "c_out": 7,
       "seed": 2023,
-      "run_id": "plugin_h96_etth2_wdan_s2023",
+      "run_id": "plugin_h96_etth2_wdan_officialh96_s2023",
       "engine": "wdan",
       "model_args": {
         "d_model": 128,
@@ -309,7 +315,7 @@
         "dec_in": 7,
         "c_out": 7,
         "stats_dwt_levels": 2,
-        "stats_window_len": 12,
+        "stats_window_len": 5,
         "stats_d_model": 128,
         "stats_d_ff": 128,
         "stats_ffn_layers": 0,
@@ -329,14 +335,15 @@
       "dec_in": 7,
       "c_out": 7,
       "seed": 2021,
-      "run_id": "plugin_h96_ettm1_acn_s2021",
+      "run_id": "plugin_h96_ettm1_acn_t0p1_s2021",
       "engine": "acn",
       "model_args": {
         "d_model": 128,
         "d_ff": 128,
         "e_layers": 2,
         "n_heads": 8,
-        "factor": 3
+        "factor": 3,
+        "temperature": 0.1
       }
     },
     {
@@ -348,7 +355,7 @@
       "dec_in": 7,
       "c_out": 7,
       "seed": 2021,
-      "run_id": "plugin_h96_ettm1_wdan_s2021",
+      "run_id": "plugin_h96_ettm1_wdan_officialh96_s2021",
       "engine": "wdan",
       "model_args": {
         "d_model": 128,
@@ -359,15 +366,15 @@
         "enc_in": 7,
         "dec_in": 7,
         "c_out": 7,
-        "stats_dwt_levels": 2,
-        "stats_window_len": 12,
+        "stats_dwt_levels": 3,
+        "stats_window_len": 5,
         "stats_d_model": 128,
         "stats_d_ff": 128,
-        "stats_ffn_layers": 0,
+        "stats_ffn_layers": 2,
         "stats_dropout": 0.1,
-        "base_stats_lr": 0.0001,
+        "base_stats_lr": 0.001,
         "stats_strategy": "stats_bb_union",
-        "twice_epoch": 0,
+        "twice_epoch": 1,
         "loss_type": "mse"
       }
     },
@@ -380,14 +387,15 @@
       "dec_in": 7,
       "c_out": 7,
       "seed": 2022,
-      "run_id": "plugin_h96_ettm1_acn_s2022",
+      "run_id": "plugin_h96_ettm1_acn_t0p1_s2022",
       "engine": "acn",
       "model_args": {
         "d_model": 128,
         "d_ff": 128,
         "e_layers": 2,
         "n_heads": 8,
-        "factor": 3
+        "factor": 3,
+        "temperature": 0.1
       }
     },
     {
@@ -399,7 +407,7 @@
       "dec_in": 7,
       "c_out": 7,
       "seed": 2022,
-      "run_id": "plugin_h96_ettm1_wdan_s2022",
+      "run_id": "plugin_h96_ettm1_wdan_officialh96_s2022",
       "engine": "wdan",
       "model_args": {
         "d_model": 128,
@@ -410,15 +418,15 @@
         "enc_in": 7,
         "dec_in": 7,
         "c_out": 7,
-        "stats_dwt_levels": 2,
-        "stats_window_len": 12,
+        "stats_dwt_levels": 3,
+        "stats_window_len": 5,
         "stats_d_model": 128,
         "stats_d_ff": 128,
-        "stats_ffn_layers": 0,
+        "stats_ffn_layers": 2,
         "stats_dropout": 0.1,
-        "base_stats_lr": 0.0001,
+        "base_stats_lr": 0.001,
         "stats_strategy": "stats_bb_union",
-        "twice_epoch": 0,
+        "twice_epoch": 1,
         "loss_type": "mse"
       }
     },
@@ -431,14 +439,15 @@
       "dec_in": 7,
       "c_out": 7,
       "seed": 2023,
-      "run_id": "plugin_h96_ettm1_acn_s2023",
+      "run_id": "plugin_h96_ettm1_acn_t0p1_s2023",
       "engine": "acn",
       "model_args": {
         "d_model": 128,
         "d_ff": 128,
         "e_layers": 2,
         "n_heads": 8,
-        "factor": 3
+        "factor": 3,
+        "temperature": 0.1
       }
     },
     {
@@ -450,7 +459,7 @@
       "dec_in": 7,
       "c_out": 7,
       "seed": 2023,
-      "run_id": "plugin_h96_ettm1_wdan_s2023",
+      "run_id": "plugin_h96_ettm1_wdan_officialh96_s2023",
       "engine": "wdan",
       "model_args": {
         "d_model": 128,
@@ -461,15 +470,15 @@
         "enc_in": 7,
         "dec_in": 7,
         "c_out": 7,
-        "stats_dwt_levels": 2,
-        "stats_window_len": 12,
+        "stats_dwt_levels": 3,
+        "stats_window_len": 5,
         "stats_d_model": 128,
         "stats_d_ff": 128,
-        "stats_ffn_layers": 0,
+        "stats_ffn_layers": 2,
         "stats_dropout": 0.1,
-        "base_stats_lr": 0.0001,
+        "base_stats_lr": 0.001,
         "stats_strategy": "stats_bb_union",
-        "twice_epoch": 0,
+        "twice_epoch": 1,
         "loss_type": "mse"
       }
     },
@@ -484,14 +493,15 @@
       "batch_size": 16,
       "learning_rate": 0.0005,
       "seed": 2021,
-      "run_id": "plugin_h96_electricity_acn_s2021",
+      "run_id": "plugin_h96_electricity_acn_t0p05_s2021",
       "engine": "acn",
       "model_args": {
         "d_model": 512,
         "d_ff": 512,
         "e_layers": 3,
         "n_heads": 8,
-        "factor": 3
+        "factor": 3,
+        "temperature": 0.05
       }
     },
     {
@@ -505,7 +515,7 @@
       "batch_size": 16,
       "learning_rate": 0.0005,
       "seed": 2021,
-      "run_id": "plugin_h96_electricity_wdan_s2021",
+      "run_id": "plugin_h96_electricity_wdan_officialh96_s2021",
       "engine": "wdan",
       "model_args": {
         "d_model": 512,
@@ -516,15 +526,15 @@
         "enc_in": 321,
         "dec_in": 321,
         "c_out": 321,
-        "stats_dwt_levels": 2,
+        "stats_dwt_levels": 3,
         "stats_window_len": 12,
-        "stats_d_model": 128,
-        "stats_d_ff": 128,
-        "stats_ffn_layers": 0,
+        "stats_d_model": 512,
+        "stats_d_ff": 512,
+        "stats_ffn_layers": 1,
         "stats_dropout": 0.1,
-        "base_stats_lr": 0.0001,
+        "base_stats_lr": 0.001,
         "stats_strategy": "stats_bb_union",
-        "twice_epoch": 0,
+        "twice_epoch": 2,
         "loss_type": "mse"
       }
     },
@@ -539,14 +549,15 @@
       "batch_size": 16,
       "learning_rate": 0.0005,
       "seed": 2022,
-      "run_id": "plugin_h96_electricity_acn_s2022",
+      "run_id": "plugin_h96_electricity_acn_t0p05_s2022",
       "engine": "acn",
       "model_args": {
         "d_model": 512,
         "d_ff": 512,
         "e_layers": 3,
         "n_heads": 8,
-        "factor": 3
+        "factor": 3,
+        "temperature": 0.05
       }
     },
     {
@@ -560,7 +571,7 @@
       "batch_size": 16,
       "learning_rate": 0.0005,
       "seed": 2022,
-      "run_id": "plugin_h96_electricity_wdan_s2022",
+      "run_id": "plugin_h96_electricity_wdan_officialh96_s2022",
       "engine": "wdan",
       "model_args": {
         "d_model": 512,
@@ -571,15 +582,15 @@
         "enc_in": 321,
         "dec_in": 321,
         "c_out": 321,
-        "stats_dwt_levels": 2,
+        "stats_dwt_levels": 3,
         "stats_window_len": 12,
-        "stats_d_model": 128,
-        "stats_d_ff": 128,
-        "stats_ffn_layers": 0,
+        "stats_d_model": 512,
+        "stats_d_ff": 512,
+        "stats_ffn_layers": 1,
         "stats_dropout": 0.1,
-        "base_stats_lr": 0.0001,
+        "base_stats_lr": 0.001,
         "stats_strategy": "stats_bb_union",
-        "twice_epoch": 0,
+        "twice_epoch": 2,
         "loss_type": "mse"
       }
     },
@@ -594,14 +605,15 @@
       "batch_size": 16,
       "learning_rate": 0.0005,
       "seed": 2023,
-      "run_id": "plugin_h96_electricity_acn_s2023",
+      "run_id": "plugin_h96_electricity_acn_t0p05_s2023",
       "engine": "acn",
       "model_args": {
         "d_model": 512,
         "d_ff": 512,
         "e_layers": 3,
         "n_heads": 8,
-        "factor": 3
+        "factor": 3,
+        "temperature": 0.05
       }
     },
     {
@@ -615,7 +627,7 @@
       "batch_size": 16,
       "learning_rate": 0.0005,
       "seed": 2023,
-      "run_id": "plugin_h96_electricity_wdan_s2023",
+      "run_id": "plugin_h96_electricity_wdan_officialh96_s2023",
       "engine": "wdan",
       "model_args": {
         "d_model": 512,
@@ -626,15 +638,15 @@
         "enc_in": 321,
         "dec_in": 321,
         "c_out": 321,
-        "stats_dwt_levels": 2,
+        "stats_dwt_levels": 3,
         "stats_window_len": 12,
-        "stats_d_model": 128,
-        "stats_d_ff": 128,
-        "stats_ffn_layers": 0,
+        "stats_d_model": 512,
+        "stats_d_ff": 512,
+        "stats_ffn_layers": 1,
         "stats_dropout": 0.1,
-        "base_stats_lr": 0.0001,
+        "base_stats_lr": 0.001,
         "stats_strategy": "stats_bb_union",
-        "twice_epoch": 0,
+        "twice_epoch": 2,
         "loss_type": "mse"
       }
     },
@@ -649,14 +661,15 @@
       "batch_size": 16,
       "learning_rate": 0.001,
       "seed": 2021,
-      "run_id": "plugin_h96_traffic_acn_s2021",
+      "run_id": "plugin_h96_traffic_acn_t0p1_s2021",
       "engine": "acn",
       "model_args": {
         "d_model": 512,
         "d_ff": 512,
         "e_layers": 4,
         "n_heads": 8,
-        "factor": 3
+        "factor": 3,
+        "temperature": 0.1
       }
     },
     {
@@ -670,7 +683,7 @@
       "batch_size": 16,
       "learning_rate": 0.001,
       "seed": 2021,
-      "run_id": "plugin_h96_traffic_wdan_s2021",
+      "run_id": "plugin_h96_traffic_wdan_officialh96_s2021",
       "engine": "wdan",
       "model_args": {
         "d_model": 512,
@@ -681,15 +694,15 @@
         "enc_in": 862,
         "dec_in": 862,
         "c_out": 862,
-        "stats_dwt_levels": 2,
+        "stats_dwt_levels": 3,
         "stats_window_len": 12,
-        "stats_d_model": 128,
-        "stats_d_ff": 128,
-        "stats_ffn_layers": 0,
+        "stats_d_model": 512,
+        "stats_d_ff": 512,
+        "stats_ffn_layers": 1,
         "stats_dropout": 0.1,
-        "base_stats_lr": 0.0001,
+        "base_stats_lr": 0.001,
         "stats_strategy": "stats_bb_union",
-        "twice_epoch": 0,
+        "twice_epoch": 2,
         "loss_type": "mse"
       }
     },
@@ -704,14 +717,15 @@
       "batch_size": 16,
       "learning_rate": 0.001,
       "seed": 2022,
-      "run_id": "plugin_h96_traffic_acn_s2022",
+      "run_id": "plugin_h96_traffic_acn_t0p1_s2022",
       "engine": "acn",
       "model_args": {
         "d_model": 512,
         "d_ff": 512,
         "e_layers": 4,
         "n_heads": 8,
-        "factor": 3
+        "factor": 3,
+        "temperature": 0.1
       }
     },
     {
@@ -725,7 +739,7 @@
       "batch_size": 16,
       "learning_rate": 0.001,
       "seed": 2022,
-      "run_id": "plugin_h96_traffic_wdan_s2022",
+      "run_id": "plugin_h96_traffic_wdan_officialh96_s2022",
       "engine": "wdan",
       "model_args": {
         "d_model": 512,
@@ -736,15 +750,15 @@
         "enc_in": 862,
         "dec_in": 862,
         "c_out": 862,
-        "stats_dwt_levels": 2,
+        "stats_dwt_levels": 3,
         "stats_window_len": 12,
-        "stats_d_model": 128,
-        "stats_d_ff": 128,
-        "stats_ffn_layers": 0,
+        "stats_d_model": 512,
+        "stats_d_ff": 512,
+        "stats_ffn_layers": 1,
         "stats_dropout": 0.1,
-        "base_stats_lr": 0.0001,
+        "base_stats_lr": 0.001,
         "stats_strategy": "stats_bb_union",
-        "twice_epoch": 0,
+        "twice_epoch": 2,
         "loss_type": "mse"
       }
     },
@@ -759,14 +773,15 @@
       "batch_size": 16,
       "learning_rate": 0.001,
       "seed": 2023,
-      "run_id": "plugin_h96_traffic_acn_s2023",
+      "run_id": "plugin_h96_traffic_acn_t0p1_s2023",
       "engine": "acn",
       "model_args": {
         "d_model": 512,
         "d_ff": 512,
         "e_layers": 4,
         "n_heads": 8,
-        "factor": 3
+        "factor": 3,
+        "temperature": 0.1
       }
     },
     {
@@ -780,7 +795,7 @@
       "batch_size": 16,
       "learning_rate": 0.001,
       "seed": 2023,
-      "run_id": "plugin_h96_traffic_wdan_s2023",
+      "run_id": "plugin_h96_traffic_wdan_officialh96_s2023",
       "engine": "wdan",
       "model_args": {
         "d_model": 512,
@@ -791,15 +806,15 @@
         "enc_in": 862,
         "dec_in": 862,
         "c_out": 862,
-        "stats_dwt_levels": 2,
+        "stats_dwt_levels": 3,
         "stats_window_len": 12,
-        "stats_d_model": 128,
-        "stats_d_ff": 128,
-        "stats_ffn_layers": 0,
+        "stats_d_model": 512,
+        "stats_d_ff": 512,
+        "stats_ffn_layers": 1,
         "stats_dropout": 0.1,
-        "base_stats_lr": 0.0001,
+        "base_stats_lr": 0.001,
         "stats_strategy": "stats_bb_union",
-        "twice_epoch": 0,
+        "twice_epoch": 2,
         "loss_type": "mse"
       }
     },
@@ -812,14 +827,15 @@
       "dec_in": 21,
       "c_out": 21,
       "seed": 2021,
-      "run_id": "plugin_h96_weather_acn_s2021",
+      "run_id": "plugin_h96_weather_acn_t0p05_s2021",
       "engine": "acn",
       "model_args": {
         "d_model": 512,
         "d_ff": 512,
         "e_layers": 3,
         "n_heads": 8,
-        "factor": 3
+        "factor": 3,
+        "temperature": 0.05
       }
     },
     {
@@ -831,7 +847,7 @@
       "dec_in": 21,
       "c_out": 21,
       "seed": 2021,
-      "run_id": "plugin_h96_weather_wdan_s2021",
+      "run_id": "plugin_h96_weather_wdan_officialh96_s2021",
       "engine": "wdan",
       "model_args": {
         "d_model": 512,
@@ -843,14 +859,14 @@
         "dec_in": 21,
         "c_out": 21,
         "stats_dwt_levels": 2,
-        "stats_window_len": 12,
-        "stats_d_model": 128,
-        "stats_d_ff": 128,
-        "stats_ffn_layers": 0,
+        "stats_window_len": 5,
+        "stats_d_model": 512,
+        "stats_d_ff": 512,
+        "stats_ffn_layers": 2,
         "stats_dropout": 0.1,
         "base_stats_lr": 0.0001,
         "stats_strategy": "stats_bb_union",
-        "twice_epoch": 0,
+        "twice_epoch": 1,
         "loss_type": "mse"
       }
     },
@@ -863,14 +879,15 @@
       "dec_in": 21,
       "c_out": 21,
       "seed": 2022,
-      "run_id": "plugin_h96_weather_acn_s2022",
+      "run_id": "plugin_h96_weather_acn_t0p05_s2022",
       "engine": "acn",
       "model_args": {
         "d_model": 512,
         "d_ff": 512,
         "e_layers": 3,
         "n_heads": 8,
-        "factor": 3
+        "factor": 3,
+        "temperature": 0.05
       }
     },
     {
@@ -882,7 +899,7 @@
       "dec_in": 21,
       "c_out": 21,
       "seed": 2022,
-      "run_id": "plugin_h96_weather_wdan_s2022",
+      "run_id": "plugin_h96_weather_wdan_officialh96_s2022",
       "engine": "wdan",
       "model_args": {
         "d_model": 512,
@@ -894,14 +911,14 @@
         "dec_in": 21,
         "c_out": 21,
         "stats_dwt_levels": 2,
-        "stats_window_len": 12,
-        "stats_d_model": 128,
-        "stats_d_ff": 128,
-        "stats_ffn_layers": 0,
+        "stats_window_len": 5,
+        "stats_d_model": 512,
+        "stats_d_ff": 512,
+        "stats_ffn_layers": 2,
         "stats_dropout": 0.1,
         "base_stats_lr": 0.0001,
         "stats_strategy": "stats_bb_union",
-        "twice_epoch": 0,
+        "twice_epoch": 1,
         "loss_type": "mse"
       }
     },
@@ -914,14 +931,15 @@
       "dec_in": 21,
       "c_out": 21,
       "seed": 2023,
-      "run_id": "plugin_h96_weather_acn_s2023",
+      "run_id": "plugin_h96_weather_acn_t0p05_s2023",
       "engine": "acn",
       "model_args": {
         "d_model": 512,
         "d_ff": 512,
         "e_layers": 3,
         "n_heads": 8,
-        "factor": 3
+        "factor": 3,
+        "temperature": 0.05
       }
     },
     {
@@ -933,7 +951,7 @@
       "dec_in": 21,
       "c_out": 21,
       "seed": 2023,
-      "run_id": "plugin_h96_weather_wdan_s2023",
+      "run_id": "plugin_h96_weather_wdan_officialh96_s2023",
       "engine": "wdan",
       "model_args": {
         "d_model": 512,
@@ -945,14 +963,14 @@
         "dec_in": 21,
         "c_out": 21,
         "stats_dwt_levels": 2,
-        "stats_window_len": 12,
-        "stats_d_model": 128,
-        "stats_d_ff": 128,
-        "stats_ffn_layers": 0,
+        "stats_window_len": 5,
+        "stats_d_model": 512,
+        "stats_d_ff": 512,
+        "stats_ffn_layers": 2,
         "stats_dropout": 0.1,
         "base_stats_lr": 0.0001,
         "stats_strategy": "stats_bb_union",
-        "twice_epoch": 0,
+        "twice_epoch": 1,
         "loss_type": "mse"
       }
     },
@@ -976,14 +994,15 @@
       "num_workers": 0,
       "gpu": 0,
       "seed": 2021,
-      "run_id": "plugin_h96_ettm2_acn_s2021",
+      "run_id": "plugin_h96_ettm2_acn_t0p05_s2021",
       "engine": "acn",
       "model_args": {
         "d_model": 128,
         "d_ff": 128,
         "e_layers": 2,
         "n_heads": 8,
-        "factor": 3
+        "factor": 3,
+        "temperature": 0.05
       }
     },
     {
@@ -1006,7 +1025,7 @@
       "num_workers": 0,
       "gpu": 0,
       "seed": 2021,
-      "run_id": "plugin_h96_ettm2_wdan_s2021",
+      "run_id": "plugin_h96_ettm2_wdan_officialh96_s2021",
       "engine": "wdan",
       "model_args": {
         "d_model": 128,
@@ -1023,9 +1042,9 @@
         "stats_d_ff": 128,
         "stats_ffn_layers": 0,
         "stats_dropout": 0.1,
-        "base_stats_lr": 0.0001,
+        "base_stats_lr": 0.001,
         "stats_strategy": "stats_bb_union",
-        "twice_epoch": 0,
+        "twice_epoch": 2,
         "loss_type": "mse"
       }
     },
@@ -1049,14 +1068,15 @@
       "num_workers": 0,
       "gpu": 0,
       "seed": 2022,
-      "run_id": "plugin_h96_ettm2_acn_s2022",
+      "run_id": "plugin_h96_ettm2_acn_t0p05_s2022",
       "engine": "acn",
       "model_args": {
         "d_model": 128,
         "d_ff": 128,
         "e_layers": 2,
         "n_heads": 8,
-        "factor": 3
+        "factor": 3,
+        "temperature": 0.05
       }
     },
     {
@@ -1079,7 +1099,7 @@
       "num_workers": 0,
       "gpu": 0,
       "seed": 2022,
-      "run_id": "plugin_h96_ettm2_wdan_s2022",
+      "run_id": "plugin_h96_ettm2_wdan_officialh96_s2022",
       "engine": "wdan",
       "model_args": {
         "d_model": 128,
@@ -1096,9 +1116,9 @@
         "stats_d_ff": 128,
         "stats_ffn_layers": 0,
         "stats_dropout": 0.1,
-        "base_stats_lr": 0.0001,
+        "base_stats_lr": 0.001,
         "stats_strategy": "stats_bb_union",
-        "twice_epoch": 0,
+        "twice_epoch": 2,
         "loss_type": "mse"
       }
     },
@@ -1122,14 +1142,15 @@
       "num_workers": 0,
       "gpu": 0,
       "seed": 2023,
-      "run_id": "plugin_h96_ettm2_acn_s2023",
+      "run_id": "plugin_h96_ettm2_acn_t0p05_s2023",
       "engine": "acn",
       "model_args": {
         "d_model": 128,
         "d_ff": 128,
         "e_layers": 2,
         "n_heads": 8,
-        "factor": 3
+        "factor": 3,
+        "temperature": 0.05
       }
     },
     {
@@ -1152,7 +1173,7 @@
       "num_workers": 0,
       "gpu": 0,
       "seed": 2023,
-      "run_id": "plugin_h96_ettm2_wdan_s2023",
+      "run_id": "plugin_h96_ettm2_wdan_officialh96_s2023",
       "engine": "wdan",
       "model_args": {
         "d_model": 128,
@@ -1169,9 +1190,9 @@
         "stats_d_ff": 128,
         "stats_ffn_layers": 0,
         "stats_dropout": 0.1,
-        "base_stats_lr": 0.0001,
+        "base_stats_lr": 0.001,
         "stats_strategy": "stats_bb_union",
-        "twice_epoch": 0,
+        "twice_epoch": 2,
         "loss_type": "mse"
       }
     }
