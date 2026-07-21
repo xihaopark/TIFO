@@ -13,6 +13,8 @@ exact checkouts. Do not cite or import results merely because code is present.
 | `third_party/PIR-official` | <https://github.com/icantnamemyself/PIR> | `fc372bb02090da887d4a20b614a6cfecbfd813d0` | MIT | NeurIPS 2025 post-hoc robustness backup | source_only |
 | `third_party/TimeEmb-official` | <https://github.com/showmeon/TimeEmb> | `9adf3fba801b34642e7191b45e08aff224b26e67` | no license file found | Selected NeurIPS 2025 recent non-stationary forecasting baseline | smoke_tested; license_review_required |
 | `third_party/TFPS-official` | <https://github.com/syrGitHub/TFPS> | `83a11827e27e6617e8c8a8771f0a1dd7e10976a5` | no license file found | Selected NeurIPS 2025 patch-level distribution-shift baseline | smoke_tested; license_review_required |
+| `third_party/CN-official` | <https://github.com/seunghan96/CN> | `2d6ce2f2c771fec5296870416844d995c23e31a2` | no license file found | ICML 2025 Channel Normalization / ACN plug-in baseline | source_only; license_review_required |
+| `third_party/WDAN-official` | <https://github.com/MonBG/WDAN> | `f01994ada4980729eb6af14c35778f480f9c0c47` | no license file found | 2025 wavelet-based normalization plug-in baseline | source_only; license_review_required |
 
 ## Use policy
 
@@ -32,6 +34,9 @@ exact checkouts. Do not cite or import results merely because code is present.
 - TimeEmb and TFPS do not currently contain a repository license file. They may
   be executed as pinned upstream checkouts for research comparison, but their
   source must not be copied into this repository without permission review.
+- CN and WDAN also lack repository license files at the pinned revisions. Keep
+  their source as ignored, pinned upstream checkouts and implement any required
+  fairness changes as separately recorded patches rather than copied modules.
 
 ## Integration states
 

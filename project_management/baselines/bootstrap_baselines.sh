@@ -21,6 +21,18 @@ checkout_repo() {
   printf '%s\t%s\n' "${name}" "${revision}"
 }
 
+apply_recorded_patch() {
+  local name="$1"
+  local patch_path="$2"
+  local target="${third_party}/${name}"
+  if git -C "${target}" apply --reverse --check --ignore-space-change --ignore-whitespace "${patch_path}" >/dev/null 2>&1; then
+    printf '%s\t%s\n' "${name}" "patch_already_applied"
+    return
+  fi
+  git -C "${target}" apply --ignore-space-change --ignore-whitespace "${patch_path}"
+  printf '%s\t%s\n' "${name}" "patch_applied"
+}
+
 checkout_repo \
   "Time-Series-Library" \
   "https://github.com/thuml/Time-Series-Library.git" \
@@ -55,3 +67,26 @@ checkout_repo \
   "TFPS-official" \
   "https://github.com/syrGitHub/TFPS.git" \
   "83a11827e27e6617e8c8a8771f0a1dd7e10976a5"
+
+checkout_repo \
+  "CN-official" \
+  "https://github.com/seunghan96/CN.git" \
+  "2d6ce2f2c771fec5296870416844d995c23e31a2"
+
+checkout_repo \
+  "WDAN-official" \
+  "https://github.com/MonBG/WDAN.git" \
+  "f01994ada4980729eb6af14c35778f480f9c0c47"
+
+apply_recorded_patch \
+  "TimeEmb-official/TimeEmb-main" \
+  "${repo_root}/project_management/experiments/system/baseline_patches/timeemb-validation-only.patch"
+apply_recorded_patch \
+  "TFPS-official" \
+  "${repo_root}/project_management/experiments/system/baseline_patches/tfps-validation-only.patch"
+apply_recorded_patch \
+  "CN-official" \
+  "${repo_root}/project_management/experiments/system/baseline_patches/cn-validation-seeds.patch"
+apply_recorded_patch \
+  "WDAN-official" \
+  "${repo_root}/project_management/experiments/system/baseline_patches/wdan-matched-runner.patch"

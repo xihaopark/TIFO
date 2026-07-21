@@ -1,0 +1,104 @@
+diff --git a/exp/exp_basic.py b/exp/exp_basic.py
+index 5dcfc0c..e1d8986 100644
+--- a/exp/exp_basic.py
++++ b/exp/exp_basic.py
+@@ -3,7 +3,6 @@ import torch
+ from models import iTransformer, iTransformer_CN, iTransformer_ACN
+ from models import RMLP, RMLP_CN, RMLP_ACN
+ from models import TSMixer, TSMixer_CN, TSMixer_ACN
+-from models import S_Mamba, S_Mamba_CN, S_Mamba_ACN
+ 
+ 
+ class Exp_Basic(object):
+@@ -19,9 +18,6 @@ class Exp_Basic(object):
+             'TSMixer': TSMixer,
+             'TSMixer_CN': TSMixer_CN,
+             'TSMixer_ACN': TSMixer_ACN,
+-            'S_Mamba': S_Mamba,
+-            'S_Mamba_CN': S_Mamba_CN,
+-            'S_Mamba_ACN': S_Mamba_ACN,
+         }
+         self.device = self._acquire_device()
+         self.model = self._build_model().to(self.device)
+diff --git a/exp/exp_long_term_forecasting.py b/exp/exp_long_term_forecasting.py
+index 49bea55..540700c 100644
+--- a/exp/exp_long_term_forecasting.py
++++ b/exp/exp_long_term_forecasting.py
+@@ -85,7 +85,6 @@ class Exp_Long_Term_Forecast(Exp_Basic):
+             
+         train_data, train_loader = self._get_data(flag='train')
+         vali_data, vali_loader = self._get_data(flag='val')
+-        test_data, test_loader = self._get_data(flag='test')
+ 
+         path = os.path.join(self.args.checkpoints, setting)
+         if not os.path.exists(path):
+@@ -165,10 +164,8 @@ class Exp_Long_Term_Forecast(Exp_Basic):
+             print("Epoch: {} cost time: {}".format(epoch + 1, time.time() - epoch_time))
+             train_loss = np.average(train_loss)
+             vali_loss = self.vali(vali_data, vali_loader, criterion)
+-            test_loss = self.vali(test_data, test_loader, criterion)
+-
+-            print("Epoch: {0}, Steps: {1} | Train Loss: {2:.7f} Vali Loss: {3:.7f} Test Loss: {4:.7f}".format(
+-                epoch + 1, train_steps, train_loss, vali_loss, test_loss))
++            print("Epoch: {0}, Steps: {1} | Train Loss: {2:.7f} Vali Loss: {3:.7f}".format(
++                epoch + 1, train_steps, train_loss, vali_loss))
+             early_stopping(vali_loss, self.model, path)
+             if early_stopping.early_stop:
+                 print("Early stopping")
+diff --git a/run.py b/run.py
+index 4ef5b4a..c879949 100644
+--- a/run.py
++++ b/run.py
+@@ -5,11 +5,6 @@ import random
+ import numpy as np
+ 
+ if __name__ == '__main__':
+-    fix_seed = 2021
+-    random.seed(fix_seed)
+-    torch.manual_seed(fix_seed)
+-    np.random.seed(fix_seed)
+-
+     parser = argparse.ArgumentParser(description='TimesNet')
+ 
+     # basic config
+@@ -31,6 +26,7 @@ if __name__ == '__main__':
+                         help='freq for time features encoding, options:[s:secondly, t:minutely, h:hourly, d:daily, b:business days, w:weekly, m:monthly], you can also use more detailed freq like 15min or 3h')
+     parser.add_argument('--checkpoints', type=str, default='./checkpoints/', help='location of model checkpoints')
+-    parser.add_argument('--temperature', type=float, default=777, help='prior anomaly ratio (%)')
++    parser.add_argument('--temperature', type=float, default=777, help='adaptive channel-normalization temperature')
++    parser.add_argument('--random_seed', type=int, default=2021, help='random seed')
+ 
+     # forecasting task
+     parser.add_argument('--seq_len', type=int, default=96, help='input sequence length')
+@@ -41,4 +37,4 @@ if __name__ == '__main__':
+     # anomaly detection task
+-    parser.add_argument('--anomaly_ratio', type=float, default=0.25, help='prior anomaly ratio (%)')
++    parser.add_argument('--anomaly_ratio', type=float, default=0.25, help='prior anomaly ratio')
+ 
+     # model define
+@@ -93,6 +89,11 @@ if __name__ == '__main__':
+ 
+ 
+     args = parser.parse_args()
++    random.seed(args.random_seed)
++    torch.manual_seed(args.random_seed)
++    np.random.seed(args.random_seed)
++    if torch.cuda.is_available():
++        torch.cuda.manual_seed_all(args.random_seed)
+     args.use_gpu = True if torch.cuda.is_available() and args.use_gpu else False
+ 
+     if args.use_gpu and args.use_multi_gpu:
+diff --git a/utils/tools.py b/utils/tools.py
+index 329d83d..999c3a7 100644
+--- a/utils/tools.py
++++ b/utils/tools.py
+@@ -31,8 +31,8 @@ class EarlyStopping:
+         self.counter = 0
+         self.best_score = None
+         self.early_stop = False
+-        self.val_loss_min = np.Inf
++        self.val_loss_min = np.inf
+         self.delta = delta
+ 
+     def __call__(self, val_loss, model, path):
+         score = -val_loss

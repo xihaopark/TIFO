@@ -1,0 +1,42 @@
+diff --git a/nns/spv/base_mts_spv.py b/nns/spv/base_mts_spv.py
+index 59d066f..1a17408 100644
+--- a/nns/spv/base_mts_spv.py
++++ b/nns/spv/base_mts_spv.py
+@@ -209,7 +209,7 @@ class BaseMTSSupervisor(BaseSupervisor):
+             'smape_overall': smape_overall,
+             'r2_overall': r2_overall
+         }
+-        self.logger.info(f"Horizon Average: MSE {mse_overall:.3f}, MAE {mae_overall:.3f}, R2 {r2_overall:.3f}")
++        self.logger.info(f"Horizon Average: MSE {mse_overall:.8f}, MAE {mae_overall:.8f}, R2 {r2_overall:.8f}")
+         for hor in key_hor_list:
+             mae_hor, mse_hor, rmse_hor, smape_hor, r2_hor = metrics_np(preds[:, hor, :], labels[:, hor, :], mask_value)
+             loss_dict[f'hor_{hor + 1}'] = {
+diff --git a/utils/config_utils.py b/utils/config_utils.py
+index 3783227..74dd48f 100644
+--- a/utils/config_utils.py
++++ b/utils/config_utils.py
+@@ -43,6 +43,12 @@ data_path_config = {
+         'data_path': 'weather.csv',
+         'data': 'custom'
+     },
++    'Traffic': {
++        'root_path': '/traffic/',
++        'data_name': 'Traffic',
++        'data_path': 'traffic.csv',
++        'data': 'custom'
++    },
+ }
+ 
+ model_params = {
+diff --git a/utils/path_utils.py b/utils/path_utils.py
+index 20a305e..25f9743 100644
+--- a/utils/path_utils.py
++++ b/utils/path_utils.py
+@@ -9,6 +9,6 @@ def get_dir(machine='local'):
+         return {
+             'work_dir': './',
+-            'data_dir': './dataset',
++            'data_dir': os.environ.get('TIFO_DATA_ROOT', './dataset'),
+             'model_dir': './models'
+         }
+     else:

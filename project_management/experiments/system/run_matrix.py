@@ -31,6 +31,14 @@ ENGINE_SPECS = {
         REPO_ROOT / "third_party/TFPS-official",
         REPO_ROOT / "third_party/TFPS-official/run_longExp.py",
     ),
+    "acn": (
+        REPO_ROOT / "third_party/CN-official",
+        REPO_ROOT / "third_party/CN-official/run.py",
+    ),
+    "wdan": (
+        REPO_ROOT / "third_party/WDAN-official",
+        REPO_ROOT / "third_party/WDAN-official/run.py",
+    ),
 }
 
 COMMON_FLAGS = (
@@ -161,6 +169,30 @@ def validate(matrix: dict[str, Any]) -> list[dict[str, Any]]:
 def build_command(config: dict[str, Any], protocol_id: str) -> list[str]:
     engine = config["engine"]
     command = [config["python"], config["entrypoint"]]
+    if engine == "wdan":
+        dataset = "ECL" if config["dataset"] == "Electricity" else config["dataset"]
+        command.extend(("--model", "WDAN_iTransformer"))
+        command.extend(("--data", dataset, "--fix_seed", str(config["seed"])))
+        command.extend(("--gpu_id", "0", "--itr", "1"))
+        command.extend(("--machine", "local", "--server_name", "server25"))
+        command.extend(("--exp_id", config["run_id"], "--use_norm", "0"))
+        mapped = {
+            "seq_len": "seq_len",
+            "label_len": "label_len",
+            "pred_len": "pred_len",
+            "num_workers": "num_workers",
+            "batch_size": "batch_size",
+            "train_epochs": "epochs",
+            "patience": "early_stop",
+            "learning_rate": "base_lr",
+        }
+        for source, target in mapped.items():
+            append_flag(command, target, config.get(source))
+        for name, value in sorted(config["model_args"].items()):
+            if name != "model":
+                append_flag(command, name, value)
+        return command
+
     command.extend(("--is_training", "1", "--model_id", config["run_id"]))
     command.extend(("--data", str(config.get("data_type", config["dataset"]))))
     command.extend(("--random_seed", str(config["seed"]), "--itr", "1"))
@@ -170,11 +202,15 @@ def build_command(config: dict[str, Any], protocol_id: str) -> list[str]:
         command.extend(("--task_name", "long_term_forecast"))
         command.extend(("--model", str(config["backbone"])))
         command.extend(("--method", str(config["method"])))
-    else:
+    elif engine in {"timeemb", "tfps"}:
         default_model = "TimeEmb" if engine == "timeemb" else "PatchTST_MoE_cluster"
         command.extend(("--model", str(config["model_args"].get("model", default_model))))
+    elif engine == "acn":
+        command.extend(("--task_name", "long_term_forecast", "--model", "iTransformer_ACN"))
 
     for name in COMMON_FLAGS:
+        if engine == "acn" and name == "cpu_threads":
+            continue
         append_flag(command, name, config.get(name))
     for name, value in sorted(config["model_args"].items()):
         if name != "model":
@@ -282,6 +318,8 @@ def execute_run(
     environment["MKL_NUM_THREADS"] = cpu_threads
     environment["OPENBLAS_NUM_THREADS"] = cpu_threads
     environment["PYTHONUNBUFFERED"] = "1"
+    if config["engine"] == "wdan":
+        environment["TIFO_DATA_ROOT"] = str(REPO_ROOT / "dataset")
     log_path = run_dir / "run.log"
     with log_path.open("w", encoding="utf-8") as log_handle:
         completed = subprocess.run(
@@ -335,6 +373,11 @@ def main() -> int:
         action="store_true",
         help="skip the per-engine import/argument-parser preflight",
     )
+    parser.add_argument(
+        "--skip-completed",
+        action="store_true",
+        help="leave runs with a completed launch record untouched",
+    )
     args = parser.parse_args()
 
     matrix_path = args.matrix.resolve()
@@ -349,6 +392,23 @@ def main() -> int:
         resolved_runs = [config for config in resolved_runs if config["run_id"] in selected_ids]
         if not resolved_runs:
             raise ValueError("--only selected no runs")
+    if args.skip_completed:
+        pending_runs = []
+        skipped_ids = []
+        for config in resolved_runs:
+            record_path = REPO_ROOT / "experiment_records" / config["run_id"] / "launch.json"
+            if record_path.is_file():
+                record = json.loads(record_path.read_text(encoding="utf-8"))
+                if record.get("status") == "completed" and record.get("returncode") == 0:
+                    skipped_ids.append(config["run_id"])
+                    continue
+            pending_runs.append(config)
+        resolved_runs = pending_runs
+        if skipped_ids:
+            print(f"skipping {len(skipped_ids)} completed runs")
+        if not resolved_runs:
+            print("all selected runs are already complete")
+            return 0
     protocol_id = matrix["protocol_id"]
     if args.max_parallel < 1:
         raise ValueError("--max-parallel must be at least 1")

@@ -16,6 +16,9 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 METRIC_PATTERN = re.compile(
     r"mse:(?P<mse>[-+0-9.eE]+),\s*mae:(?P<mae>[-+0-9.eE]+)"
 )
+WDAN_METRIC_PATTERN = re.compile(
+    r"Horizon Average:\s*MSE\s*(?P<mse>[-+0-9.eE]+),\s*MAE\s*(?P<mae>[-+0-9.eE]+)"
+)
 EPOCH_PATTERN = re.compile(r"Epoch:\s*(?P<epoch>\d+),\s*Steps:")
 
 
@@ -41,7 +44,8 @@ def method_label(record: dict) -> str:
                 qualifiers.append(f"alpha={residual_alpha:g}")
             label += f"[{','.join(qualifiers)}]"
         return label
-    return "TimeEmb" if record["engine"] == "timeemb" else "TFPS"
+    labels = {"timeemb": "TimeEmb", "tfps": "TFPS", "acn": "ACN", "wdan": "WDAN"}
+    return labels[record["engine"]]
 
 
 def parse_record(record_path: Path) -> dict | None:
@@ -50,7 +54,8 @@ def parse_record(record_path: Path) -> dict | None:
         return None
     log_path = Path(record["log_file"])
     text = log_path.read_text(encoding="utf-8", errors="replace")
-    metrics = list(METRIC_PATTERN.finditer(text))
+    pattern = WDAN_METRIC_PATTERN if record["engine"] == "wdan" else METRIC_PATTERN
+    metrics = list(pattern.finditer(text))
     if not metrics:
         raise ValueError(f"completed run has no final metric: {record_path}")
     epochs = [int(match.group("epoch")) for match in EPOCH_PATTERN.finditer(text)]
