@@ -1594,7 +1594,7 @@ Dataset & \multicolumn{2}{c|}{+TIFO} & \multicolumn{2}{c}{Ori} \\
 
 \begin{table}[t]
 \centering
-\caption{\resubmitchange{Recent-baseline comparison on ETTm2 with $H=96$ over three seeds.}}
+\caption{\resubmitchange{Recent-baseline comparison on ETTh1 and ETTm2 with $H=96$ over three seeds.}}
 \label{table:recent_baselines}
 \resizebox{\columnwidth}{!}{\input{generated_tables/recent_baselines_ettm2_h96.tex}}
 \end{table}
@@ -1685,7 +1685,7 @@ Multivariate forecasting results (average) with forecasting lengths $ H \in \{96
 %Table \ref{table: 1st_results} presents the overall forecasting results using iTransformer and PatchTST as the backbone across seven datasets. 
 \resubmitchange{For PatchTST, TIFO improves average MSE on ETTh2, ETTm1, ETTm2, and Weather, with its clearest gain on ETTm2; ETTh1, Electricity, and Traffic are neutral or negative. At $H=96$, TIFO improves iTransformer on ETTh1, ETTm2, Electricity, and Weather, is near-neutral on ETTh2 and ETTm1, and degrades Traffic. These results support TIFO as a useful plug-in in selected settings rather than a universally improving transformation.}
 %, as shown in all bold results.
-\resubmitchange{Table~\ref{table:recent_baselines} further compares against TimeEmb and TFPS, two recent NeurIPS 2025 forecasting methods, under the same ETTm2 task and three-seed reporting protocol. Both model-level baselines outperform the tested TIFO backbones on this cell; we therefore separate absolute model ranking from the matched effect of adding TIFO to a fixed backbone.}
+\resubmitchange{Table~\ref{table:recent_baselines} further compares against TimeEmb and TFPS, two recent NeurIPS 2025 forecasting methods, on ETTh1 and ETTm2 under the same $H=96$ three-seed reporting protocol. TimeEmb is strongest on both cells, while TIFO improves its fixed iTransformer backbone on both; we therefore separate absolute model ranking from the matched effect of adding TIFO to a fixed backbone.}
 
 
 

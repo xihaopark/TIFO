@@ -40,7 +40,7 @@ Official sources:
 - [x] Historical candidate code is isolated from the official TIFO path.
 - [x] Main Ori--TIFO tables are generated from complete three-seed evidence.
 - [x] TimeEmb and TFPS ETTm2/H96 results are verified.
-- [ ] ETTh1/H96 TimeEmb and TFPS extension is complete and aggregated.
+- [x] ETTh1/H96 TimeEmb and TFPS extension is complete and aggregated.
 - [ ] Minimal reviewer-concern ablation and direct spectral evidence are complete.
 - [ ] Every Summary of Changes statement points to a completed manuscript change.
 - [ ] No placeholder table, figure, reference, or unsupported result remains.
