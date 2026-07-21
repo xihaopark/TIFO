@@ -53,7 +53,7 @@ not a result database, and a result directory name is not a complete config.
 | protocol | representative gate frozen | full-table split and input-length contradictions remain |
 | baseline sources | pinned, patched and smoke-tested | expand only after the representative gate is frozen |
 | matched Ori/TIFO experiments | iTransformer H96 complete on all seven datasets; PatchTST ETTm2/H96 gate passed | PatchTST coverage and additional horizons still required |
-| recent baselines | TimeEmb and TFPS three-seed gate complete | broader dataset/horizon coverage remains |
+| recent baselines | TimeEmb and TFPS three-seed H96 gates complete on ETTh1 and ETTm2 | no further expansion planned without a specific reviewer need |
 | manuscript | highlighted draft with gaps | placeholders, unsupported claims and internal red markup |
 | submission | not ready | scientific and formatting gates remain open |
 
