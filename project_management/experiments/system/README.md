@@ -57,6 +57,11 @@ Executed runs write launch records and logs under ignored
 `run_manifest.json` beside `metrics.npy`, containing the full CLI arguments,
 data SHA-256, source revision, dirty-state snapshot and metrics.
 
+Every engine launch record also captures the orchestrator and engine Git HEAD,
+dirty status, tracked-diff hash and status entries. The minimal recent-baseline
+extension is `baseline_etth1_96.json`: TimeEmb and TFPS on ETTh1/H96 with seeds
+2021/2022/2023, complementing the completed ETTm2/H96 gate.
+
 ## Fairness boundary
 
 - Dataset split, features, lengths, horizon, seed set and metric definitions are

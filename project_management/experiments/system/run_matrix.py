@@ -60,6 +60,30 @@ def sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def git_snapshot(workdir: Path) -> dict[str, Any]:
+    """Record the exact source state used by an experiment engine."""
+
+    def git(*args: str) -> str:
+        completed = subprocess.run(
+            ["git", *args],
+            cwd=workdir,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            check=True,
+        )
+        return completed.stdout.strip()
+
+    status = git("status", "--porcelain=v1", "--untracked-files=all")
+    diff = git("diff", "--binary", "HEAD")
+    return {
+        "head": git("rev-parse", "HEAD"),
+        "dirty": bool(status),
+        "status": status.splitlines(),
+        "tracked_diff_sha256": hashlib.sha256(diff.encode("utf-8")).hexdigest(),
+    }
+
+
 def cli_value(value: Any) -> str:
     if isinstance(value, bool):
         return "1" if value else "0"
@@ -218,6 +242,7 @@ def preflight_environment(resolved_runs: list[dict[str, Any]], physical_gpu: int
 def launch_record(
     config: dict[str, Any], protocol_id: str, command: list[str], status: str
 ) -> dict[str, Any]:
+    engine_workdir = Path(config["workdir"])
     return {
         "schema_version": 1,
         "protocol_id": protocol_id,
@@ -230,6 +255,8 @@ def launch_record(
         "physical_gpu": config.get("gpu", 0),
         "dataset_file": config["dataset_file"],
         "dataset_sha256": config["dataset_sha256"],
+        "orchestrator_source": git_snapshot(REPO_ROOT),
+        "engine_source": git_snapshot(engine_workdir),
         "resolved_config": {
             key: value
             for key, value in config.items()
