@@ -41,7 +41,7 @@ if rg -n 'Table~?[[:space:]]*[XYZWV]|Table[[:space:]]+[XYZWV]' "$tex_file" >/tmp
 fi
 rm -f /tmp/kdd27_placeholder_hits.$$
 
-if rg -n -i 'TODO|FIXME|TBD|INSERT[[:space:]]+(RESULT|VALUE|CITATION)|\\?\\?' "$tex_file" >/tmp/kdd27_todo_hits.$$; then
+if rg -n -i 'TODO|FIXME|TBD|INSERT[[:space:]]+(RESULT|VALUE|CITATION)|\?\?' "$tex_file" >/tmp/kdd27_todo_hits.$$; then
   fail 'Unresolved TODO/FIXME/TBD/placeholder markers remain.'
 fi
 rm -f /tmp/kdd27_todo_hits.$$

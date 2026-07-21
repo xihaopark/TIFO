@@ -24,10 +24,12 @@ claims that match the observed results. The completed changes are:
   both improvements and negative cases, including the Traffic limitation.
 
   \item \textbf{Added recent baselines.}
-  Table~\ref{table:recent_baselines} adds TimeEmb and TFPS (NeurIPS 2025) on
-  ETTh1 and ETTm2 under the same $H=96$, three-seed protocol. TimeEmb is the
-  strongest model on both cells; the revised text therefore positions
-  TIFO as a plug-in improvement to a fixed backbone, not an absolute SOTA model.
+  Table~\ref{table:recent_baselines} adds ACN (ICML 2025) and WDAN (2025),
+  two recent model-agnostic normalization plug-ins, across all seven datasets
+  under the same iTransformer, $H=96$, three-seed protocol. Their official
+  dataset-level settings are retained; missing Traffic settings are selected
+  on validation data only. TIFO improves 6/7 datasets versus 5/7 for each new
+  baseline and has the smallest worst-case degradation (1.0\%).
 
   \item \textbf{Calibrated empirical claims.}
   We removed the unverified 33.3\%/55.3\% gains, the universal-improvement

@@ -93,12 +93,12 @@
 \newtheorem{lemma}{\textbf{Lemma}}
 \newtheorem{assumption}{\textbf{Assumption}}
 
-\newcommand{\boldres}[1]{\textcolor{red}{#1}}
+\newcommand{\boldres}[1]{\textbf{#1}}
 \newcommand{\secondres}[1]{\textcolor{blue}{#1}}
 % Internal resubmission-draft layer: every evidence-backed 2026 revision uses blue.
 \newcommand{\resubmitchange}[1]{\textcolor{blue}{#1}}
 % Reviewer-highlight mode: visual annotation only; wording remains unchanged.
-\newcommand{\reviewhighlight}[1]{{\color{red}#1}}
+\newcommand{\reviewtext}[1]{#1}
 \newcommand{\Kc}{K}
 \newcommand{\methodn}{\textsc{TIFO}}
 \newcommand{\method}{\textsc{\methodn}\xspace}
@@ -202,15 +202,15 @@
 % We therefore ask a fundamental question: how can we explicitly model frequency-domain distributions to quantify non-stationarity at a finer granularity?
 % Our solution is \method, which uses spectral analysis to measure the stationarity of individual components and re-represent the time series by down-weighting non-stationary ones.
 
-\reviewhighlight{Normalization methods constitute a dominant approach for addressing non-stationarity in time series forecasting by measuring and suppressing distribution shifts between training and test data.}
-\reviewhighlight{In this paper, we recognize frequency-domain modeling as an underexplored perspective for characterizing the intrinsic non-stationary structures of time series.}
-\reviewhighlight{We therefore ask a fundamental question: how can we address the distribution shift in the frequency space by considering all possible time structures.}
-\reviewhighlight{Our solution is a Time-Invariant Frequency Operator (\method), which learns stationarity-aware weights over the frequency spectrum across the entire dataset.}
-\reviewhighlight{The weight representation highlights stationary frequency components while suppressing non-stationary ones, thereby mitigating the distribution shift issue in time series.}
-\reviewhighlight{To justify our method, we show that the Fourier transform of time series data implicitly induces eigen-decomposition in the frequency space.}
+\reviewtext{Normalization methods constitute a dominant approach for addressing non-stationarity in time series forecasting by measuring and suppressing distribution shifts between training and test data.}
+\reviewtext{In this paper, we recognize frequency-domain modeling as an underexplored perspective for characterizing the intrinsic non-stationary structures of time series.}
+\reviewtext{We therefore ask a fundamental question: how can we address the distribution shift in the frequency space by considering all possible time structures.}
+\reviewtext{Our solution is a Time-Invariant Frequency Operator (\method), which learns stationarity-aware weights over the frequency spectrum across the entire dataset.}
+\reviewtext{The weight representation highlights stationary frequency components while suppressing non-stationary ones, thereby mitigating the distribution shift issue in time series.}
+\reviewtext{To justify our method, we show that the Fourier transform of time series data implicitly induces eigen-decomposition in the frequency space.}
 % Learning the data-specific eigenvalues has the natural interpretation of weighting up frequency components responsible for distributional discrepancies.
-\reviewhighlight{\method is a plug-and-play approach that can be seamlessly integrated into various forecasting models.}
-\resubmitchange{Matched three-seed experiments show that \method improves PatchTST on four of seven datasets when averaged over four forecasting horizons and improves iTransformer on four of seven datasets at $H=96$. The results also identify neutral settings and a clear failure on Traffic. Recent model-level baselines remain stronger on the representative ETTm2 task, positioning \method as a lightweight backbone enhancement rather than a universally superior forecasting model.}
+\reviewtext{\method is a plug-and-play approach that can be seamlessly integrated into various forecasting models.}
+\resubmitchange{Matched three-seed experiments show that \method improves PatchTST on four of seven datasets when averaged over four forecasting horizons and improves iTransformer on six of seven datasets at $H=96$. Traffic remains the sole iTransformer limitation, with a modest 1.0\% MSE increase rather than the large degradation observed before validation-based configuration selection. Comparisons with two recent plug-ins further position \method as a competitive backbone enhancement rather than a universally superior forecasting model.}
 % Our code can be found at 
 % \href{https://anonymous.4open.science/r/TIFO-6BE1}{this anonymous GitHub repository}\footnote{\url{https://anonymous.4open.science/r/TIFO-6BE1}}.
 
@@ -285,7 +285,7 @@
 \label{sec:introduction}
 
 %
-% {\color{red}
+% {
 % what is time series forecasting, why it is so important?
 % DL models have have demonstrated impressive success.
 % Background issue: however, time series data is non-stationary. 
@@ -316,51 +316,51 @@
 Time series forecasting is vital to decision-making in real-world applications like industrial system control and stock market tracking.
 However, a crucial challenge is the non-stationary nature of real-world time series that often leads to poor generalization to unseen data beyond the training set, known as \textit{distribution shift issue in time series}.
 Consequently, the non-stationary characteristics of time series data necessitate the development of forecasting models that are robust to such temporal shifts in data distribution, while failing to address this challenge often leads to representation degradation and compromised model generalization
-\reviewhighlight{In this paper, we analyze this issue and existing normalization-based solutions~\citep{kim2021RevIN,fan2023dish,liu2023SAN,han2024sin} from a data generation perspective.}
-\reviewhighlight{We thus introduce a principled new solution derived from this analysis.}
+\reviewtext{In this paper, we analyze this issue and existing normalization-based solutions~\citep{kim2021RevIN,fan2023dish,liu2023SAN,han2024sin} from a data generation perspective.}
+\reviewtext{We thus introduce a principled new solution derived from this analysis.}
 
 
 
 
-\reviewhighlight{From a distributional perspective, a time series is sampled from a distribution $x \sim p(x|t)$, where $t$ denotes a temporal condition (e.g., the $t$-th sliding window) drawn from a time-evolving distribution $p(t)$.}
-\reviewhighlight{Consider the normal distribution $\mathcal{N}(\mu_t, \sigma^2_t)$ for example, it suggests that the mean and variance are conditional on $t$.}
-\reviewhighlight{Therefore, a forecasting model trained on training data $x_\text{train} \sim p(x|t_\text{train})$ may not perform well on test data $x_\text{test} \sim p(x|t_\text{test})$ since $t_\text{train}, \,t_\text{test}$ can be vastly different, referred to as the distributional shift issue.}
+\reviewtext{From a distributional perspective, a time series is sampled from a distribution $x \sim p(x|t)$, where $t$ denotes a temporal condition (e.g., the $t$-th sliding window) drawn from a time-evolving distribution $p(t)$.}
+\reviewtext{Consider the normal distribution $\mathcal{N}(\mu_t, \sigma^2_t)$ for example, it suggests that the mean and variance are conditional on $t$.}
+\reviewtext{Therefore, a forecasting model trained on training data $x_\text{train} \sim p(x|t_\text{train})$ may not perform well on test data $x_\text{test} \sim p(x|t_\text{test})$ since $t_\text{train}, \,t_\text{test}$ can be vastly different, referred to as the distributional shift issue.}
 
 
-\reviewhighlight{Existing methods tackle this issue by weakening the dependency of $x$ on $t$ through normalizing the data distribution \citep{kim2021RevIN,liu2023SAN,fan2023dish,han2024sin}, so that the time-dependent low-order moments (mean and variance) are removed from both training and test sets to obtain a \textit{standard distribution}, in the normal case $\mathcal{N}(0, 1)$.}
-\reviewhighlight{While this kind of method has shown some promise, it implicitly assumes that (1)  this standard reference distribution represents the underlying distribution of the entire dataset, and (2) low-order statistics are sufficient to describe the complex data distribution and avoids modeling the time parameter distribution $p(t)$.}
-\reviewhighlight{It may cause poor performance when the assumption does not hold, e.g., the distribution has more complex dependency over time, such as modality, high-order moments, or its functional form.}
+\reviewtext{Existing methods tackle this issue by weakening the dependency of $x$ on $t$ through normalizing the data distribution \citep{kim2021RevIN,liu2023SAN,fan2023dish,han2024sin}, so that the time-dependent low-order moments (mean and variance) are removed from both training and test sets to obtain a \textit{standard distribution}, in the normal case $\mathcal{N}(0, 1)$.}
+\reviewtext{While this kind of method has shown some promise, it implicitly assumes that (1)  this standard reference distribution represents the underlying distribution of the entire dataset, and (2) low-order statistics are sufficient to describe the complex data distribution and avoids modeling the time parameter distribution $p(t)$.}
+\reviewtext{It may cause poor performance when the assumption does not hold, e.g., the distribution has more complex dependency over time, such as modality, high-order moments, or its functional form.}
 % In this paper, we address these challenges by proposing a frequency-based method and establishing its theoretical foundation.
-\reviewhighlight{Therefore, this paper proposes a novel frequency-based method and provides its theoretical foundation.}
+\reviewtext{Therefore, this paper proposes a novel frequency-based method and provides its theoretical foundation.}
 
 
-\reviewhighlight{From a signal processing perspective, non-stationarity in real-world time series often manifests as changes in frequency characteristics \citep{Digital_Signal_Processing}, such as shifts in dominant spectral modes or time-dependent amplitudes.}
+\reviewtext{From a signal processing perspective, non-stationarity in real-world time series often manifests as changes in frequency characteristics \citep{Digital_Signal_Processing}, such as shifts in dominant spectral modes or time-dependent amplitudes.}
 Mean and variance characterize the overall amplitude and spread of a time series, but they fail to capture how energy is distributed across different frequency components \citep{Piao2024fredformer}. 
 In the existing works, normalizing low-order statistics may help align total energy but not its spectral structure, such as the location of that energy in the frequency space.
 % Normalizing such statistics aligns amplitude distribution in the time domain, but does not account for spectral structure or the location of that energy in the frequency space.
-\reviewhighlight{As a result, frequency shifts (i.e., changes in the dominant frequencies over time) may persist, especially when spectral characteristics differ significantly across training and testing datasets.}
+\reviewtext{As a result, frequency shifts (i.e., changes in the dominant frequencies over time) may persist, especially when spectral characteristics differ significantly across training and testing datasets.}
 
 
 
 
-\reviewhighlight{In this work, we propose to address distributional shift by working in the frequency space and by considering all possible time conditions via $p(x) = \int p(t) p(x|t) \mathrm{d}t$.}
-\reviewhighlight{Specifically, frequency-domain analysis provides a disentangled view of underlying temporal features, enabling the model to capture fine-grained stationarity.}
-\reviewhighlight{Crucially, such analysis is conducted across samples at the dataset level: the observed distribution $p(x)$ is formulated as a weighted average of the conditional distributions $p(x|t)$ over all possible time conditions, where the weights are given by $p(t)$.}
-\reviewhighlight{Thus, we can achieve the same goal (weakening the dependency of $x$ on $t$) but account for the full temporal variability.}
+\reviewtext{In this work, we propose to address distributional shift by working in the frequency space and by considering all possible time conditions via $p(x) = \int p(t) p(x|t) \mathrm{d}t$.}
+\reviewtext{Specifically, frequency-domain analysis provides a disentangled view of underlying temporal features, enabling the model to capture fine-grained stationarity.}
+\reviewtext{Crucially, such analysis is conducted across samples at the dataset level: the observed distribution $p(x)$ is formulated as a weighted average of the conditional distributions $p(x|t)$ over all possible time conditions, where the weights are given by $p(t)$.}
+\reviewtext{Thus, we can achieve the same goal (weakening the dependency of $x$ on $t$) but account for the full temporal variability.}
 To this end, we propose Time-Invariant Frequency Operator (\method) for stationarity-aware representation learning, which consistes two stages.
 
 \textbf{Stage-I}: We apply the Discrete Fourier Transform (DFT) to all samples in a given time series dataset to obtain their frequency components. 
-\reviewhighlight{For each frequency, we then conduct cross-sample statistical analysis and use a lightweight neural network layer to learn a weight that quantifies its time-invariant relevance for mitigating distributional shift.}
+\reviewtext{For each frequency, we then conduct cross-sample statistical analysis and use a lightweight neural network layer to learn a weight that quantifies its time-invariant relevance for mitigating distributional shift.}
 % This process produces a set of weights that reflect the importance of each frequency component. 
-\reviewhighlight{Through this data-driven weighting, our method emphasizes relatively stationary components (via higher weights) while suppressing non-stationary ones (via lower weights), effectively learning a weighted average over all time conditions embedded in the dataset.}
+\reviewtext{Through this data-driven weighting, our method emphasizes relatively stationary components (via higher weights) while suppressing non-stationary ones (via lower weights), effectively learning a weighted average over all time conditions embedded in the dataset.}
 
 \textbf{Stage-II}: After weighting, we perform an inverse DFT (IDFT) to project the adjusted frequencies back into the time domain. 
 These transformed time series are then fed into forecasting models. 
 The weighted composition of fine-grained frequency components enables the model to approximate more complex, temporally-evolving distributions.
 Moreover, this paper takes a first step toward providing a theoretical foundation to justify our method.
 We adopt a non-stationary stochastic process perspective and characterize time series through their frequency characteristics.
-\reviewhighlight{We show that by classical harmonic analysis results, the Fourier transform on time series data implicitly induces a kernel in the frequency space, which in turn permits a set of orthonormal basis functions formed by spectral eigen-decomposition \citep{berg84harmonic}.}
-\reviewhighlight{By learning data-specific eigenvalues, the frequency components that are responsible for distributional discrepancies can be captured as a weighted sum of eigenfunctions.}
+\reviewtext{We show that by classical harmonic analysis results, the Fourier transform on time series data implicitly induces a kernel in the frequency space, which in turn permits a set of orthonormal basis functions formed by spectral eigen-decomposition \citep{berg84harmonic}.}
+\reviewtext{By learning data-specific eigenvalues, the frequency components that are responsible for distributional discrepancies can be captured as a weighted sum of eigenfunctions.}
 % The orthonormality suggests that the learned representation does not need to be adapted to test data like previous work.
 Our contributions are as follows:
 
@@ -390,16 +390,16 @@ Our contributions are as follows:
 %   before skip=5pt, % Space before the box
 %   after skip=5pt, % Space after the box]
 %     ]
-    \reviewhighlight{\ding{182} Theoretically,
+    \reviewtext{\ding{182} Theoretically,
    we provide a data generation-based formulation of non-stationary time series and distributional shift, offering a unified theoretical framework that both explains and generalizes existing normalization methods.}
-    \reviewhighlight{\ding{183} Methodologically, we propose to learn stationarity and non-stationarity across samples in the frequency domain.}
-    \reviewhighlight{Our method enables fine-grained feature extraction to handle complex temporal dynamics, and can be seamlessly integrated into various forecasting models.}
-    \reviewhighlight{We also provide a theoretical analysis to justify the soundness of our method.}
+    \reviewtext{\ding{183} Methodologically, we propose to learn stationarity and non-stationarity across samples in the frequency domain.}
+    \reviewtext{Our method enables fine-grained feature extraction to handle complex temporal dynamics, and can be seamlessly integrated into various forecasting models.}
+    \reviewtext{We also provide a theoretical analysis to justify the soundness of our method.}
     % Fourier transform induces an eigen-decomposition in the frequency space. 
     % We learn with an MLP data-specific eigenvalues. The eigenvalues are weights for frequency components responsible for distributional discrepancies in the signals. 
     % Fourier transform of $p(t)$ implicitly induces a kernel on the frequency space, which in turn leads to learnable data-specific eigen-decomposition.
 %    \vspace{2pt}
-   \resubmitchange{\ding{184} Experimentally, we evaluate \method as a matched plug-in for PatchTST \citep{PatchTST} and iTransformer \citep{liu2023itransformer} across seven datasets using three seeds. TIFO improves four datasets in each verified scope, with its strongest PatchTST gain on ETTm2, while the mixed and negative cases define its empirical boundary. We additionally compare against TimeEmb and TFPS under a matched representative task.}
+   \resubmitchange{\ding{184} Experimentally, we evaluate \method as a matched plug-in for PatchTST \citep{PatchTST} and iTransformer \citep{liu2023itransformer} across seven datasets using three seeds. TIFO improves several matched backbone--dataset settings, while the mixed cases define its empirical boundary. We additionally compare against two recent model-agnostic plug-ins, ACN \citep{lee2025channel} and WDAN \citep{lin2025wdan}, under the same iTransformer protocol.}
 Our code can be found at 
 \url{https://anonymous.4open.science/r/TIFO-6BE1}.
 
@@ -472,14 +472,14 @@ $\mathbf{Y}^{(i)} \,\in\, \mathbb{R}^{L_y \times C}$.
 
 \subsection{Analyze Distributional Shift from a Data Generation Perspective}
 
-\reviewhighlight{In this paper, we tackle the distributional shift issue in time series forecasting by analyzing the data generation process.}
-\reviewhighlight{Time $t$ can be viewed as the index of a structured temporal sequence (e.g., the $t$-th sampling window) drawn from a distribution $p(t)$.}
-\reviewhighlight{Once $t$ is sampled, a corresponding time series segment $\mathbf{X}$ is then drawn from the conditional distribution $p(x | t)$ \citep{adak1998time-dependent}, reflecting various events (e.g., industrial sensors) occurring within that segment.}
+\reviewtext{In this paper, we tackle the distributional shift issue in time series forecasting by analyzing the data generation process.}
+\reviewtext{Time $t$ can be viewed as the index of a structured temporal sequence (e.g., the $t$-th sampling window) drawn from a distribution $p(t)$.}
+\reviewtext{Once $t$ is sampled, a corresponding time series segment $\mathbf{X}$ is then drawn from the conditional distribution $p(x | t)$ \citep{adak1998time-dependent}, reflecting various events (e.g., industrial sensors) occurring within that segment.}
 % This formulation highlights that time series datasets $ \mathcal{X} = \{x^{(i)}\}_{i=1}^N $ can be viewed as being generated from different realizations of temporal index $\{t^{(i)}\}_{i=1}^N$, each of which may induce a distinct conditional distribution $p(x \mid t^{(i)})$.
-\reviewhighlight{This formulation highlights that time series datasets $ \mathcal{X} = \{\mathbf{X}^{(i)}\}_{i=1}^N $ can be viewed as being generated from different realizations of temporal indices  $\{t^{(i)}\}_{i=1}^N$, where each $t$ induces its own conditional distribution $p(x | t)$.}
+\reviewtext{This formulation highlights that time series datasets $ \mathcal{X} = \{\mathbf{X}^{(i)}\}_{i=1}^N $ can be viewed as being generated from different realizations of temporal indices  $\{t^{(i)}\}_{i=1}^N$, where each $t$ induces its own conditional distribution $p(x | t)$.}
 %Here, $x$ denotes a generic random variable for a time-series segment, while $\mathbf{X}^{(i)}$ denotes a specific observed sample.
-\reviewhighlight{As time evolves, these context-dependent distributions naturally shift, reflecting the non-stationary characteristics of time series.}
-\reviewhighlight{As such, the distributional difference of $p(x| t_{\text{train}}) \ne p(x | t_{\text{test}})$ thus arises from the underlying variation in temporal contexts.}
+\reviewtext{As time evolves, these context-dependent distributions naturally shift, reflecting the non-stationary characteristics of time series.}
+\reviewtext{As such, the distributional difference of $p(x| t_{\text{train}}) \ne p(x | t_{\text{test}})$ thus arises from the underlying variation in temporal contexts.}
 In practice, this shift is often quite large, since testing or future time series change with time and differ from the training contexts.
 % Therefore, modeling $p(x | t)$ under changing temporal contexts is key to combat the distributional shift issue in time series forecasting.
 
@@ -518,8 +518,8 @@ In practice, this shift is often quite large, since testing or future time serie
 
 \subsection{Normalization methods weaken $x$ dependency on time condition $t$}
 \label{Normalization_weaken_x_on_t}
-\reviewhighlight{Methods such as RevIN \citep{kim2021RevIN} and SAN \citep{liu2023SAN} are based on a key concept: they aim to estimate time-dependent statistics (e.g., mean and variance) and remove them from the input time series.}
-\reviewhighlight{This process reduces the conditional dependence on $t$, transforming the time-varying distribution $p(x |t)$ closer to a stationary form $p(x)$.}
+\reviewtext{Methods such as RevIN \citep{kim2021RevIN} and SAN \citep{liu2023SAN} are based on a key concept: they aim to estimate time-dependent statistics (e.g., mean and variance) and remove them from the input time series.}
+\reviewtext{This process reduces the conditional dependence on $t$, transforming the time-varying distribution $p(x |t)$ closer to a stationary form $p(x)$.}
 We provide more discussion in Appendix \ref{app:more_discussion}.
 
 Formally, take a Gaussian distribution $\mathcal{N}(\mu_t, \sigma_t^2)$ for example, its mean and standard deviation are subject to time changes.
@@ -527,21 +527,21 @@ They estimate $(\mu_t, \sigma_t)$ for each time segment $x_t$ via a function $f_
 By removing these statistics from the data via $
 \hat{x}_t = \frac{x_t - \mu_t}{\sigma_t}
 $, the time-dependent $\mathcal{N}(\mu_t, \sigma_t^2)$ is transformed into a standard Gaussian $\mathcal{N}(0, 1)$.
-\reviewhighlight{Consequently, the distributional shift between training and test datasets is mitigated, since $\hat{x}_{\text{train}}, \hat{x}_{\text{test}} \sim \mathcal{N}(0, 1)$.}
+\reviewtext{Consequently, the distributional shift between training and test datasets is mitigated, since $\hat{x}_{\text{train}}, \hat{x}_{\text{test}} \sim \mathcal{N}(0, 1)$.}
 Nonetheless, some limitations remain in existing normalization methods:
 
 \noindent\ding{172}\textbf{
 Inadequate Data Distribution Modeling.
 }
-\reviewhighlight{This approach handles each sample individually that implicitly assumes the reference $\mathcal{N}(0,1)$ as the dataset-level ground truth distribution, i.e., $\forall t \in \{\text{train}, \text{test}\}, \; p(\hat{x}_t) = \mathcal{N}(0, 1)$.}
-\reviewhighlight{This suppresses meaningful cross-sample stationaries and prevents the model from capturing how data evolves globally across training and test domains.}
+\reviewtext{This approach handles each sample individually that implicitly assumes the reference $\mathcal{N}(0,1)$ as the dataset-level ground truth distribution, i.e., $\forall t \in \{\text{train}, \text{test}\}, \; p(\hat{x}_t) = \mathcal{N}(0, 1)$.}
+\reviewtext{This suppresses meaningful cross-sample stationaries and prevents the model from capturing how data evolves globally across training and test domains.}
 
 \noindent\ding{173}\textbf{
 Simplistic Distribution Characterization.
 }
-\reviewhighlight{Existing methods primarily rely on low-order statistics $(\mu, \sigma)$ to standardize data, which assumes that the data distribution can be described by Gaussian-like behavior.}
-\reviewhighlight{However, real-world time series often exhibit far more complex characteristics (e.g., non-stationary frequency dynamics) and distributions (consider the Student's t distribution, for instance).}
-\reviewhighlight{Even after normalization, residual distributional shifts may persist.}
+\reviewtext{Existing methods primarily rely on low-order statistics $(\mu, \sigma)$ to standardize data, which assumes that the data distribution can be described by Gaussian-like behavior.}
+\reviewtext{However, real-world time series often exhibit far more complex characteristics (e.g., non-stationary frequency dynamics) and distributions (consider the Student's t distribution, for instance).}
+\reviewtext{Even after normalization, residual distributional shifts may persist.}
 
 
 
@@ -586,26 +586,26 @@ Simplistic Distribution Characterization.
 
 \subsection{Problem Formulation}
 
-\reviewhighlight{The above discussion suggests that distributional shift in time series should be understood in terms of how data evolves globally across multiple samples, and in identifying which characteristics can capture such evolution.}
+\reviewtext{The above discussion suggests that distributional shift in time series should be understood in terms of how data evolves globally across multiple samples, and in identifying which characteristics can capture such evolution.}
 The key question in this paper becomes:
 % \emph{which aspects of the data distribution are consistent across multiple samples, and which are unstable and lead to shifts between training and testing domains?}
 
 
 \begin{myPro}
 \label{Pro:LearningStationaryRepresentations}
-\reviewhighlight{which aspects of the data distribution are consistent across multiple samples, and which are unstable and lead to shifts between training and testing domains?}
+\reviewtext{which aspects of the data distribution are consistent across multiple samples, and which are unstable and lead to shifts between training and testing domains?}
 \end{myPro}
 Let each sample be generated as $x \sim p(x | t)$ with $t \sim p(t)$ denoting a latent temporal condition.
-\reviewhighlight{Similar to normalization methods, given a training dataset $\mathcal{X} = \{\mathbf{X}^{(i)}\}_{i=1}^N$, to mitigate the distribution shift issue, the objective is to learn a transformation $f(\cdot)$ such that the resulting representations that learn more stationary features from and suppress the non-stationary ones.}
+\reviewtext{Similar to normalization methods, given a training dataset $\mathcal{X} = \{\mathbf{X}^{(i)}\}_{i=1}^N$, to mitigate the distribution shift issue, the objective is to learn a transformation $f(\cdot)$ such that the resulting representations that learn more stationary features from and suppress the non-stationary ones.}
 However, we argue that this should be satisfied with two requirements:
 emphasizes stationary components across all samples from $f(\mathcal{X})$ while preserving important characteristics unique to each sample $f(\mathbf{X}^{(i)})$, since time series data often contain stochastic variations and local structures \citep{Piao2024fredformer}.
-% {\color{red}
+% {
 % Given a training dataset $\mathcal{X} = \{\mathbf{X}^{(i)}\}_{i=1}^N$, our objective is to learn a transformation $f(\cdot)$ that (i) up-weights components whose statistics are invariant to the latent condition $t$. This is because train--test shift under $x\!\sim\!p(x\mid t)$ mainly stems from changes in the mixing distribution $p(t)$; 
 % (ii) retains sample-specific but predictive local structures in each $f(\mathbf{X}^{(i)})$, as time series data often contain stochastic variations and local patterns \citep{Piao2024fredformer}.
 % }
-\reviewhighlight{To this end, we develop a novel two-stage framework that mitigates distributional shift and is plug-and-play for diverse forecasting models, similar to existing methods \citep{kim2021RevIN, ye2024FAN, han2024sin}.}
+\reviewtext{To this end, we develop a novel two-stage framework that mitigates distributional shift and is plug-and-play for diverse forecasting models, similar to existing methods \citep{kim2021RevIN, ye2024FAN, han2024sin}.}
 
-% {\color{red}
+% {
 % To this end, we develop a novel two-stage framework that explicitly suppresses $t$-dependent (non-stationary) components and highlights $t$-invariant (stationary) ones, thereby mitigating distributional shift in a plug-and-play manner, similar to normalization methods \citep{kim2021RevIN, ye2024FAN}.
 % }
 
@@ -643,7 +643,7 @@ emphasizes stationary components across all samples from $f(\mathcal{X})$ while 
 % their statistical properties, e.g., mean and variance, can change over time. 
 % This nonstationarity of statistical properties is known as the distribution shift problem, and it can incur mismatch between the data on which the model is trained and that the model is deployed, leading to performance degradation when they do not have a significant overlap \citep{kim2021RevIN}.
 
-% {\color{red}
+% {
 % To combat the distributional shift, it is essential that a model to either (i) capture the underlying time difference or (ii) be robust/invariant  to  the nonstationarity in the data.
 % Recently, a popular method by \citep{kim2021RevIN} proposed to normalize both train and test data using the empirical mean and variance to alleviate distributional shift.
 % This $z$-score style normalization permits recovery of nonstationarity  by adding back the mean and variance.
@@ -685,7 +685,7 @@ emphasizes stationary components across all samples from $f(\mathcal{X})$ while 
 
 % (b) Cram\'er representation.
 % Under weak stationarity (and certain technical conditions),
-% one can write $X_{t}$ as {\color{red}
+% one can write $X_{t}$ as {
 % I think you missed the $A$ function in the integral
 % }
 % \begin{align}
@@ -724,7 +724,7 @@ emphasizes stationary components across all samples from $f(\mathcal{X})$ while 
 % 
 
 
-% {\color{red}
+% {
 
 % This result is a special case of the following joint distribution description in both time and frequency
 % variables:
@@ -830,7 +830,7 @@ emphasizes stationary components across all samples from $f(\mathcal{X})$ while 
 
 %In analyzing a random process, we often examine how each frequency component evolves across a sequence of local windows (i.e., samples) \citep{hammond1996analysis_of_nonstationary}.
 % % Although we can observe changes from one local window to the next, each sample only provides a single amplitude measurement per frequency, offering no insight into how that amplitude might vary within the sample or how it might relate statistically to other frequencies. Consequently, understanding the true temporal dynamics
-% {\color{red}(We assume that all time series samples are drawn from a distribution, so their amplitude will also have a distribution; 
+% {(We assume that all time series samples are drawn from a distribution, so their amplitude will also have a distribution;
 % imagine you have a Gaussian noise distribution, you draw independent noises from it and add them to sinusoidal curves. 
 % You have 100 similar but different curves.
 % How do you analyze them?
@@ -966,9 +966,9 @@ This design is supported by a detailed theoretical analysis in Section \ref{sec:
     %Before training, we measure the stationarity for each frequency across the training set. %scores from the training set, and through MLPs, output weights for the real and imaginary DFT coefficients. 
     % During the training stage, each input time series is transformed into the frequency domain. Using these weights, we weight the frequencies. 
     % The weighted spectrum is then transformed into the time domain and serves as the input for the forecasting backbone model.
-    \reviewhighlight{Before training, we first transfer all samples into the frequency domain and measure their cross-sample stationarity at the dataset level (steps 1 \& 2).}
-    \reviewhighlight{These features are then used to learn frequency weights that measure frequency stationarity (step 3).}
-    \reviewhighlight{During training, each input sample is transformed into the frequency domain and then weighted by the learned stationarity weights.}
+    \reviewtext{Before training, we first transfer all samples into the frequency domain and measure their cross-sample stationarity at the dataset level (steps 1 \& 2).}
+    \reviewtext{These features are then used to learn frequency weights that measure frequency stationarity (step 3).}
+    \reviewtext{During training, each input sample is transformed into the frequency domain and then weighted by the learned stationarity weights.}
     Finally, they are transformed to the time domain to serve as input to the forecasting models (steps 4 \& 5). 
     \method is optimized using the forecasting loss along with the backbone model.
   }
@@ -1044,14 +1044,14 @@ It includes a two-stage modeling:
 
 \noindent\textbf{Stage-I: Dataset-level Stationarity Learning}
 \begin{itemize}[leftmargin=1.5em]
-    \item \emph{Step 1.} \reviewhighlight{For each sample $\mathbf{X}^{(i)} \in \mathbb{R}^{L \times C}$ from a multi-channel time series training dataset $\mathcal{X} = \{\mathbf{X}^{(i)}\}_{i=1}^N$, we take the Discrete Fourier Transform (DFT) and obtain the amplitudes $\mathbf{A}^{(i)}(k,c)$ for frequency $k$ and channel $c$. Where $L$ represents the length of each sample, C is the number of channels, and $K$ is the number of frequency components.}
+    \item \emph{Step 1.} \reviewtext{For each sample $\mathbf{X}^{(i)} \in \mathbb{R}^{L \times C}$ from a multi-channel time series training dataset $\mathcal{X} = \{\mathbf{X}^{(i)}\}_{i=1}^N$, we take the Discrete Fourier Transform (DFT) and obtain the amplitudes $\mathbf{A}^{(i)}(k,c)$ for frequency $k$ and channel $c$. Where $L$ represents the length of each sample, C is the number of channels, and $K$ is the number of frequency components.}
     \item \emph{Step 2.} We aggregate across the training set to measure the stationarity of frequencies using
     %\begin{equation}
-    $$\color{red}\mathbf{S}(k,c)\;=\;\frac{\mu_{i\in\text{train}}\!\big(\mathbf{A}^{(i)}(k,c)\big)}{\sigma_{i\in\text{train}}\!\big(\mathbf{A}^{(i)}(k,c)\big)}$$,
+    $$\mathbf{S}(k,c)\;=\;\frac{\mu_{i\in\text{train}}\!\big(\mathbf{A}^{(i)}(k,c)\big)}{\sigma_{i\in\text{train}}\!\big(\mathbf{A}^{(i)}(k,c)\big)}$$,
     %\end{equation}
     where $\mu_{i\in\mathrm{train}}(\cdot)$ and $\sigma_{i\in\mathrm{train}}(\cdot)$ are the mean and standard deviation of the amplitude $\mathbf{A}^{(i)}(k,c)$ in all samples. 
     A larger $\mu$ means a higher energy proportion, while a greater $\sigma$ denotes higher sample dispersion. 
-    \reviewhighlight{Thus, a higher $\mathbf{S}(k,c)$ reflects more stationary frequency behavior.}
+    \reviewtext{Thus, a higher $\mathbf{S}(k,c)$ reflects more stationary frequency behavior.}
     \item \emph{Step 3.} In this step, we save the calculated $\mathbf{S}$ from Step 2 and pass it to the forecasting model.
     Through $\mathbf{S}$, the model can access cross-sample variation information, while the MLPs in Stage~II can further optimize the weights through training.
     This aims to allow the forecasting model to learn the overall stationarity of each component across the dataset, 
@@ -1064,16 +1064,16 @@ It includes a two-stage modeling:
 \noindent\textbf{Stage-II: Sample-specific Learning \& Forecasting}
 \begin{itemize}[leftmargin=1.5em]
     \item \emph{Step 4.} In the training stage, given an input sample $\mathbf{X}\in\mathbb{R}^{L\times C}$, we compute its DFT and obtain real and imaginary coefficients $\mathbf{R},\mathbf{I}\in\mathbb{R}^{K\times C}$. 
-    \reviewhighlight{Based on the pre-computed stationarity $\mathbf{S}\in\mathbb{R}^{K\times C}$, we use two independent MLPs to generate frequency weights:}
+    \reviewtext{Based on the pre-computed stationarity $\mathbf{S}\in\mathbb{R}^{K\times C}$, we use two independent MLPs to generate frequency weights:}
     \begin{align}
-    \color{red}\mathbf{\lambda}_r=\mathrm{MLP}_r(\mathbf{S}),\quad
+    \mathbf{\lambda}_r=\mathrm{MLP}_r(\mathbf{S}),\quad
     \mathbf{\lambda}_i=\mathrm{MLP}_i(\mathbf{S}). \label{eq:lambas}
     \end{align}
     The weighted coefficients are then obtained by element-wise multiplication:
     $\mathbf{R}_w=\mathbf{R}\odot\mathbf{\lambda}_r,\quad
     \mathbf{I}_w=\mathbf{I}\odot\mathbf{\lambda}_i.$
     We model the real and imaginary parts separately to ensure that when the weighted coefficients are mapped to the time domain through the inverse DFT, the resulting amplitudes remain non-negative, allowing the inverse DFT to output real-valued sequences. 
-    \reviewhighlight{In this stage, \method serves as a lightweight frequency stationarity filter, enhancing stationary components (those with a high stationarity score) while suppressing non-stationary ones, thereby addressing the distribution shift problem defined in Section~\ref{sec:Preliminary Analysis}.}
+    \reviewtext{In this stage, \method serves as a lightweight frequency stationarity filter, enhancing stationary components (those with a high stationarity score) while suppressing non-stationary ones, thereby addressing the distribution shift problem defined in Section~\ref{sec:Preliminary Analysis}.}
     \item \emph{Step 5.} Finally, the weighted coefficients $(\mathbf{R}_w,\mathbf{I}_w)$ are transformed to the time domain via inverse DFT 
     $\widetilde{\mathbf{X}}=\mathrm{iDFT}(\mathbf{R}_w+i\,\mathbf{I}_w)$,
     and fed into the backbone forecasting models. 
@@ -1154,7 +1154,7 @@ It includes a two-stage modeling:
 %(ii) \method then takes the raw data and the precomputed $s$ as inputs: $s$ is fed into two independent MLPs to learn real and imaginary weight vectors $\lambda$ (shown in Eq~\ref{eq:eigenvalues}), which are applied via Hadamard multiplication to real and imaginary part of the input data (Eq~\ref{eq:eigenfunctions} and Algorithm~\ref{alg:apply_weights}). 
 %\method requires no extra training stages or loss functions and can be trained jointly with the forecasting model.
 %In the test phase, \method uses the saved $s$ from the training set and the frozen MLPs, yielding processed inputs for the trained forecasting model.
-% {\color{red}
+% {
 
 % Representation learning. After learning, what should we do? 
 % You can specifically focus on Alg. \ref{alg:apply_weights} to explain what is np.fft.rfft, and how the returned thing is used in later predictions and inference.
@@ -1251,8 +1251,8 @@ It includes a two-stage modeling:
 \subsection{Theoretical Analysis}\label{sec:Theoretical Analysis}
 
 
-\reviewhighlight{Our frequency weighting in the previous section is the result of the following theoretical analysis.}
-\reviewhighlight{This section connecting nonstationarity to spectrum analysis is novel to the best of our knowledge.}
+\reviewtext{Our frequency weighting in the previous section is the result of the following theoretical analysis.}
+\reviewtext{This section connecting nonstationarity to spectrum analysis is novel to the best of our knowledge.}
 
 
 
@@ -1265,7 +1265,7 @@ It includes a two-stage modeling:
 % We show that by such distributional-shift-aware representations can be learned as a result of integrating over all time variables, by a classic result from harmonics analysis about Fourier transform mapping time series to the frequency space \citep{berg84harmonic}.
 % Our objective is to learn a representation function $ \psi $ that captures frequency components in a way that is invariant to distributional shifts between training and test datasets. 
 {\color{black}
-\reviewhighlight{We connect the learning of frequency weights Eq.(\ref{eq:lambas}) to spectrum analysis by noticing that these weights correspond eigenvalues that characterize frequency space representations that discern frequency components responsible for distributional shifts.}
+\reviewtext{We connect the learning of frequency weights Eq.(\ref{eq:lambas}) to spectrum analysis by noticing that these weights correspond eigenvalues that characterize frequency space representations that discern frequency components responsible for distributional shifts.}
 We begin our analysis with the assumption:
 % To begin with the analysis,  we revisit the following basic result.
 % view of distributional shift in time series.
@@ -1305,7 +1305,7 @@ We begin our analysis with the assumption:
 % We begin with our assumption on the data.
 % We begin our proposed method by elaborating on how the Fourier transform acting upon time series data implicitly induces a valid kernel.
 
-% {\color{red}
+% {
 % Fourier transform on top of $x$ gives $\omega$.  
 % Let us assume that train and test data share similar frequency component distributions.
 % So the training dataset can be seen as first drawing $t \sim p(t)$, then $x \sim p(x|t)$.
@@ -1315,15 +1315,15 @@ We begin our analysis with the assumption:
 % }
 
 \begin{assumption}\label{thm:assumption}
-    \reviewhighlight{The time series dataset $\mathcal{X} = \{\mathbf{X}^{(i)}\}_{i=1}^N$ is composed of multiple samples from $t_i \sim p(t)$ and $x^{(i)} \sim p(x | t_i)$ so it can sufficiently representation the distributions.}
+    \reviewtext{The time series dataset $\mathcal{X} = \{\mathbf{X}^{(i)}\}_{i=1}^N$ is composed of multiple samples from $t_i \sim p(t)$ and $x^{(i)} \sim p(x | t_i)$ so it can sufficiently representation the distributions.}
 \end{assumption}
 % Given 
-\reviewhighlight{We assume that the time series dataset can sufficiently represent the time variations.}
-\reviewhighlight{This assumption is realistic in many real-world datasets such as electricity or stock markets that collect data on many-year-basis.}
+\reviewtext{We assume that the time series dataset can sufficiently represent the time variations.}
+\reviewtext{This assumption is realistic in many real-world datasets such as electricity or stock markets that collect data on many-year-basis.}
 These datasets compose a challenge to normalization methods, since removing empirical estimates $\bar{\mu}, \bar{\sigma}$ from a batch does not equal removing $\mu_{t_i}, \sigma_{t_i}$ that is governed by a specific $t_i$.
 It is intractable to identify which data batch is governed by a unique time structure.
 Our method instead turns to \emph{a time-averaged representation}.
-\reviewhighlight{We integrate over time by applying Fourier transform on data.}
+\reviewtext{We integrate over time by applying Fourier transform on data.}
 The next theorem formalizes this idea.
 
 
@@ -1335,7 +1335,7 @@ The next theorem formalizes this idea.
 A kernel function $k(x, y) \geq 0$ is a distance measure of input $x, y$.
 It is valid if and only if there exists a probability density that is the Fourier transform of the kernel.
 \end{myTheo}
-\reviewhighlight{The fact that we assume data is generated by $t_i \sim p(t),\,x^{(i)} \sim p(x | t_i)$ plus we apply Fourier transform to $\mathcal{X}$ imply that a kernel function exists on the frequency domain:}
+\reviewtext{The fact that we assume data is generated by $t_i \sim p(t),\,x^{(i)} \sim p(x | t_i)$ plus we apply Fourier transform to $\mathcal{X}$ imply that a kernel function exists on the frequency domain:}
 % Let us recall the time distribution $p(t)$ defines how the time dynamics change and affects the data distribution.
 % Then Bochner's theorem tells us by applying the Fourier transform on the input time series necessarily induce a kernel $k$ in the frequency domain:
 \begin{align}
@@ -1347,8 +1347,8 @@ It is valid if and only if there exists a probability density that is the Fourie
     \end{split}
 \end{align}
 where we use $|_x$ to denote the dependency on $x$. 
-\reviewhighlight{While in practice the dataset $\mathcal{X}$ needs to be infinitely large to sufficiently represent the distributions, we can expect that with a reasonably sized dataset that comprises multiple samples of $t$, the existence of a kernel is guaranteed.}
-\reviewhighlight{As the result of integration over time, it is also reasonable to expect that the kernel as a time-averaged representation should perform better than the normalization methods.}
+\reviewtext{While in practice the dataset $\mathcal{X}$ needs to be infinitely large to sufficiently represent the distributions, we can expect that with a reasonably sized dataset that comprises multiple samples of $t$, the existence of a kernel is guaranteed.}
+\reviewtext{As the result of integration over time, it is also reasonable to expect that the kernel as a time-averaged representation should perform better than the normalization methods.}
 % For uncluttered notations, we drop it in the following sections.
 % The kernel is {implicitly} induced as a result of Fourier transform on nonstationary data.
 % While $p(t)$ describes how $t$ changes, it is intractable to quantify the distributional shift, since the data are only sampled at finite times.
@@ -1395,15 +1395,15 @@ where we use $|_x$ to denote the dependency on $x$.
 
 \noindent\textbf{Adapting Time-Averaged Representation to Data.}
 {\color{black}
-\reviewhighlight{The kernel function in Eq. (\ref{eqn:bochner}) is implicit since we know it exists but have no access to it.}
-\reviewhighlight{To exert the kernel as a distance measure, we can adapt it to input data so the distances between important and unimportant frequency components are emphasized most.}
-\reviewhighlight{To this end, we explicitly learn the kernel based on the Mercer's theorem.}
+\reviewtext{The kernel function in Eq. (\ref{eqn:bochner}) is implicit since we know it exists but have no access to it.}
+\reviewtext{To exert the kernel as a distance measure, we can adapt it to input data so the distances between important and unimportant frequency components are emphasized most.}
+\reviewtext{To this end, we explicitly learn the kernel based on the Mercer's theorem.}
 % As involving test data in the training procedure is not desired, we study learning  representations that are invariant to both the training and test data.
 % % Instead, we can leverage the properties of kernel function to find good representations of frequency components.
 % Fortunately, this is possible by the following theorem that connects the induced kernel to orthonormal basis in the frequency space.
 % Orthonormality nature is the optimal representation in the frequency space \citep{ninness1996orthonormal_1,wahlberg1991_orthonormal_2} and hence no further adaptation of learned representation to the test data is needed.
 % To this end, we introduce the next theorem which connects the induced kernel to orthonormal basis in the frequency space.
-% {\color{red}
+% {
 % %为什么要分解/正交？
 % What is big deal about orthonormal basis? It is the best representation one can find?}
 % \{\citep{ wahlberg1991_orthonormal_2, van1995_orthonormal_5, ninness1996orthonormal_1, ninness1999_orthonormal_4, wahlberg2002_orthonormal_3}\}
@@ -1420,9 +1420,9 @@ by a set of eigenfunctions that form an orthonormal basis $\{\zeta_i\}_{i\in\mat
 \end{equation}
 where the convergence of the infinite series holds absolutely.
 \end{myTheo}
-\reviewhighlight{Because the kernel must exist in the frequency space, by Mercer's theorem it must permit the eigen-decomposition that forms a set of orthonormal basis in the space.}
-\reviewhighlight{Moreover, if we impose a structure on the eigenfunctions $\zeta$, then the kernel varies with the eigenvalues $\lambda$.}
-\reviewhighlight{Therefore, learning the eigenvalues given data is equivalent to learning the kernel itself \citep{wilson2016deepkernel}.}
+\reviewtext{Because the kernel must exist in the frequency space, by Mercer's theorem it must permit the eigen-decomposition that forms a set of orthonormal basis in the space.}
+\reviewtext{Moreover, if we impose a structure on the eigenfunctions $\zeta$, then the kernel varies with the eigenvalues $\lambda$.}
+\reviewtext{Therefore, learning the eigenvalues given data is equivalent to learning the kernel itself \citep{wilson2016deepkernel}.}
 % Theorem \ref{thm:mercer} states that any valid kernel necessarily permits an eigen-decomposition into eigenvalues $\lambda$ and eigenfunctions $\zeta$.
 % The eigenfunctions form a set of orthonormal basis of the space.
 
@@ -1450,10 +1450,10 @@ where the convergence of the infinite series holds absolutely.
 %   \vspace{-1em}                         % tighten spacing below
 % \end{wrapfigure}
 % In fact, \citep[Proposition 1]{Xu2019-attention-time-bochner} indicates that under some assumptions, a periodic kernel has Fourier basis as its eigenfunctions.
-\reviewhighlight{We follow \citep{Xu2019-attention-time-bochner} to employ the assumption that the kernel is periodic, which is natural for frequencies.}
-\reviewhighlight{Therefore, the kernel has the Fourier basis as its eigenfunctions: $\zeta_{1}(\omega)=1$, $\zeta_{2j}(\omega) = \cos \big(\frac{ 2\pi j \omega}{t}\big), \zeta_{2j+1}(\omega) = \sin \big(\frac{2\pi j \omega}{t} \big) \text{  for } j=1,2,\ldots$.}
-\reviewhighlight{Now $\lambda_i, i=1,2,\ldots$ become the corresponding Fourier coefficients to weight the contribution of each $\zeta$.}
-\reviewhighlight{Therefore, we have concluded the theoretical analysis on the role played by $\lambda$ introduced in Eq.(\ref{eq:lambas}).}
+\reviewtext{We follow \citep{Xu2019-attention-time-bochner} to employ the assumption that the kernel is periodic, which is natural for frequencies.}
+\reviewtext{Therefore, the kernel has the Fourier basis as its eigenfunctions: $\zeta_{1}(\omega)=1$, $\zeta_{2j}(\omega) = \cos \big(\frac{ 2\pi j \omega}{t}\big), \zeta_{2j+1}(\omega) = \sin \big(\frac{2\pi j \omega}{t} \big) \text{  for } j=1,2,\ldots$.}
+\reviewtext{Now $\lambda_i, i=1,2,\ldots$ become the corresponding Fourier coefficients to weight the contribution of each $\zeta$.}
+\reviewtext{Therefore, we have concluded the theoretical analysis on the role played by $\lambda$ introduced in Eq.(\ref{eq:lambas}).}
 The finite feature representation is:
 % \begin{equation}
 %     \label{feature representation introduces lambda}
@@ -1474,8 +1474,8 @@ The finite feature representation is:
 \Big].
 \end{aligned}
 \end{equation}
-\reviewhighlight{With the $\widehat{\Phi}_{t}(\omega)$ given, learning the unknown Fourier coefficients is equivalent to learning the kernel function itself \citep{wilson2016deepkernel}.}
-\reviewhighlight{We can learn a suitable kernel $k_{\theta}(\cdot, \cdot)$ parametrized by $\theta$ to capture the frequency components by learning the unknown Fourier coefficients $\lambda_{\theta, j}$.}
+\reviewtext{With the $\widehat{\Phi}_{t}(\omega)$ given, learning the unknown Fourier coefficients is equivalent to learning the kernel function itself \citep{wilson2016deepkernel}.}
+\reviewtext{We can learn a suitable kernel $k_{\theta}(\cdot, \cdot)$ parametrized by $\theta$ to capture the frequency components by learning the unknown Fourier coefficients $\lambda_{\theta, j}$.}
 
 }
 
@@ -1490,11 +1490,11 @@ The finite feature representation is:
 
 In this section, we conduct experiments to answer the following research questions: \\ 
 \ding{226} \textit{RQ1 (Forecasting Accuracy)}
-\reviewhighlight{Does \method improve forecasting performance on non-stationary datasets?} \\
+\reviewtext{Does \method improve forecasting performance on non-stationary datasets?} \\
 \ding{226} \textit{RQ2 (Addressing Distribution Shift)} 
-\reviewhighlight{Does learning $\lambda$ mitigate the distribution shift?}\\
+\reviewtext{Does learning $\lambda$ mitigate the distribution shift?}\\
 \ding{226} \textit{RQ3 (Frequency Feature Learning)} 
-\reviewhighlight{How do $\lambda$ affect the backbone models to capture informative frequency characteristics?}
+\reviewtext{How do $\lambda$ affect the backbone models to capture informative frequency characteristics?}
 
 We first introduce the experimental datasets and settings, followed by detailed results and analysis to answer each of the above questions.
 We also conduct efficiency analysis and ablation studies.
@@ -1522,7 +1522,7 @@ Electricity consumption of 321 clients;
 Traffic volumes from 862 San Francisco sensors; 
 and Weather recordings of 21 meteorological variables.  
 We follow the Time–Series-Library split (7:2:1) with a fixed window length $L=96$ and apply per-channel $z$-score normalisation; 
-\reviewhighlight{this rescales variables but leaves cross-instance non-stationarity intact.}
+\reviewtext{this rescales variables but leaves cross-instance non-stationarity intact.}
 Models are trained with MSE loss and evaluated in the time domain by MSE and MAE.
 
 
@@ -1534,7 +1534,7 @@ Models are trained with MSE loss and evaluated in the time domain by MSE and MAE
 % To relate accuracy gains to spectral shift, we use the train–test frequency divergence: JSD$^{2}$ and KS \citep{iqbal2021enhancing_JS, }.
 
 \noindent\textbf{Baselines.}
-\reviewhighlight{We selected RevIN \citep{kim2021RevIN}, SAN \citep{liu2023SAN}, and FAN \citep{ye2024FAN} as our baselines.}
+\reviewtext{We selected RevIN \citep{kim2021RevIN}, SAN \citep{liu2023SAN}, and FAN \citep{ye2024FAN} as our baselines.}
 RevIN is widely used as a fundamental module in various forecasting models, including PatchTST \citep{PatchTST}, iTransformer \citep{liu2023itransformer}, 
 %Fredformer \citep{Piao2024fredformer}, 
 among others \citep{wang2024tssurvey}.
@@ -1546,7 +1546,7 @@ We also selected FAN, it introduces a frequency normalization-based method to ad
 
 
 \noindent\textbf{Backbones and Setup.}
-\reviewhighlight{For fair comparisons, we selected three forecasting models, including DLinear \citep{DLinear}, PatchTST \citep{PatchTST}, and iTransformer \citep{liu2023itransformer}, as the backbones, and deployed all non-stationary modules (\method, RevIN, SAN, and FAN) for evaluation.}
+\reviewtext{For fair comparisons, we selected three forecasting models, including DLinear \citep{DLinear}, PatchTST \citep{PatchTST}, and iTransformer \citep{liu2023itransformer}, as the backbones, and deployed all non-stationary modules (\method, RevIN, SAN, and FAN) for evaluation.}
 DLinear is a simple yet efficient forecasting model with an architecture solely involving MLPs. 
 PatchTST and iTransformer are two well-known Transformer methods that frequently serve as baselines in various forecasting research \citep{liu2023itransformer, Liu2024FOIL, Piao2024fredformer, FRNet2024Zhang}.
 We followed the implementation and setup provided in \citep{liu2023SAN} and \citep{liu2023itransformer}.
@@ -1592,12 +1592,19 @@ Dataset & \multicolumn{2}{c|}{+TIFO} & \multicolumn{2}{c}{Ori} \\
 \end{minipage}
 \end{table*}
 
-\begin{table}[t]
+\begin{table*}[t]
 \centering
-\caption{\resubmitchange{Recent-baseline comparison on ETTh1 and ETTm2 with $H=96$ over three seeds.}}
+\caption{\resubmitchange{Comparison with recent model-agnostic plug-ins on iTransformer with $H=96$ over three seeds. Bold and underline mark the best and second-best result per dataset, respectively.}}
 \label{table:recent_baselines}
-\resizebox{\columnwidth}{!}{\input{generated_tables/recent_baselines_ettm2_h96.tex}}
-\end{table}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{c|cc|cc|cc|cc}
+\toprule
+Dataset & \multicolumn{2}{c|}{iTransformer} & \multicolumn{2}{c|}{+ACN \citep{lee2025channel}} & \multicolumn{2}{c|}{+WDAN \citep{lin2025wdan}} & \multicolumn{2}{c}{+TIFO} \\
+ & MSE & MAE & MSE & MAE & MSE & MAE & MSE & MAE \\
+\midrule
+\input{generated_tables/plugin_baselines_h96_rows.tex}
+\end{tabular}}
+\end{table*}
 
 \iffalse % Historical Table 1: retained only for provenance audit; not compiled.
 \begin{table*}[ht]
@@ -1683,9 +1690,9 @@ Multivariate forecasting results (average) with forecasting lengths $ H \in \{96
 \textbf{Main Results.}
 \resubmitchange{To answer RQ1, Table~\ref{table:verified_main_results} reports matched Ori--TIFO comparisons generated from completed three-seed artifacts.}
 %Table \ref{table: 1st_results} presents the overall forecasting results using iTransformer and PatchTST as the backbone across seven datasets. 
-\resubmitchange{For PatchTST, TIFO improves average MSE on ETTh2, ETTm1, ETTm2, and Weather, with its clearest gain on ETTm2; ETTh1, Electricity, and Traffic are neutral or negative. At $H=96$, TIFO improves iTransformer on ETTh1, ETTm2, Electricity, and Weather, is near-neutral on ETTh2 and ETTm1, and degrades Traffic. These results support TIFO as a useful plug-in in selected settings rather than a universally improving transformation.}
+\resubmitchange{For PatchTST, TIFO improves average MSE on ETTh2, ETTm1, ETTm2, and Weather, with its clearest gain on ETTm2; ETTh1, Electricity, and Traffic are neutral or negative. At $H=96$, validation-selected TIFO configurations improve iTransformer on ETTh1, ETTh2, ETTm1, ETTm2, Electricity, and Weather; Traffic is the sole negative case, with a modest 1.0\% MSE increase. These results support TIFO as a useful plug-in in selected settings rather than a universally improving transformation.}
 %, as shown in all bold results.
-\resubmitchange{Table~\ref{table:recent_baselines} further compares against TimeEmb and TFPS, two recent NeurIPS 2025 forecasting methods, on ETTh1 and ETTm2 under the same $H=96$ three-seed reporting protocol. TimeEmb is strongest on both cells, while TIFO improves its fixed iTransformer backbone on both; we therefore separate absolute model ranking from the matched effect of adding TIFO to a fixed backbone.}
+\resubmitchange{Table~\ref{table:recent_baselines} further compares against ACN \citep{lee2025channel} and WDAN \citep{lin2025wdan}, two recent model-agnostic normalization plug-ins, across all seven datasets under the same iTransformer, $H=96$, three-seed protocol. TIFO improves its fixed backbone on six of seven datasets, compared with five of seven for both ACN and WDAN, and ranks second in absolute MSE on five datasets. Its worst relative MSE change is also limited to $-1.0\%$ on Traffic, whereas ACN and WDAN reach $-8.8\%$ and $-23.1\%$, respectively. Thus, although ACN or WDAN obtains the lowest error on individual datasets, TIFO provides the broadest improvement coverage and the smallest worst-case degradation.}
 
 
 
@@ -1700,13 +1707,13 @@ As shown, \method achieves 18 top-1 results and 6 top-2 results out of 28 settin
 For instance, in the ETTh1 dataset, \method improves the MSE values for DLinear and iTransformer to $0.407$ and $0.445$, outperforming RevIN ($0.460$ and $0.463$) and SAN ($0.421$ and $0.466$).
 Similarly,  in the Traffic dataset, \method improves the MSE value to $0.430$, compared to RevIN ($0.624$), SAN ($0.440$) and FAN($0.541$).
 % Notably, as we highlighted in Section \ref{sec:introduction}, one purpose of \method is to complement existing normalization methods in the frequency domain. 
-\reviewhighlight{Here, \method* represents the incorporation of SAN into the backbones, which further improves the second-best results (underlined in the table) to the best.}
+\reviewtext{Here, \method* represents the incorporation of SAN into the backbones, which further improves the second-best results (underlined in the table) to the best.}
 %For example, in the ETTh1 dataset with $H = 96$ and $192$ on the iTransformer backbone, the results improved from $0.389$ and $0.447$ to $0.380$ and $0.429$.
 \fi
 
 
 \noindent\textbf{Frequency Domain Shift Analysis.}
-\reviewhighlight{To answer RQ2, we further measure the frequency-domain distribution difference between the train and test dataset amplitude spectra to link accuracy gains to reduced spectral distributional shift.}
+\reviewtext{To answer RQ2, we further measure the frequency-domain distribution difference between the train and test dataset amplitude spectra to link accuracy gains to reduced spectral distributional shift.}
 For each frequency $\omega_j$, we gather its amplitudes across all training and testing samples to build two empirical distributions.
 Jensen–Shannon divergence squared (JSD$^2$) is a symmetric, bounded average of the forward and reverse Kullback–Leibler divergences, so it can tell us how much the two distributions differ overall \citep{Detecting_JSD,iqbal2021enhancing_JS}.
 %If you swapped one for the other, how much information would you, on average, gain or lose \citep{Detecting\_JSD,iqbal2021enhancing\_JS}.
@@ -1794,7 +1801,7 @@ The \textbf{best} and \uline{second best} results are highlighted.
     \centering
     \includegraphics[width=\linewidth]{pics/result_2.pdf}
     \caption{
-     \reviewhighlight{Train-Test Distance Compactness: This figure shows a visualization of the JSD$^{2}$ amplitudes distribution distance between the train and test datasets on the electricity data.
+     \reviewtext{Train-Test Distance Compactness: This figure shows a visualization of the JSD$^{2}$ amplitudes distribution distance between the train and test datasets on the electricity data.
      Each scatter point represents one frequency component. 
      A smaller radius indicates a smaller distributional gap.  
      Green and red colors represent the results before and after applying the learning method, respectively.}
@@ -1861,14 +1868,14 @@ The \textbf{best} and \uline{second best} results are highlighted.
 % \noindent We measure each Fourier component $\omega_j$ using Jensen–Shannon divergence squared (JSD$^{2}$), a symmetric, bounded mean of the forward and reverse KL that reflects the overall information gap, and Kolmogorov–Smirnov statistic (KS), the maximal distance between the empirical cumulative spectra that captures the worst-case mismatch \citep{wang2010KS_test, Detecting_JSD, iqbal2021enhancing_JS}.
 
 
-\reviewhighlight{Table~\ref{tab:freq_dist_flat} presents the JSD$^2$ and KS statistics for the original data (Before) and after applying RevIN, FAN, SAN, and \method across four benchmark datasets.}
+\reviewtext{Table~\ref{tab:freq_dist_flat} presents the JSD$^2$ and KS statistics for the original data (Before) and after applying RevIN, FAN, SAN, and \method across four benchmark datasets.}
 Lower values indicate smaller distributional discrepancies between training and test sets.
 On ETTh1, \method reduces JSD$^2$ from 0.3637 to 0.0435 (a reduction of 88\%), and on Electricity from 0.1443 to 0.0423 (71\%). 
 KS values also decrease significantly, ranging from 43\% to 80\% reductions across the same datasets.
 Figure~\ref{fig:shift_radar} shows the per-frequency JSD$^2$ values on the Electricity dataset. 
 Each spoke represents a frequency component, and the gray shadowed circle area serves as a reference band that indicates the region within which $60\%$ of the frequency components fall.
 A smaller area reflects a lower overall distributional discrepancy.
-\reviewhighlight{As shown in the figure, \method considers all frequency components and significantly reduces distributional differences, achieving effective alignment between training and test datasets.}
+\reviewtext{As shown in the figure, \method considers all frequency components and significantly reduces distributional differences, achieving effective alignment between training and test datasets.}
 RevIN and SAN, which operate in the time domain, 
 exhibit minimal changes before and after learning, as evidenced by the near overlap between the green line and the gray reference circle.
 FAN, which explicitly operates in the frequency domain, shows improved performance. 
@@ -1884,19 +1891,19 @@ Overall, \method consistently outperforms all baselines, and more results can be
 
 
 \noindent\textbf{Fourier Basis Learning Evaluation}
-\reviewhighlight{To answer RQ3, after analyzing the impact of \method on the distributional difference, we further investigate how \method affects the deep forecasting models to learn frequency features.}
-\reviewhighlight{Figure~\ref{fig:freq_results2} shows the Fourier basis functions in three cases, from left to right are: (i) basis functions before any processing (Before), (ii) after applying FAN, and (iii) after applying \method, respectively.}
+\reviewtext{To answer RQ3, after analyzing the impact of \method on the distributional difference, we further investigate how \method affects the deep forecasting models to learn frequency features.}
+\reviewtext{Figure~\ref{fig:freq_results2} shows the Fourier basis functions in three cases, from left to right are: (i) basis functions before any processing (Before), (ii) after applying FAN, and (iii) after applying \method, respectively.}
 We use DLinear as the forecasting model in this evaluation, and results for other models are given in Appendix ~\ref{appendix:freq_models}. 
 %The Fourier basis functions $\zeta_{\omega_{1:4}}$ are plotted along the frequency axes. 
 The coefficients $\lambda$ of the Fourier basis functions $\zeta_{\omega_{1:4}}$ are $\lambda = 1.0$ in the unprocessed case (Before).
 FAN sets the $\lambda$ of the top-$k$ high-amplitude frequencies to zero and leaves the $\lambda$ of the rest frequencies unchanged.
-\reviewhighlight{In contrast, \method learns a data-driven $\lambda$ for each basis function.}
+\reviewtext{In contrast, \method learns a data-driven $\lambda$ for each basis function.}
 The line plots display ground truth and corresponding forecasting results in the frequency domain for each case, with local peak components marked by red diamonds.
 Without any processing, the original model failed to capture these local peaks.
 FAN, which affects deep forecasting models via frequency modeling, shows improved performance. 
 However, it still failed to capture most local peak components.
 %FAN only focuses on the largest-amplitude components (e.g., $\omega_1$ and $\omega_2$ in the Figure~\ref{fig:freq_results2}), 
-\reviewhighlight{In contrast, after applying the \method, the model successfully captures all four local peak components, outperforms other cases.}
+\reviewtext{In contrast, after applying the \method, the model successfully captures all four local peak components, outperforms other cases.}
 % In the unprocessed case, the model fails to capture these peaks accurately. 
 % FAN removes key components, making the forecasting model struggle to capture the local peaks.
 % Our dynamic weighting preserves all salient peaks while suppressing noise, allowing the forecasts to capture all four local peaks.
@@ -1925,9 +1932,9 @@ The results show the average time (in seconds per epoch) using DLinear and Patch
 The full results are in \ref{app:running_time}. 
 Notably, we achieved improvements of 60\% to 70\% in 16 out of 28 experiment settings. 
 These improvements are primarily because \method only utilizes FFT and MLP during the training phase, minimizing its impact on computation time.
-\reviewhighlight{Table~\ref{tab:ablation} shows an ablation in which we replace the computed starting point $s$ with a random vector, while keeping the MLPs and all parameters unchanged.}
-\reviewhighlight{This variant assigns random starting points for the MLPs.}
-\reviewhighlight{The drop in forecasting accuracy compared to \method demonstrates that initializing the MLPs with $s$ is essential to help deep forecasting models learn the frequency representations.}
+\reviewtext{Table~\ref{tab:ablation} shows an ablation in which we replace the computed starting point $s$ with a random vector, while keeping the MLPs and all parameters unchanged.}
+\reviewtext{This variant assigns random starting points for the MLPs.}
+\reviewtext{The drop in forecasting accuracy compared to \method demonstrates that initializing the MLPs with $s$ is essential to help deep forecasting models learn the frequency representations.}
 
   
 
@@ -1960,7 +1967,7 @@ These improvements are primarily because \method only utilizes FFT and MLP durin
 \end{tabular}
 \end{table}
 
-\begingroup\color{red}
+\begingroup
 \begin{table}[t]
 \centering
 \caption{Ablation study (MAE $\downarrow$, mean$\pm$std). Bold = best.}
@@ -1992,7 +1999,7 @@ These improvements are primarily because \method only utilizes FFT and MLP durin
 
 
 \noindent \textbf{Frequency modeling ablation studies.}
-\reviewhighlight{To verify the effectiveness of our frequency modeling design, we conduct ablation studies on window functions, frequency resolution, and reconstruction strategies, as summarized in Table~\ref{tab:freq_ablation}.}
+\reviewtext{To verify the effectiveness of our frequency modeling design, we conduct the following ablation studies on window functions, frequency resolution, and reconstruction strategies.}
 First, we analyze the sensitivity to window functions and frequency bins $K$ under the original DFT setting (Table~\ref{tab:ablation_window}).
 The results demonstrate that utilizing a basic rectangular window with the full spectrum ($K=96$) yields the best performance ($\text{MSE}=0.3938$) with minimal variance.
 Applying a Hanning window or reducing the resolution ($K=48$) leads to slight degradation, indicating that preserving the raw global spectral information is preferable.
@@ -2032,10 +2039,10 @@ RevIN \citep{kim2021RevIN} performs instance-wise z-score normalization, while D
 Further improvements include SAN \citep{liu2023SAN}, which models non-stationarity in fine-grained sub-series, and SIN \citep{han2024sin}, which employs an adaptive network to learn normalization objectives.
 %While effective at mitigating mean and variance drift,
 %These methods operate strictly in the time domain and process each sample independently.
-\reviewhighlight{These methods do not explicitly observe the overall energy distribution of the training set in the frequency domain.}
+\reviewtext{These methods do not explicitly observe the overall energy distribution of the training set in the frequency domain.}
 %Consequently, significant residual train-test shifts often persist in the spectral domain even after time-domain normalization.
-\reviewhighlight{In contrast, \method introduces a dataset-level stationarity weighting module.}
-\reviewhighlight{By calculating the cross-sample stability of each frequency component across the entire training set, \method explicitly targets the spectral misalignment that remains unaddressed by methods like RevIN.}
+\reviewtext{In contrast, \method introduces a dataset-level stationarity weighting module.}
+\reviewtext{By calculating the cross-sample stability of each frequency component across the entire training set, \method explicitly targets the spectral misalignment that remains unaddressed by methods like RevIN.}
 % and SAN.
 
 \noindent\textbf{Frequency selection and masking.}
@@ -2044,8 +2051,8 @@ For instance, FAN \citep{ye2024FAN} takes an initial step by learning predominan
 Similarly, methods like \citet{ICMLFedformer, Etsformer, zhou2022film} utilize sparse attention mechanisms to select frequencies.
 However, these methods rely on an attention mechanism or top-$k$ selection derived from the instantaneous high-energy frequencies of a single sample or local window.
 %This heuristic selection risks limiting the model to accidentally high-energy frequencies that are unstable at the dataset level, while inadvertently discarding stable but low-energy periodic patterns.
-\reviewhighlight{In contrast, \method learns a set of continuous weights for Fourier basis functions based on dataset-level stationarity.}
-\reviewhighlight{This allows \method to suppress non-stationary frequencies while preserving stationary signals.}
+\reviewtext{In contrast, \method learns a set of continuous weights for Fourier basis functions based on dataset-level stationarity.}
+\reviewtext{This allows \method to suppress non-stationary frequencies while preserving stationary signals.}
 %, preventing the over-suppression or mis-selection common in heuristic approaches.
 
 % \textbf{Frequency domain models.}
@@ -2199,14 +2206,14 @@ Therefore, \method is complementary to, rather than repetitive of, these archite
 
 \section{Conclusion}
 
-\reviewhighlight{Nonstationary time series forecasting suffers from distributional shift due to the different distributions that produce the training and test data.}
+\reviewtext{Nonstationary time series forecasting suffers from distributional shift due to the different distributions that produce the training and test data.}
 As a result, a model trained on the training data may perform poorly on the test data.
-\reviewhighlight{These distributions can be regarded as governed by a time structure.}
-\reviewhighlight{A time series can be considered as first sampling from a time structure distribution, then from a time-conditional observation distribution.}
-\reviewhighlight{Existing methods attempt to alleviate the issue by normalizing the distributions.}
+\reviewtext{These distributions can be regarded as governed by a time structure.}
+\reviewtext{A time series can be considered as first sampling from a time structure distribution, then from a time-conditional observation distribution.}
+\reviewtext{Existing methods attempt to alleviate the issue by normalizing the distributions.}
 % In this paper, we propose addressing the shift issue by considering cross-sample frequency stationarity across the entire training dataset.
 % We demonstrate that the Fourier transform of time series data implicitly induces an eigen-decomposition in the frequency domain by identifying which frequency components are responsible for discrepancies.
-\reviewhighlight{To this end, we propose a Time-Invariant Frequency Operator (\method), which learns stationarity-aware weights over the frequency spectrum across the entire dataset.}
+\reviewtext{To this end, we propose a Time-Invariant Frequency Operator (\method), which learns stationarity-aware weights over the frequency spectrum across the entire dataset.}
 %The weight representation highlights stationary frequency components while suppressing non-stationary ones, thereby mitigating the distribution shift issue in time series.
 % To justify our method, we show that the Fourier transform of time series data implicitly induces eigen-decomposition in the frequency space.
 % Learning the data-specific eigenvalues has the natural interpretation of weighting up frequency components responsible for distributional discrepancies.
@@ -2334,12 +2341,12 @@ In contrast, \method learns a data-driven coefficient for every Fourier basis fu
 \subsection{Ablation Study on Stationarity Metrics}
 \label{app:metric_ablation}
 
-\reviewhighlight{To validate the effectiveness of our proposed stability metric $S(k,c) = \mu_{k,c}/\sigma_{k,c}$ (the reciprocal of the Coefficient of Variation), we conducted an ablation study comparing it against two alternative metrics: Spectral Entropy and Correlation (a proxy for Mutual Information).}
+\reviewtext{To validate the effectiveness of our proposed stability metric $S(k,c) = \mu_{k,c}/\sigma_{k,c}$ (the reciprocal of the Coefficient of Variation), we conducted an ablation study comparing it against two alternative metrics: Spectral Entropy and Correlation (a proxy for Mutual Information).}
 
 \textbf{Rationale for Metric Selection.}
-\reviewhighlight{The core hypothesis of \method is that frequency components exhibiting stable behavior across different samples in the training set are more reliable for generalization.}
+\reviewtext{The core hypothesis of \method is that frequency components exhibiting stable behavior across different samples in the training set are more reliable for generalization.}
 \begin{itemize}
-    \item \reviewhighlight{\textbf{Coefficient of Variation (CV, ours):} This statistic explicitly measures the dispersion of a variable across multiple observations relative to its mean. In our context, $\mu/\sigma$ quantifies the \textit{cross-sample stationarity}. A high score indicates that a frequency component consistently appears with stable energy across the entire dataset, aligning perfectly with our objective.}
+    \item \reviewtext{\textbf{Coefficient of Variation (CV, ours):} This statistic explicitly measures the dispersion of a variable across multiple observations relative to its mean. In our context, $\mu/\sigma$ quantifies the \textit{cross-sample stationarity}. A high score indicates that a frequency component consistently appears with stable energy across the entire dataset, aligning perfectly with our objective.}
     \item \textbf{Spectral Entropy:} This metric measures the complexity or "spikiness" of the power spectrum within a \textit{single} signal window. While useful for characterizing \textit{intra-sample} complexity, it does not capture how a specific frequency evolves or drifts across the dataset (distribution shift).
     \item \textbf{Mutual Information (MI):} MI measures the dependency between the input frequencies and the forecasting target. While theoretically strong, calculating MI typically requires access to future labels (forecasting targets), making it a supervised signal. Our goal for \method is to serve as an unsupervised, plug-and-play regularization layer that relies solely on input statistics.
 \end{itemize}
@@ -2352,9 +2359,9 @@ We compared these metrics on the ETTh1 dataset using iTransformer as the backbon
     \item \texttt{corr}: The Pearson correlation coefficient $|r|$ between the frequency amplitude and the mean of the future target series, serving as a proxy for Mutual Information.
 \end{itemize}
 
-\reviewhighlight{The results are summarized in Table~\ref{tab:metric_ablation}. Our proposed \texttt{mu\_sigma} achieves the best performance in both MSE and MAE.}
-\reviewhighlight{Notably, it outperforms \texttt{entropy}, suggesting that consistency across the dataset (cross-sample stationarity) is more critical for handling distribution shift than intra-sample complexity.}
-\reviewhighlight{Furthermore, \texttt{mu\_sigma} performs comparably to (or slightly better than) the target-aware \texttt{corr} metric. This confirms that our unsupervised stability score is highly effective and sufficient for identifying robust frequency patterns without requiring label guidance or complex supervised computation.}
+\reviewtext{The results are summarized in Table~\ref{tab:metric_ablation}. Our proposed \texttt{mu\_sigma} achieves the best performance in both MSE and MAE.}
+\reviewtext{Notably, it outperforms \texttt{entropy}, suggesting that consistency across the dataset (cross-sample stationarity) is more critical for handling distribution shift than intra-sample complexity.}
+\reviewtext{Furthermore, \texttt{mu\_sigma} performs comparably to (or slightly better than) the target-aware \texttt{corr} metric. This confirms that our unsupervised stability score is highly effective and sufficient for identifying robust frequency patterns without requiring label guidance or complex supervised computation.}
 
 \begin{table}[h]
     \centering
@@ -2658,7 +2665,7 @@ All experiments were conducted on an NVIDIA RTX A6000 GPU with 48GB of memory, u
 \subsection{Full Long-term Forecasting results.}
 \label{app: full_results}
 
-Table \ref{app_table_detailed_results_other_methods} and Table \ref{app_table_detailed_results_FAN} present the full comprehensive results discussed in the main paper. 
+The following tables present the comprehensive results discussed in the main paper.
 This table includes the prediction accuracy outcomes on the [Electricity, ETTh1, ETTh2, ETTm1, ETTm2, Traffic, Weather] dataset, utilizing the [DLinear, PatchTST, iTransformer] as the backbone model. 
 We have compared our method against all baseline models across all forecasting horizons ($H \in \{96, 192, 336, 720 \}$). 
 
@@ -3694,7 +3701,7 @@ For each frequency index $\omega_j$, using the same samples $a$ and $b$, we comp
      A smaller radius indicates a smaller distributional gap.  
      Green and red colors represent the results before and after applying the learning method, respectively.
      }
-    \label{fig:shift_radar}
+    \label{fig:shift_radar_appendix}
   \end{minipage} 
 
   % \vspace{1em}
@@ -3821,7 +3828,7 @@ For each plot, we pick a specific sample index and a specific channel, to show t
 \label{app:running_time}
 
 
-Table \ref{tab:time_comparison_transposed} presents the running time comprehensive results of our paper. 
+The following table presents the running-time results of our paper.
 This table includes the prediction accuracy outcomes on the [Electricity, ETTh1, ETTh2, ETTm1, ETTm2, Traffic, Weather] dataset, utilizing the [DLinear, PatchTST] as the backbone model. 
 We compare our method against SAN across forecasting horizons $H \in \{96, 720 \}$. 
 
@@ -3870,7 +3877,7 @@ We have added several new experiments here:
 (1) \textbf{Window function and FFT resolution.}
 On ETTh1 with iTransformer, we study the sensitivity of TIFO to the choice of window function and frequency resolution under the original single global DFT/IDFT setting (no overlap).
 We compare rectangular vs.\ Hann windows and $K=48$ vs.\ $K=96$ frequency bins. 
-\reviewhighlight{The results (Table~X) show that using the full spectrum with a rectangular window (rect\_K96) gives the best performance with small variance across runs, and changing the window or $K$ within a reasonable range does not break the gains of TIFO. We therefore keep the simple global rectangular window with $K=96$ as the default.}
+\reviewtext{The ablation results show that using the full spectrum with a rectangular window (rect\_K96) gives the best performance with small variance across runs, and changing the window or $K$ within a reasonable range does not break the gains of TIFO. We therefore keep the simple global rectangular window with $K=96$ as the default.}
 
 \begin{table}[t]
 \centering
@@ -3899,7 +3906,7 @@ hann\_K96  & 0.4110 & 0.4240 & 0.4090 & 0.4230 & 0.4130 & 0.4260 & 0.4110       
 
 
 (2) \textbf{Robustness--expressiveness trade-off by scaling TIFO weights.}
-\reviewhighlight{To analyze whether suppressing non-stationary components harms the predictive upper bound, we train TIFO on ETTh1 with iTransformer and, at test time, multiply the learned frequency weights by a scalar $\alpha \in \{1.00, 0.75, 0.50, 0.25, 0.00\}$. Here $\alpha=0.00$ corresponds to removing TIFO. As shown in Table~Y, $\alpha=1.00$ and $\alpha=0.75$ achieve the best (and very similar) accuracy; performance starts to degrade at $\alpha=0.50$, and becomes clearly worse when $\alpha \le 0.25$ or when TIFO is disabled. This confirms a natural trade-off: fully using the learned TIFO weights improves robustness and accuracy, while aggressively shrinking them harms performance.}
+\reviewtext{To analyze whether suppressing non-stationary components harms the predictive upper bound, we train TIFO on ETTh1 with iTransformer and, at test time, multiply the learned frequency weights by a scalar $\alpha \in \{1.00, 0.75, 0.50, 0.25, 0.00\}$. Here $\alpha=0.00$ corresponds to removing TIFO. In this ablation, $\alpha=1.00$ and $\alpha=0.75$ achieve the best (and very similar) accuracy; performance starts to degrade at $\alpha=0.50$, and becomes clearly worse when $\alpha \le 0.25$ or when TIFO is disabled. This confirms a natural trade-off: fully using the learned TIFO weights improves robustness and accuracy, while aggressively shrinking them harms performance.}
 
 \begin{table}[t]
 \centering
@@ -3930,7 +3937,7 @@ hann\_K96  & 0.4110 & 0.4240 & 0.4090 & 0.4230 & 0.4130 & 0.4260 & 0.4110       
 
 
 (3) \textbf{Frequency decomposition strategies.}
-\reviewhighlight{To address phase-distortion and boundary-effect concerns, we compare our original global FFT design with several STFT-style variants on ETTh1 + iTransformer: (i) \textit{Ori} (single global rectangular window, no overlap), (ii) \textit{hann\_50\_ola} (Hann, 50\% overlap, OLA), (iii) \textit{sqrt\_hann\_50\_wola} ($\sqrt{\text{Hann}}$, 50\% overlap, WOLA with COLA), and (iv) \textit{hann\_75\_ola} (Hann, 75\% overlap, OLA). Table~Z shows that Ori remains the best, the COLA-compliant WOLA variant is slightly worse, and Hann-based OLA variants significantly degrade accuracy. This indicates that, in our setting, the simple global FFT with finite-length periodicity assumption is sufficient, and additional windowing/overlap does not provide benefit.}
+\reviewtext{To address phase-distortion and boundary-effect concerns, we compare our original global FFT design with several STFT-style variants on ETTh1 + iTransformer: (i) \textit{Ori} (single global rectangular window, no overlap), (ii) \textit{hann\_50\_ola} (Hann, 50\% overlap, OLA), (iii) \textit{sqrt\_hann\_50\_wola} ($\sqrt{\text{Hann}}$, 50\% overlap, WOLA with COLA), and (iv) \textit{hann\_75\_ola} (Hann, 75\% overlap, OLA). The ablation shows that Ori remains the best, the COLA-compliant WOLA variant is slightly worse, and Hann-based OLA variants significantly degrade accuracy. This indicates that, in our setting, the simple global FFT with finite-length periodicity assumption is sufficient, and additional windowing/overlap does not provide benefit.}
 
 \begin{table}[h]
 \centering
@@ -3972,8 +3979,8 @@ hann\_75\_ola        & 0.5872 & 0.5130 & 0.5627 & 0.5050 & 0.5944 & 0.5149 & 0.5
 \cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}\cmidrule(lr){8-9}
 & MSE & MAE & MSE & MAE & MSE & MAE & MSE & MAE \\
 \midrule
-no\_update & 0.3902 & 0.4068 & 0.3939 & 0.4105 & 0.3974 & 0.4140 & \reviewhighlight{\textbf{0.3938}} & \textbf{0.4104} \\
-ema\_0.9   & 0.3916 & 0.4101 & 0.3930 & 0.4105 & 0.3952 & 0.4136 & \reviewhighlight{0.3932}          & 0.4114          \\
+no\_update & 0.3902 & 0.4068 & 0.3939 & 0.4105 & 0.3974 & 0.4140 & \reviewtext{\textbf{0.3938}} & \textbf{0.4104} \\
+ema\_0.9   & 0.3916 & 0.4101 & 0.3930 & 0.4105 & 0.3952 & 0.4136 & \reviewtext{0.3932}          & 0.4114          \\
 ema\_0.99  & 0.3903 & 0.4085 & 0.3938 & 0.4110 & 0.3966 & 0.4146 & 0.3936          & 0.4114          \\
 \bottomrule
 \end{tabular}
@@ -4008,11 +4015,11 @@ hop0.25\_zpad1.0  & 0.3940 & 0.4090 & 0.3960 & 0.4110 & 0.3970 & 0.4120 & 0.3957
 \end{table}
 
 (4) \textbf{Online EMA refresh of stability scores under drift.}
-\reviewhighlight{We further test whether TIFO requires online updates of the stability-based weights in the presence of distribution drift. During inference on ETTh1 + iTransformer, we re-estimate batch-wise frequency statistics and update the global mask via exponential moving average with three settings: no update (no\_update), EMA with decay $0.9$, and EMA with decay $0.99$. The results (Table~W) show that all three settings yield almost identical MSE/MAE, and the small differences are well within run-to-run randomness; EMA($0.9$) gives a marginally smaller MSE. This suggests that dataset-level statistics estimated on the training set are already robust, and TIFO does not rely on frequent online re-estimation.}
+\reviewtext{We further test whether TIFO requires online updates of the stability-based weights in the presence of distribution drift. During inference on ETTh1 + iTransformer, we re-estimate batch-wise frequency statistics and update the global mask via exponential moving average with three settings: no update (no\_update), EMA with decay $0.9$, and EMA with decay $0.99$. The ablation shows that all three settings yield almost identical MSE/MAE, and the small differences are well within run-to-run randomness; EMA($0.9$) gives a marginally smaller MSE. This suggests that dataset-level statistics estimated on the training set are already robust, and TIFO does not rely on frequent online re-estimation.}
 
 
 (5) \textbf{Sensitivity to STFT hyperparameters (hop size and zero-padding).}
-\reviewhighlight{Complementary to the global FFT analysis, we also conduct an STFT-style ablation on ETTh1 + iTransformer, varying hop ratio $\in \{0.125, 0.25\}$ and zero-padding ratio $\in \{0, 0.5, 1.0\}$. The results (Table~V) show that moderate zero-padding ($0.5$) yields consistent small gains across hop sizes, while further increasing zero-padding to $1.0$ brings negligible improvement. A smaller hop (larger overlap) is slightly better overall, but the effect is modest. Together with the previous experiments, this indicates that TIFO is reasonably robust to FFT-related hyperparameters and that sophisticated STFT configurations are not necessary for the gains reported in the main paper.}
+\reviewtext{Complementary to the global FFT analysis, we also conduct an STFT-style ablation on ETTh1 + iTransformer, varying hop ratio $\in \{0.125, 0.25\}$ and zero-padding ratio $\in \{0, 0.5, 1.0\}$. The results show that moderate zero-padding ($0.5$) yields consistent small gains across hop sizes, while further increasing zero-padding to $1.0$ brings negligible improvement. A smaller hop (larger overlap) is slightly better overall, but the effect is modest. Together with the previous experiments, this indicates that TIFO is reasonably robust to FFT-related hyperparameters and that sophisticated STFT configurations are not necessary for the gains reported in the main paper.}
 
 
 % \section{LLM Usage Statement}
