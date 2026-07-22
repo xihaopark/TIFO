@@ -1,0 +1,146 @@
+[
+  {
+    "run_id": "tune_electricity_h96_tifo_ew_hermitian_aligned_zpad100_s2022",
+    "engine": "native",
+    "dataset": "Electricity",
+    "seed": 2022,
+    "validation_mse": 0.1217066,
+    "model_args": "{\"d_ff\": 512, \"d_model\": 512, \"e_layers\": 3, \"factor\": 3, \"filter_dim\": 512, \"n_heads\": 8, \"skip_final_test\": true, \"tifo_dropout\": 0.5, \"tifo_lr_scale\": 1.0, \"tifo_residual_alpha\": 1.0, \"tifo_variant\": \"hermitian_aligned\", \"tifo_zero_pad_ratio\": 1.0}",
+    "log_file": "/mnt/data1/park/TS/FredNormer/experiment_records/tune_electricity_h96_tifo_ew_hermitian_aligned_zpad100_s2022/run.log"
+  },
+  {
+    "run_id": "tune_electricity_h96_tifo_ew_zpad100_s2022",
+    "engine": "native",
+    "dataset": "Electricity",
+    "seed": 2022,
+    "validation_mse": 0.121825,
+    "model_args": "{\"d_ff\": 512, \"d_model\": 512, \"e_layers\": 3, \"factor\": 3, \"filter_dim\": 512, \"n_heads\": 8, \"skip_final_test\": true, \"tifo_dropout\": 0.5, \"tifo_lr_scale\": 1.0, \"tifo_residual_alpha\": 1.0, \"tifo_variant\": \"historical\", \"tifo_zero_pad_ratio\": 1.0}",
+    "log_file": "/mnt/data1/park/TS/FredNormer/experiment_records/tune_electricity_h96_tifo_ew_zpad100_s2022/run.log"
+  },
+  {
+    "run_id": "tune_electricity_h96_tifo_ew_compact_zpad100_s2022",
+    "engine": "native",
+    "dataset": "Electricity",
+    "seed": 2022,
+    "validation_mse": 0.1218852,
+    "model_args": "{\"d_ff\": 512, \"d_model\": 512, \"e_layers\": 3, \"factor\": 3, \"filter_dim\": 256, \"n_heads\": 8, \"skip_final_test\": true, \"tifo_dropout\": 0.3, \"tifo_lr_scale\": 1.0, \"tifo_residual_alpha\": 1.0, \"tifo_variant\": \"historical\", \"tifo_zero_pad_ratio\": 1.0}",
+    "log_file": "/mnt/data1/park/TS/FredNormer/experiment_records/tune_electricity_h96_tifo_ew_compact_zpad100_s2022/run.log"
+  },
+  {
+    "run_id": "tune_electricity_h96_tifo_ew_historical_control_s2022",
+    "engine": "native",
+    "dataset": "Electricity",
+    "seed": 2022,
+    "validation_mse": 0.1231158,
+    "model_args": "{\"d_ff\": 512, \"d_model\": 512, \"e_layers\": 3, \"factor\": 3, \"filter_dim\": 512, \"n_heads\": 8, \"skip_final_test\": true, \"tifo_dropout\": 0.5, \"tifo_lr_scale\": 1.0, \"tifo_residual_alpha\": 1.0, \"tifo_variant\": \"historical\", \"tifo_zero_pad_ratio\": 0.0}",
+    "log_file": "/mnt/data1/park/TS/FredNormer/experiment_records/tune_electricity_h96_tifo_ew_historical_control_s2022/run.log"
+  },
+  {
+    "run_id": "tune_electricity_h96_tifo_ew_lr0p25_alpha0p5_zpad100_s2022",
+    "engine": "native",
+    "dataset": "Electricity",
+    "seed": 2022,
+    "validation_mse": 0.1232935,
+    "model_args": "{\"d_ff\": 512, \"d_model\": 512, \"e_layers\": 3, \"factor\": 3, \"filter_dim\": 512, \"n_heads\": 8, \"skip_final_test\": true, \"tifo_dropout\": 0.5, \"tifo_lr_scale\": 0.25, \"tifo_residual_alpha\": 0.5, \"tifo_variant\": \"historical\", \"tifo_zero_pad_ratio\": 1.0}",
+    "log_file": "/mnt/data1/park/TS/FredNormer/experiment_records/tune_electricity_h96_tifo_ew_lr0p25_alpha0p5_zpad100_s2022/run.log"
+  },
+  {
+    "run_id": "tune_electricity_h96_tifo_ew_alpha0p5_s2022",
+    "engine": "native",
+    "dataset": "Electricity",
+    "seed": 2022,
+    "validation_mse": 0.1235248,
+    "model_args": "{\"d_ff\": 512, \"d_model\": 512, \"e_layers\": 3, \"factor\": 3, \"filter_dim\": 512, \"n_heads\": 8, \"skip_final_test\": true, \"tifo_dropout\": 0.5, \"tifo_lr_scale\": 1.0, \"tifo_residual_alpha\": 0.5, \"tifo_variant\": \"historical\", \"tifo_zero_pad_ratio\": 0.0}",
+    "log_file": "/mnt/data1/park/TS/FredNormer/experiment_records/tune_electricity_h96_tifo_ew_alpha0p5_s2022/run.log"
+  },
+  {
+    "run_id": "tune_electricity_h96_tifo_ew_lr0p25_alpha0p5_s2022",
+    "engine": "native",
+    "dataset": "Electricity",
+    "seed": 2022,
+    "validation_mse": 0.1236427,
+    "model_args": "{\"d_ff\": 512, \"d_model\": 512, \"e_layers\": 3, \"factor\": 3, \"filter_dim\": 512, \"n_heads\": 8, \"skip_final_test\": true, \"tifo_dropout\": 0.5, \"tifo_lr_scale\": 0.25, \"tifo_residual_alpha\": 0.5, \"tifo_variant\": \"historical\", \"tifo_zero_pad_ratio\": 0.0}",
+    "log_file": "/mnt/data1/park/TS/FredNormer/experiment_records/tune_electricity_h96_tifo_ew_lr0p25_alpha0p5_s2022/run.log"
+  },
+  {
+    "run_id": "tune_electricity_h96_tifo_ew_lr0p25_s2022",
+    "engine": "native",
+    "dataset": "Electricity",
+    "seed": 2022,
+    "validation_mse": 0.1237275,
+    "model_args": "{\"d_ff\": 512, \"d_model\": 512, \"e_layers\": 3, \"factor\": 3, \"filter_dim\": 512, \"n_heads\": 8, \"skip_final_test\": true, \"tifo_dropout\": 0.5, \"tifo_lr_scale\": 0.25, \"tifo_residual_alpha\": 1.0, \"tifo_variant\": \"historical\", \"tifo_zero_pad_ratio\": 0.0}",
+    "log_file": "/mnt/data1/park/TS/FredNormer/experiment_records/tune_electricity_h96_tifo_ew_lr0p25_s2022/run.log"
+  },
+  {
+    "run_id": "tune_weather_h96_tifo_ew_hermitian_aligned_zpad100_s2022",
+    "engine": "native",
+    "dataset": "Weather",
+    "seed": 2022,
+    "validation_mse": 0.397548,
+    "model_args": "{\"d_ff\": 512, \"d_model\": 512, \"e_layers\": 3, \"factor\": 3, \"filter_dim\": 512, \"n_heads\": 8, \"skip_final_test\": true, \"tifo_dropout\": 0.5, \"tifo_lr_scale\": 1.0, \"tifo_residual_alpha\": 1.0, \"tifo_variant\": \"hermitian_aligned\", \"tifo_zero_pad_ratio\": 1.0}",
+    "log_file": "/mnt/data1/park/TS/FredNormer/experiment_records/tune_weather_h96_tifo_ew_hermitian_aligned_zpad100_s2022/run.log"
+  },
+  {
+    "run_id": "tune_weather_h96_tifo_ew_compact_zpad100_s2022",
+    "engine": "native",
+    "dataset": "Weather",
+    "seed": 2022,
+    "validation_mse": 0.4013063,
+    "model_args": "{\"d_ff\": 512, \"d_model\": 512, \"e_layers\": 3, \"factor\": 3, \"filter_dim\": 256, \"n_heads\": 8, \"skip_final_test\": true, \"tifo_dropout\": 0.3, \"tifo_lr_scale\": 1.0, \"tifo_residual_alpha\": 1.0, \"tifo_variant\": \"historical\", \"tifo_zero_pad_ratio\": 1.0}",
+    "log_file": "/mnt/data1/park/TS/FredNormer/experiment_records/tune_weather_h96_tifo_ew_compact_zpad100_s2022/run.log"
+  },
+  {
+    "run_id": "tune_weather_h96_tifo_ew_alpha0p5_s2022",
+    "engine": "native",
+    "dataset": "Weather",
+    "seed": 2022,
+    "validation_mse": 0.4060633,
+    "model_args": "{\"d_ff\": 512, \"d_model\": 512, \"e_layers\": 3, \"factor\": 3, \"filter_dim\": 512, \"n_heads\": 8, \"skip_final_test\": true, \"tifo_dropout\": 0.5, \"tifo_lr_scale\": 1.0, \"tifo_residual_alpha\": 0.5, \"tifo_variant\": \"historical\", \"tifo_zero_pad_ratio\": 0.0}",
+    "log_file": "/mnt/data1/park/TS/FredNormer/experiment_records/tune_weather_h96_tifo_ew_alpha0p5_s2022/run.log"
+  },
+  {
+    "run_id": "tune_weather_h96_tifo_ew_zpad100_s2022",
+    "engine": "native",
+    "dataset": "Weather",
+    "seed": 2022,
+    "validation_mse": 0.4070501,
+    "model_args": "{\"d_ff\": 512, \"d_model\": 512, \"e_layers\": 3, \"factor\": 3, \"filter_dim\": 512, \"n_heads\": 8, \"skip_final_test\": true, \"tifo_dropout\": 0.5, \"tifo_lr_scale\": 1.0, \"tifo_residual_alpha\": 1.0, \"tifo_variant\": \"historical\", \"tifo_zero_pad_ratio\": 1.0}",
+    "log_file": "/mnt/data1/park/TS/FredNormer/experiment_records/tune_weather_h96_tifo_ew_zpad100_s2022/run.log"
+  },
+  {
+    "run_id": "tune_weather_h96_tifo_ew_lr0p25_alpha0p5_s2022",
+    "engine": "native",
+    "dataset": "Weather",
+    "seed": 2022,
+    "validation_mse": 0.4118325,
+    "model_args": "{\"d_ff\": 512, \"d_model\": 512, \"e_layers\": 3, \"factor\": 3, \"filter_dim\": 512, \"n_heads\": 8, \"skip_final_test\": true, \"tifo_dropout\": 0.5, \"tifo_lr_scale\": 0.25, \"tifo_residual_alpha\": 0.5, \"tifo_variant\": \"historical\", \"tifo_zero_pad_ratio\": 0.0}",
+    "log_file": "/mnt/data1/park/TS/FredNormer/experiment_records/tune_weather_h96_tifo_ew_lr0p25_alpha0p5_s2022/run.log"
+  },
+  {
+    "run_id": "tune_weather_h96_tifo_ew_historical_control_s2022",
+    "engine": "native",
+    "dataset": "Weather",
+    "seed": 2022,
+    "validation_mse": 0.4119957,
+    "model_args": "{\"d_ff\": 512, \"d_model\": 512, \"e_layers\": 3, \"factor\": 3, \"filter_dim\": 512, \"n_heads\": 8, \"skip_final_test\": true, \"tifo_dropout\": 0.5, \"tifo_lr_scale\": 1.0, \"tifo_residual_alpha\": 1.0, \"tifo_variant\": \"historical\", \"tifo_zero_pad_ratio\": 0.0}",
+    "log_file": "/mnt/data1/park/TS/FredNormer/experiment_records/tune_weather_h96_tifo_ew_historical_control_s2022/run.log"
+  },
+  {
+    "run_id": "tune_weather_h96_tifo_ew_lr0p25_alpha0p5_zpad100_s2022",
+    "engine": "native",
+    "dataset": "Weather",
+    "seed": 2022,
+    "validation_mse": 0.4133907,
+    "model_args": "{\"d_ff\": 512, \"d_model\": 512, \"e_layers\": 3, \"factor\": 3, \"filter_dim\": 512, \"n_heads\": 8, \"skip_final_test\": true, \"tifo_dropout\": 0.5, \"tifo_lr_scale\": 0.25, \"tifo_residual_alpha\": 0.5, \"tifo_variant\": \"historical\", \"tifo_zero_pad_ratio\": 1.0}",
+    "log_file": "/mnt/data1/park/TS/FredNormer/experiment_records/tune_weather_h96_tifo_ew_lr0p25_alpha0p5_zpad100_s2022/run.log"
+  },
+  {
+    "run_id": "tune_weather_h96_tifo_ew_lr0p25_s2022",
+    "engine": "native",
+    "dataset": "Weather",
+    "seed": 2022,
+    "validation_mse": 0.4146032,
+    "model_args": "{\"d_ff\": 512, \"d_model\": 512, \"e_layers\": 3, \"factor\": 3, \"filter_dim\": 512, \"n_heads\": 8, \"skip_final_test\": true, \"tifo_dropout\": 0.5, \"tifo_lr_scale\": 0.25, \"tifo_residual_alpha\": 1.0, \"tifo_variant\": \"historical\", \"tifo_zero_pad_ratio\": 0.0}",
+    "log_file": "/mnt/data1/park/TS/FredNormer/experiment_records/tune_weather_h96_tifo_ew_lr0p25_s2022/run.log"
+  }
+]
