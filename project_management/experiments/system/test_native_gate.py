@@ -61,6 +61,8 @@ def make_args(
         tifo_dropout=0.5,
         tifo_zero_pad_ratio=tifo_zero_pad_ratio,
         tifo_residual_alpha=tifo_residual_alpha,
+        tifo_score_mode="data",
+        tifo_score_seed=1729,
         filter_dim=64,
         d_model=32,
         d_ff=32,
@@ -190,6 +192,24 @@ def main() -> int:
         f"shape={tuple(mask.shape)} min={mask.min().item():.6f} "
         f"max={mask.max().item():.6f}"
     )
+
+    permuted_args = make_args("tifo")
+    permuted_args.tifo_score_mode = "permuted"
+    comparison_state = torch.random.get_rng_state()
+    data_control_mask = run_filter(args, mask_loader, device)
+    after_data_control = torch.random.get_rng_state()
+    torch.random.set_rng_state(comparison_state)
+    permuted_mask = run_filter(permuted_args, mask_loader, device)
+    after_permutation = torch.random.get_rng_state()
+    if not torch.equal(after_data_control, after_permutation):
+        raise AssertionError("permuted-score control consumed extra training RNG")
+    if torch.equal(data_control_mask, permuted_mask):
+        raise AssertionError("permuted-score control did not change frequency alignment")
+    torch.testing.assert_close(
+        torch.sort(data_control_mask, dim=0).values,
+        torch.sort(permuted_mask, dim=0).values,
+    )
+    print("permuted-score control ok: marginals preserved and RNG isolated")
 
     transform = FrequencyDomainFilter(args, mask).to(device)
     x = torch.randn(4, args.seq_len, args.enc_in, device=device, requires_grad=True)

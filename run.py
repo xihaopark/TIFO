@@ -41,6 +41,11 @@ if __name__ == '__main__':
                         help='blend strength from the identity input to the TIFO-filtered input')
     parser.add_argument('--tifo_zero_pad_ratio', type=float, default=0.0,
                         help='right-side zero padding as a fraction of seq_len; statistics and weights use the padded FFT grid')
+    parser.add_argument('--tifo_score_mode', type=str, default='data',
+                        choices=['data', 'permuted', 'ones'],
+                        help='dataset score or an auditable score-conditioning control')
+    parser.add_argument('--tifo_score_seed', type=int, default=1729,
+                        help='fixed local seed for the permuted-score control')
     parser.add_argument('--method', type=str, default='tifo', choices=['ori', 'tifo'],
                         help='representation method; ori disables TIFO and is the matched backbone control')
 

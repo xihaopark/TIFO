@@ -59,7 +59,24 @@ class GlobalMaskCalculator:
         mean = amp_sum / sample_count
         variance = (amp2_sum / sample_count - mean.square()).clamp_min(0.0)
         std = torch.sqrt(variance + 1e-5)
-        return mean / (std + 1e-5)
+        score = mean / (std + 1e-5)
+        mode = getattr(self.args, "tifo_score_mode", "data")
+        if mode == "data":
+            return score
+        if mode == "ones":
+            return torch.ones_like(score)
+        if mode == "permuted":
+            # Preserve each channel's score distribution while breaking its
+            # association with frequency. A local generator avoids advancing
+            # the model/training RNG stream.
+            generator = torch.Generator(device="cpu")
+            generator.manual_seed(int(getattr(self.args, "tifo_score_seed", 1729)))
+            shuffled = torch.empty_like(score)
+            for channel in range(channels):
+                order = torch.randperm(frequencies, generator=generator).to(score.device)
+                shuffled[:, channel] = score[order, channel]
+            return shuffled
+        raise ValueError(f"unsupported tifo_score_mode: {mode}")
 
 
 def run_filter(args, loader, device=None):
