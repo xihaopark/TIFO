@@ -94,7 +94,7 @@ shared as one scalar multiplier for a Fourier eigenfunction.
   are separated from training-engine differences.
 - TIFO improves its paired backbone on 6/7 datasets and has the smallest
   worst-case degradation and across-dataset effect variance.
-- The seven-dataset macro-average MSE is best for TIFO (0.273613), ahead of ACN
+- The seven-dataset macro-average MSE is best for TIFO (0.272629), ahead of ACN
   (0.275660), the original backbone (0.276399), and WDAN (0.284525).
 - The paper discloses that TIFO wins no individual dataset and that ACN retains
   the best macro-average MAE. This is transparent and credible.
@@ -111,9 +111,12 @@ shared as one scalar multiplier for a Fourier eigenfunction.
    supplement must state the exact search budget, official commit, configuration,
    and paired-control construction. Otherwise the improved table can still look
    selectively tuned.
-2. The macro-average advantage over ACN is small. It should be reported as an
-   observed aggregate ranking, not a statistically significant or universally
-   superior result.
+2. The macro-average advantage over ACN is descriptive rather than universal.
+   It holds for all three seed-indexed macro averages and for 6/7
+   leave-one-dataset-out summaries, but omitting Traffic reverses the ordering;
+   Traffic supplies 86.8% of the positive contributions to the absolute gap.
+   It should therefore be reported as an observed aggregate ranking, not a
+   statistically significant or universally superior result.
 3. ACN+TIFO is reported only as a complementarity diagnostic. It retains the
    predeclared ETTh1/ETTm2/Traffic scope, shows all three datasets, defines the
    order `normalization -> TIFO -> ACN encoder`, and states that it does not

@@ -97,7 +97,10 @@ training engines, we also reran a bare iTransformer inside each engine and
 report paired plug-in effects separately from absolute values. TIFO improves
 6/7 paired datasets, has the smallest worst-case degradation and effect
 variance, and obtains the lowest seven-dataset macro-average MSE. ACN retains
-the best macro-average MAE. We did not present unrelated full forecasting
+the best macro-average MAE. The updated TIFO macro MSE is 0.272629 versus
+0.275660 for ACN; the ordering holds for all three seed-indexed macro averages,
+although the absolute gap is concentrated in Traffic and is not presented as a
+cross-engine significance result. We did not present unrelated full forecasting
 architectures as plug-in controls because changing the backbone would confound
 the effect under review.
 
@@ -136,8 +139,11 @@ metrics. For ACN and WDAN, we preserve official dataset-level configurations
 and run the bare backbone in the same official engine. Missing Traffic settings
 were each selected from four validation-only candidates. We do not claim an
 identical search budget: the disclosed promoted TIFO validation lineages contain
-4 candidates on ETTh1, 50 on ETTh2, 17 on ETTm1, 4 on ETTm2, 31 on Traffic, and
-no new search on Electricity or Weather. We therefore separate absolute
+4 candidates on ETTh1, 50 on ETTh2, 17 on ETTm1, 4 on ETTm2, 8 each on
+Electricity and Weather, and 31 on Traffic. The Electricity and Weather gates
+were the first new searches for those datasets; both independently selected the
+same Hermitian-aligned, zero-pad-ratio-1.0 configuration before final testing.
+We therefore separate absolute
 cross-engine values from paired within-engine plug-in effects and retain all
 negative cases. We removed earlier headline values that could not be traced to
 complete multi-seed artifacts.
