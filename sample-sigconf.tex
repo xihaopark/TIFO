@@ -1603,11 +1603,29 @@ hyperparameter search objective.
 The current evidence supports a robust plug-in claim, not a universal or
 dataset-wise state-of-the-art claim. TIFO improves six of seven paired
 iTransformer datasets, but Traffic remains negative and ACN or WDAN has lower
-absolute MSE on several individual datasets. Moreover, the public benchmarks
-use chronological splits rather than controlled interventions on spectral
-shift. The current study therefore does not establish robustness under arbitrary
-out-of-distribution frequency changes; targeted synthetic or naturally shifted
-evaluation remains necessary for that stronger claim.
+absolute MSE on several individual datasets. We therefore add one bounded
+stress test that coherently scales the upper half of non-DC rFFT bins over each
+input/future window (table below). It probes sensitivity to
+a controlled high-frequency intervention, but does not establish robustness
+under arbitrary out-of-distribution changes or naturally occurring shifts.
+
+\begin{table}[H]
+\centering
+\caption*{Controlled high-frequency shift stress test over three seeds. Cells report
+Ori/TIFO MSE; Effect is TIFO's relative MSE reduction over Ori.}
+\small
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{c|cc|cc}
+\toprule
+Shift & ETTh1 Ori/TIFO & Effect & Traffic Ori/TIFO & Effect \\
+\midrule
+0.00 & 0.393 / 0.389 & +1.09\% & 0.393 / 0.397 & -1.02\% \\
+0.25 & 0.407 / 0.401 & +1.28\% & 0.425 / 0.428 & -0.84\% \\
+0.50 & 0.423 / 0.417 & +1.50\% & 0.464 / 0.468 & -0.70\% \\
+1.00 & 0.466 / 0.456 & +1.97\% & 0.567 / 0.569 & -0.51\% \\
+\bottomrule
+\end{tabular}}
+\end{table}
 
 \clearpage
 \onecolumn
@@ -1782,6 +1800,8 @@ Multivariate forecasting results (average) with forecasting lengths $ H \in \{96
 \resubmitchange{Table~\ref{table:recent_baselines} compares against ACN \citep{lee2025channel} and WDAN \citep{lin2025wdan}, two recent model-agnostic plug-ins, over seven datasets with iTransformer, $H=96$, and three seeds. Because their official repositories use different training engines, absolute values are reported for completeness but do not by themselves isolate the plug-in effect. We therefore rerun the bare backbone in each engine and report paired effects in Table~\ref{table:plugin_effects}. TIFO and ACN each improve 6/7 paired datasets. ACN has the largest mean improvement (+2.44\%), whereas TIFO has the smallest worst-case degradation (-1.02\%) and lowest across-dataset effect standard deviation (1.59 percentage points). In the absolute comparison, TIFO ranks second on five datasets but is not the overall winner.}
 
 \resubmitchange{Table~\ref{table:weight_alignment} provides a direct diagnostic of the proposed mechanism on the frozen ETTh1 and ETTm2 checkpoints. Positive rank correlations and high/low quartile gain ratios above one show that higher stationarity scores tend to receive larger learned gains. This evidence supports the intended conditioning behavior, but it is not a proof of monotonicity and does not eliminate the negative Traffic case.}
+
+\resubmitchange{The controlled-shift stress table evaluates the frozen ETTh1 and Traffic checkpoints under a preregistered high-frequency intervention. As shift strength increases from 0 to 1, TIFO's relative effect over Ori improves monotonically from +1.09\% to +1.97\% on ETTh1 and from -1.02\% to -0.51\% on Traffic. Thus TIFO is less sensitive to this intervention in both cases, but it does not reverse the clean-data Traffic failure.}
 
 
 
