@@ -1,0 +1,277 @@
+{
+  "protocol_id": "kdd_resubmit_tifo_hermitian_ettm2_refine_v1",
+  "defaults": {
+    "python": "/mnt/data1/park/Time Series/Forecasting/TKDE/envs/fredformer-cu128/bin/python",
+    "dataset": "ETTm2",
+    "data_type": "ETTm2",
+    "root_path": "/home/park/TS/FredNormer/dataset/ETT-small",
+    "data_path": "ETTm2.csv",
+    "features": "M",
+    "seq_len": 96,
+    "label_len": 48,
+    "pred_len": 96,
+    "enc_in": 7,
+    "dec_in": 7,
+    "c_out": 7,
+    "train_epochs": 30,
+    "patience": 3,
+    "batch_size": 32,
+    "learning_rate": 0.0001,
+    "num_workers": 0,
+    "cpu_threads": 4
+  },
+  "runs": [
+    {
+      "run_id": "tune_ettm2_h96_tifo_hermitian_refine_fd128_s2022",
+      "engine": "native",
+      "backbone": "iTransformer",
+      "method": "tifo",
+      "seed": 2022,
+      "model_args": {
+        "d_model": 128,
+        "d_ff": 128,
+        "e_layers": 2,
+        "n_heads": 8,
+        "factor": 3,
+        "filter_dim": 128,
+        "tifo_variant": "hermitian_raw",
+        "tifo_dropout": 0.5,
+        "tifo_lr_scale": 1.0,
+        "tifo_residual_alpha": 1.0,
+        "tifo_zero_pad_ratio": 0.0,
+        "skip_final_test": true
+      }
+    },
+    {
+      "run_id": "tune_ettm2_h96_tifo_hermitian_refine_fd256_s2022",
+      "engine": "native",
+      "backbone": "iTransformer",
+      "method": "tifo",
+      "seed": 2022,
+      "model_args": {
+        "d_model": 128,
+        "d_ff": 128,
+        "e_layers": 2,
+        "n_heads": 8,
+        "factor": 3,
+        "filter_dim": 256,
+        "tifo_variant": "hermitian_raw",
+        "tifo_dropout": 0.5,
+        "tifo_lr_scale": 1.0,
+        "tifo_residual_alpha": 1.0,
+        "tifo_zero_pad_ratio": 0.0,
+        "skip_final_test": true
+      }
+    },
+    {
+      "run_id": "tune_ettm2_h96_tifo_hermitian_refine_fd1024_s2022",
+      "engine": "native",
+      "backbone": "iTransformer",
+      "method": "tifo",
+      "seed": 2022,
+      "model_args": {
+        "d_model": 128,
+        "d_ff": 128,
+        "e_layers": 2,
+        "n_heads": 8,
+        "factor": 3,
+        "filter_dim": 1024,
+        "tifo_variant": "hermitian_raw",
+        "tifo_dropout": 0.5,
+        "tifo_lr_scale": 1.0,
+        "tifo_residual_alpha": 1.0,
+        "tifo_zero_pad_ratio": 0.0,
+        "skip_final_test": true
+      }
+    },
+    {
+      "run_id": "tune_ettm2_h96_tifo_hermitian_refine_do0_s2022",
+      "engine": "native",
+      "backbone": "iTransformer",
+      "method": "tifo",
+      "seed": 2022,
+      "model_args": {
+        "d_model": 128,
+        "d_ff": 128,
+        "e_layers": 2,
+        "n_heads": 8,
+        "factor": 3,
+        "filter_dim": 512,
+        "tifo_variant": "hermitian_raw",
+        "tifo_dropout": 0.0,
+        "tifo_lr_scale": 1.0,
+        "tifo_residual_alpha": 1.0,
+        "tifo_zero_pad_ratio": 0.0,
+        "skip_final_test": true
+      }
+    },
+    {
+      "run_id": "tune_ettm2_h96_tifo_hermitian_refine_do0p1_s2022",
+      "engine": "native",
+      "backbone": "iTransformer",
+      "method": "tifo",
+      "seed": 2022,
+      "model_args": {
+        "d_model": 128,
+        "d_ff": 128,
+        "e_layers": 2,
+        "n_heads": 8,
+        "factor": 3,
+        "filter_dim": 512,
+        "tifo_variant": "hermitian_raw",
+        "tifo_dropout": 0.1,
+        "tifo_lr_scale": 1.0,
+        "tifo_residual_alpha": 1.0,
+        "tifo_zero_pad_ratio": 0.0,
+        "skip_final_test": true
+      }
+    },
+    {
+      "run_id": "tune_ettm2_h96_tifo_hermitian_refine_do0p3_s2022",
+      "engine": "native",
+      "backbone": "iTransformer",
+      "method": "tifo",
+      "seed": 2022,
+      "model_args": {
+        "d_model": 128,
+        "d_ff": 128,
+        "e_layers": 2,
+        "n_heads": 8,
+        "factor": 3,
+        "filter_dim": 512,
+        "tifo_variant": "hermitian_raw",
+        "tifo_dropout": 0.3,
+        "tifo_lr_scale": 1.0,
+        "tifo_residual_alpha": 1.0,
+        "tifo_zero_pad_ratio": 0.0,
+        "skip_final_test": true
+      }
+    },
+    {
+      "run_id": "tune_ettm2_h96_tifo_hermitian_refine_lr0p125_s2022",
+      "engine": "native",
+      "backbone": "iTransformer",
+      "method": "tifo",
+      "seed": 2022,
+      "model_args": {
+        "d_model": 128,
+        "d_ff": 128,
+        "e_layers": 2,
+        "n_heads": 8,
+        "factor": 3,
+        "filter_dim": 512,
+        "tifo_variant": "hermitian_raw",
+        "tifo_dropout": 0.5,
+        "tifo_lr_scale": 0.125,
+        "tifo_residual_alpha": 1.0,
+        "tifo_zero_pad_ratio": 0.0,
+        "skip_final_test": true
+      }
+    },
+    {
+      "run_id": "tune_ettm2_h96_tifo_hermitian_refine_lr0p25_s2022",
+      "engine": "native",
+      "backbone": "iTransformer",
+      "method": "tifo",
+      "seed": 2022,
+      "model_args": {
+        "d_model": 128,
+        "d_ff": 128,
+        "e_layers": 2,
+        "n_heads": 8,
+        "factor": 3,
+        "filter_dim": 512,
+        "tifo_variant": "hermitian_raw",
+        "tifo_dropout": 0.5,
+        "tifo_lr_scale": 0.25,
+        "tifo_residual_alpha": 1.0,
+        "tifo_zero_pad_ratio": 0.0,
+        "skip_final_test": true
+      }
+    },
+    {
+      "run_id": "tune_ettm2_h96_tifo_hermitian_refine_lr0p5_s2022",
+      "engine": "native",
+      "backbone": "iTransformer",
+      "method": "tifo",
+      "seed": 2022,
+      "model_args": {
+        "d_model": 128,
+        "d_ff": 128,
+        "e_layers": 2,
+        "n_heads": 8,
+        "factor": 3,
+        "filter_dim": 512,
+        "tifo_variant": "hermitian_raw",
+        "tifo_dropout": 0.5,
+        "tifo_lr_scale": 0.5,
+        "tifo_residual_alpha": 1.0,
+        "tifo_zero_pad_ratio": 0.0,
+        "skip_final_test": true
+      }
+    },
+    {
+      "run_id": "tune_ettm2_h96_tifo_hermitian_refine_lr2_s2022",
+      "engine": "native",
+      "backbone": "iTransformer",
+      "method": "tifo",
+      "seed": 2022,
+      "model_args": {
+        "d_model": 128,
+        "d_ff": 128,
+        "e_layers": 2,
+        "n_heads": 8,
+        "factor": 3,
+        "filter_dim": 512,
+        "tifo_variant": "hermitian_raw",
+        "tifo_dropout": 0.5,
+        "tifo_lr_scale": 2.0,
+        "tifo_residual_alpha": 1.0,
+        "tifo_zero_pad_ratio": 0.0,
+        "skip_final_test": true
+      }
+    },
+    {
+      "run_id": "tune_ettm2_h96_tifo_hermitian_refine_alpha0p5_s2022",
+      "engine": "native",
+      "backbone": "iTransformer",
+      "method": "tifo",
+      "seed": 2022,
+      "model_args": {
+        "d_model": 128,
+        "d_ff": 128,
+        "e_layers": 2,
+        "n_heads": 8,
+        "factor": 3,
+        "filter_dim": 512,
+        "tifo_variant": "hermitian_raw",
+        "tifo_dropout": 0.5,
+        "tifo_lr_scale": 1.0,
+        "tifo_residual_alpha": 0.5,
+        "tifo_zero_pad_ratio": 0.0,
+        "skip_final_test": true
+      }
+    },
+    {
+      "run_id": "tune_ettm2_h96_tifo_hermitian_refine_alpha0p75_s2022",
+      "engine": "native",
+      "backbone": "iTransformer",
+      "method": "tifo",
+      "seed": 2022,
+      "model_args": {
+        "d_model": 128,
+        "d_ff": 128,
+        "e_layers": 2,
+        "n_heads": 8,
+        "factor": 3,
+        "filter_dim": 512,
+        "tifo_variant": "hermitian_raw",
+        "tifo_dropout": 0.5,
+        "tifo_lr_scale": 1.0,
+        "tifo_residual_alpha": 0.75,
+        "tifo_zero_pad_ratio": 0.0,
+        "skip_final_test": true
+      }
+    }
+  ]
+}
