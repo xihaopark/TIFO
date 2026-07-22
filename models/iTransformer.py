@@ -8,6 +8,7 @@ import numpy as np
 
 from utils.frequency_domain_filter import build_frequency_domain_filter
 from layers.PluginNormalization import AdaptiveChannelNorm
+from utils.wdan_adapter import build_wdan_adapter
 
 
 class Model(nn.Module):
@@ -20,6 +21,7 @@ class Model(nn.Module):
         self.global_mask = global_mask
         self.use_tifo = getattr(configs, 'method', 'tifo') == 'tifo'
         self.use_acn = getattr(configs, 'method', 'tifo') == 'acn'
+        self.use_wdan = getattr(configs, 'method', 'tifo') == 'wdan'
         self.channels = configs.enc_in
 
         self.task_name = configs.task_name
@@ -67,13 +69,19 @@ class Model(nn.Module):
             self.projection = nn.Linear(configs.d_model * configs.enc_in, configs.num_class)
 
         self.filter = build_frequency_domain_filter(configs, self.global_mask) if self.use_tifo else None
+        self.wdan_adapter = build_wdan_adapter(configs) if self.use_wdan else None
 
     def forecast(self, x_enc, x_mark_enc, x_dec, x_mark_dec):
 
-        means = x_enc.mean(1, keepdim=True).detach()
-        x_enc = x_enc - means
-        stdev = torch.sqrt(torch.var(x_enc, dim=1, keepdim=True, unbiased=False) + 1e-5)
-        x_enc /= stdev
+        wdan_statistics = None
+        if self.use_wdan:
+            x_enc, wdan_statistics = self.wdan_adapter.normalize(x_enc)
+            means = stdev = None
+        else:
+            means = x_enc.mean(1, keepdim=True).detach()
+            x_enc = x_enc - means
+            stdev = torch.sqrt(torch.var(x_enc, dim=1, keepdim=True, unbiased=False) + 1e-5)
+            x_enc /= stdev
 
         _, _, N = x_enc.shape
 
@@ -86,9 +94,24 @@ class Model(nn.Module):
         enc_out, attns = self.encoder(enc_out, attn_mask=None)
         dec_out = self.projection(enc_out).permute(0, 2, 1)[:, :, :N]
         # De-Normalization from Non-stationary Transformer
-        dec_out = dec_out * (stdev[:, 0, :].unsqueeze(1).repeat(1, self.pred_len, 1))
-        dec_out = dec_out + (means[:, 0, :].unsqueeze(1).repeat(1, self.pred_len, 1))
+        if self.use_wdan:
+            dec_out = self.wdan_adapter.de_normalize(dec_out, wdan_statistics)
+            save = wdan_statistics
+        else:
+            dec_out = dec_out * (stdev[:, 0, :].unsqueeze(1).repeat(1, self.pred_len, 1))
+            dec_out = dec_out + (means[:, 0, :].unsqueeze(1).repeat(1, self.pred_len, 1))
         return dec_out, save
+
+    def wdan_statistics_loss(self, predicted_statistics, future):
+        if not self.use_wdan or predicted_statistics is None:
+            raise RuntimeError("WDAN statistics loss requested outside WDAN mode")
+        _, low_frequency, high_frequency_scale = self.wdan_adapter.normalize(
+            future, predict=False
+        )
+        target_statistics = torch.stack(
+            (low_frequency, high_frequency_scale), dim=1
+        )
+        return F.mse_loss(predicted_statistics, target_statistics)
 
     def imputation(self, x_enc, x_mark_enc, x_dec, x_mark_dec, mask):
         # Normalization from Non-stationary Transformer

@@ -51,7 +51,15 @@ if __name__ == '__main__':
                         help='fixed local seed for the permuted-score control')
     parser.add_argument('--acn_temperature', type=float, default=0.1,
                         help='temperature for the native adaptive channel-normalization plug-in')
-    parser.add_argument('--method', type=str, default='tifo', choices=['ori', 'tifo', 'acn'],
+    parser.add_argument('--wdan_levels', type=int, default=2)
+    parser.add_argument('--wdan_window', type=int, default=5)
+    parser.add_argument('--wdan_d_model', type=int, default=128)
+    parser.add_argument('--wdan_d_ff', type=int, default=128)
+    parser.add_argument('--wdan_layers', type=int, default=1)
+    parser.add_argument('--wdan_dropout', type=float, default=0.1)
+    parser.add_argument('--wdan_aux_weight', type=float, default=1.0)
+    parser.add_argument('--wdan_lr_scale', type=float, default=1.0)
+    parser.add_argument('--method', type=str, default='tifo', choices=['ori', 'tifo', 'acn', 'wdan'],
                         help='matched representation plug-in; ori is the bare backbone control')
 
     #Fredformer:

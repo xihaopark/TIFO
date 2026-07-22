@@ -83,6 +83,26 @@ class Exp_Long_Term_Forecast(Exp_Basic):
         return data_set, data_loader
 
     def _select_optimizer(self):
+        if getattr(self.args, 'method', 'ori') == 'wdan':
+            lr_scale = float(getattr(self.args, 'wdan_lr_scale', 1.0))
+            backbone_params, adapter_params = [], []
+            for name, parameter in self.model.named_parameters():
+                if not parameter.requires_grad:
+                    continue
+                (adapter_params if 'wdan_adapter.' in name else backbone_params).append(parameter)
+            if not adapter_params:
+                raise RuntimeError('WDAN mode has no statistics-adapter parameters')
+            return optim.Adam(
+                [
+                    {'params': backbone_params, 'lr': self.args.learning_rate, 'lr_scale': 1.0},
+                    {
+                        'params': adapter_params,
+                        'lr': self.args.learning_rate * lr_scale,
+                        'lr_scale': lr_scale,
+                    },
+                ],
+                lr=self.args.learning_rate,
+            )
         lr_scale = float(getattr(self.args, 'tifo_lr_scale', 1.0))
         if getattr(self.args, 'method', 'ori') != 'tifo' or lr_scale == 1.0:
             return optim.Adam(self.model.parameters(), lr=self.args.learning_rate)
@@ -113,6 +133,13 @@ class Exp_Long_Term_Forecast(Exp_Basic):
     def _select_criterion(self):
         criterion = nn.MSELoss()
         return criterion
+
+    def _add_method_training_loss(self, loss, auxiliary, target):
+        if getattr(self.args, 'method', 'ori') != 'wdan':
+            return loss
+        model = self.model.module if isinstance(self.model, nn.DataParallel) else self.model
+        weight = float(getattr(self.args, 'wdan_aux_weight', 1.0))
+        return loss + weight * model.wdan_statistics_loss(auxiliary, target)
 
 
     def vali(self, vali_data, vali_loader, criterion):
@@ -205,6 +232,7 @@ class Exp_Long_Term_Forecast(Exp_Basic):
                         outputs = outputs[:, -self.args.pred_len:, f_dim:]
                         batch_y = batch_y[:, -self.args.pred_len:, f_dim:].to(self.device)
                         loss = criterion(outputs, batch_y)
+                        loss = self._add_method_training_loss(loss, save, batch_y)
                         train_loss.append(loss.item())
                 else:
                     if self.args.output_attention:
@@ -215,7 +243,8 @@ class Exp_Long_Term_Forecast(Exp_Basic):
                     f_dim = -1 if self.args.features == 'MS' else 0
                     outputs = outputs[:, -self.args.pred_len:, f_dim:]
                     batch_y = batch_y[:, -self.args.pred_len:, f_dim:].to(self.device)
-                    loss = criterion(outputs, batch_y) #+ self.model.calculate_sin_loss(batch_x, batch_y).detach().cpu()
+                    loss = criterion(outputs, batch_y)
+                    loss = self._add_method_training_loss(loss, save, batch_y)
                     train_loss.append(loss.item())
 
                 if (i + 1) % 100 == 0:

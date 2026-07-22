@@ -123,6 +123,28 @@ def assert_paired_initialization(mask: torch.Tensor) -> None:
         )
     print("native ACN ok: paired backbone initialization and finite gradients")
 
+    wdan_args = make_args("wdan")
+    wdan_args.wdan_levels = 2
+    wdan_args.wdan_window = 5
+    wdan_args.wdan_d_model = 32
+    wdan_args.wdan_d_ff = 32
+    wdan_args.wdan_layers = 1
+    wdan_args.wdan_dropout = 0.0
+    seed_everything(2021)
+    wdan = iTransformer.Model(wdan_args, None)
+    output, statistics = wdan(sample, sample_mark, None, None)
+    if output.shape != (4, 96, 7) or not torch.isfinite(output).all():
+        raise AssertionError("native WDAN returned an invalid output")
+    loss = output.square().mean() + wdan.wdan_statistics_loss(statistics, sample)
+    loss.backward()
+    if not all(
+        parameter.grad is not None and torch.isfinite(parameter.grad).all()
+        for parameter in wdan.wdan_adapter.parameters()
+        if parameter.requires_grad
+    ):
+        raise AssertionError("native WDAN adapter lacks finite gradients")
+    print("native WDAN ok: real forecast, auxiliary statistics, finite gradients")
+
 
 def assert_yamabuki_candidates(device: torch.device) -> None:
     """Check the alpha-shrinkage and zero-padding candidates imported from server 25."""
