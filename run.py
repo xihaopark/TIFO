@@ -49,8 +49,10 @@ if __name__ == '__main__':
                         help='dataset score or an auditable score-conditioning control')
     parser.add_argument('--tifo_score_seed', type=int, default=1729,
                         help='fixed local seed for the permuted-score control')
-    parser.add_argument('--method', type=str, default='tifo', choices=['ori', 'tifo'],
-                        help='representation method; ori disables TIFO and is the matched backbone control')
+    parser.add_argument('--acn_temperature', type=float, default=0.1,
+                        help='temperature for the native adaptive channel-normalization plug-in')
+    parser.add_argument('--method', type=str, default='tifo', choices=['ori', 'tifo', 'acn'],
+                        help='matched representation plug-in; ori is the bare backbone control')
 
     #Fredformer:
     parser.add_argument('--cf_dim',         type=int, default=48)   #feature dimension

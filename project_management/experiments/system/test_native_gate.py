@@ -95,6 +95,27 @@ def assert_paired_initialization(mask: torch.Tensor) -> None:
             raise AssertionError(f"paired backbone initialization differs at {key}")
     torch.testing.assert_close(ori_next_random, tifo_next_random, rtol=0, atol=0)
 
+    seed_everything(2021)
+    acn = iTransformer.Model(make_args("acn"), None)
+    for key in shared_keys:
+        if key.startswith("encoder.attn_layers") and ".norm" in key:
+            continue
+        if key in acn.state_dict() and not torch.equal(ori_state[key], acn.state_dict()[key]):
+            raise AssertionError(f"paired Ori/ACN backbone initialization differs at {key}")
+
+    sample = torch.randn(4, 96, 7)
+    output, _ = acn(sample, None, None, None)
+    if output.shape != (4, 96, 7) or not torch.isfinite(output).all():
+        raise AssertionError("native ACN returned an invalid output")
+    output.square().mean().backward()
+    if not all(
+        parameter.grad is not None and torch.isfinite(parameter.grad).all()
+        for name, parameter in acn.named_parameters()
+        if "norm" in name and parameter.requires_grad
+    ):
+        raise AssertionError("native ACN normalization parameters lack finite gradients")
+    print("native ACN ok: paired backbone initialization and finite gradients")
+
 
 def assert_yamabuki_candidates(device: torch.device) -> None:
     """Check the alpha-shrinkage and zero-padding candidates imported from server 25."""

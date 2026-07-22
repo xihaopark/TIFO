@@ -7,6 +7,7 @@ from layers.Embed import DataEmbedding_inverted
 import numpy as np
 
 from utils.frequency_domain_filter import build_frequency_domain_filter
+from layers.PluginNormalization import AdaptiveChannelNorm
 
 
 class Model(nn.Module):
@@ -18,6 +19,7 @@ class Model(nn.Module):
         super(Model, self).__init__()
         self.global_mask = global_mask
         self.use_tifo = getattr(configs, 'method', 'tifo') == 'tifo'
+        self.use_acn = getattr(configs, 'method', 'tifo') == 'acn'
         self.channels = configs.enc_in
 
         self.task_name = configs.task_name
@@ -28,18 +30,28 @@ class Model(nn.Module):
         self.enc_embedding = DataEmbedding_inverted(configs.seq_len, configs.d_model, configs.embed, configs.freq,
                                                     configs.dropout)
         # Encoder
-        self.encoder = Encoder(
-            [
-                EncoderLayer(
+        encoder_layers = []
+        for _ in range(configs.e_layers):
+            layer = EncoderLayer(
                     AttentionLayer(
                         FullAttention(False, configs.factor, attention_dropout=configs.dropout,
                                       output_attention=configs.output_attention), configs.d_model, configs.n_heads),
                     configs.d_model,
                     configs.d_ff,
                     dropout=configs.dropout,
-                    activation=configs.activation
-                ) for l in range(configs.e_layers)
-            ],
+                    activation=configs.activation,
+                )
+            if self.use_acn:
+                temperature = float(getattr(configs, 'acn_temperature', 0.1))
+                layer.norm1 = AdaptiveChannelNorm(
+                    configs.enc_in, configs.d_model, temperature
+                )
+                layer.norm2 = AdaptiveChannelNorm(
+                    configs.enc_in, configs.d_model, temperature
+                )
+            encoder_layers.append(layer)
+        self.encoder = Encoder(
+            encoder_layers,
             norm_layer=torch.nn.LayerNorm(configs.d_model)
         )
         # Decoder
