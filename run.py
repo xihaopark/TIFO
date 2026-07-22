@@ -28,6 +28,7 @@ if __name__ == '__main__':
                             'hermitian_raw',
                             'hermitian_aligned',
                             'hermitian_shared',
+                            'hermitian_diagonal',
                         ],
                         help=(
                             'TIFO operator; historical exactly matches the result-producing '
@@ -38,6 +39,8 @@ if __name__ == '__main__':
                         ))
     parser.add_argument('--tifo_dropout', type=float, default=0.5,
                         help='dropout inside the historical TIFO weight MLPs')
+    parser.add_argument('--tifo_gain_limit', type=float, default=0.5,
+                        help='maximum log-gain scale for the diagonal phase-preserving TIFO variant')
     parser.add_argument('--tifo_lr_scale', type=float, default=1.0,
                         help='TIFO filter learning-rate multiplier relative to the backbone')
     parser.add_argument('--tifo_residual_alpha', type=float, default=1.0,
