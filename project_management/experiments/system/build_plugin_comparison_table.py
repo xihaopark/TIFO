@@ -59,6 +59,10 @@ def main() -> None:
     improves = {method: 0 for method in ("ACN", "WDAN", "TIFO")}
     worst_relative = {method: float("inf") for method in improves}
     relative_effects = {method: [] for method in improves}
+    aggregate = {
+        method: {metric: {seed: [] for seed in SEEDS} for metric in ("mse", "mae")}
+        for method in ("Ori", "ACN", "WDAN", "TIFO")
+    }
 
     for dataset in DATASETS:
         if dataset in hermitian_datasets:
@@ -94,6 +98,10 @@ def main() -> None:
         }
         mse = {name: stats(rows, "mse") for name, rows in groups.items()}
         mae = {name: stats(rows, "mae") for name, rows in groups.items()}
+        for name, rows in groups.items():
+            for row in rows:
+                aggregate[name]["mse"][row["seed"]].append(float(row["mse"]))
+                aggregate[name]["mae"][row["seed"]].append(float(row["mae"]))
         best_mse = min(value[0] for value in mse.values())
         best_mae = min(value[0] for value in mae.values())
         second_mse = sorted(value[0] for value in mse.values())[1]
@@ -125,6 +133,41 @@ def main() -> None:
                 mae_cell = f"\\uline{{{mae_cell}}}"
             cells.extend((mse_cell, mae_cell))
         tex.append(f"{dataset} & " + " & ".join(cells) + r" \\")
+
+    aggregate_stats = {}
+    for name in ("Ori", "ACN", "WDAN", "TIFO"):
+        aggregate_stats[name] = {}
+        for metric in ("mse", "mae"):
+            seed_averages = [
+                statistics.mean(aggregate[name][metric][seed]) for seed in sorted(SEEDS)
+            ]
+            aggregate_stats[name][metric] = (
+                statistics.mean(seed_averages), statistics.stdev(seed_averages)
+            )
+    best_avg_mse = min(aggregate_stats[name]["mse"][0] for name in aggregate_stats)
+    best_avg_mae = min(aggregate_stats[name]["mae"][0] for name in aggregate_stats)
+    second_avg_mse = sorted(aggregate_stats[name]["mse"][0] for name in aggregate_stats)[1]
+    second_avg_mae = sorted(aggregate_stats[name]["mae"][0] for name in aggregate_stats)[1]
+    markdown.append(
+        "| **Macro avg.** | " + " | ".join(
+            f"{aggregate_stats[name]['mse'][0]:.6f} / {aggregate_stats[name]['mae'][0]:.6f}"
+            for name in ("Ori", "ACN", "WDAN", "TIFO")
+        ) + " |"
+    )
+    aggregate_cells = []
+    for name in ("Ori", "ACN", "WDAN", "TIFO"):
+        mse_cell = fmt(aggregate_stats[name]["mse"])
+        mae_cell = fmt(aggregate_stats[name]["mae"])
+        if aggregate_stats[name]["mse"][0] == best_avg_mse:
+            mse_cell = f"\\textbf{{{mse_cell}}}"
+        elif aggregate_stats[name]["mse"][0] == second_avg_mse:
+            mse_cell = f"\\uline{{{mse_cell}}}"
+        if aggregate_stats[name]["mae"][0] == best_avg_mae:
+            mae_cell = f"\\textbf{{{mae_cell}}}"
+        elif aggregate_stats[name]["mae"][0] == second_avg_mae:
+            mae_cell = f"\\uline{{{mae_cell}}}"
+        aggregate_cells.extend((mse_cell, mae_cell))
+    tex.extend((r"\midrule", "Macro avg. & " + " & ".join(aggregate_cells) + r" \\"))
 
     markdown.extend((
         "",
