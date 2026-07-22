@@ -38,9 +38,10 @@ The theory should establish only what the implementation supports:
 3. `lambda = MLP(S)` is a set of globally shared spectral gains optimized jointly
    with the forecasting backbone. The forecasting loss, not a kernel objective,
    determines whether high- or low-score components are emphasized.
-4. With one-sided rFFT coefficients and real-valued gains, iRFFT produces a
-   real-valued sequence by construction. This is the only clean formal property
-   needed for the operator.
+4. With one-sided rFFT coefficients, TIFO applies separate real-valued gains to
+   the real and imaginary coefficient arrays. Passing the resulting one-sided
+   complex array to iRFFT produces a real-valued sequence by construction. This
+   is the only clean formal property needed for the operator.
 5. "Time-invariant" means that the learned gains are fixed across test samples
    and require no online update. It does not mean invariance to every unseen
    temporal distribution.
@@ -70,14 +71,17 @@ The theory should establish only what the implementation supports:
 ### Narrow formal statement
 
 > **Proposition (real-valued reconstruction).** Let `X` be real-valued and let
-> `Z=rFFT(X)`. For any real-valued gain array `g` with the same one-sided spectral
-> shape, `X_tilde=iRFFT(g odot Z, n=L)` is real-valued. Moreover, if `g=1`, then
+> `Z=rFFT(X)`. For real-valued gain arrays `g_r` and `g_i` with the same
+> one-sided spectral shape, define
+> `Z_tilde = g_r odot Re(Z) + i g_i odot Im(Z)`. Then
+> `X_tilde=iRFFT(Z_tilde, n=L)` is real-valued. Moreover, if `g_r=g_i=1`, then
 > `X_tilde=X` up to numerical precision.
 >
 > **Justification.** The one-sided rFFT representation implicitly specifies the
-> conjugate-symmetric negative-frequency coefficients required for a real signal;
-> multiplying the represented bins by real gains preserves that construction.
-> The inverse rFFT therefore maps the reweighted spectrum to a real sequence.
+> conjugate-symmetric negative-frequency coefficients required for a real signal.
+> The inverse rFFT constructs those omitted coefficients from any supplied
+> one-sided complex array, so it maps the separately reweighted real and imaginary
+> parts to a real sequence. Unit gains recover the original one-sided spectrum.
 
 ### Scope
 
