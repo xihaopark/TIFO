@@ -350,7 +350,7 @@ In the existing works, normalizing low-order statistics may help align total ene
 \reviewtext{Specifically, frequency-domain analysis provides a disentangled view of underlying temporal features, enabling the model to capture fine-grained stationarity.}
 \reviewtext{Crucially, such analysis is conducted across samples at the dataset level: the observed distribution $p(x)$ is formulated as a weighted average of the conditional distributions $p(x|t)$ over all possible time conditions, where the weights are given by $p(t)$.}
 \reviewtext{Thus, we can achieve the same goal (weakening the dependency of $x$ on $t$) but account for the full temporal variability.}
-To this end, we propose Time-Invariant Frequency Operator (\method) for stationarity-aware representation learning, which consistes two stages.
+To this end, we propose Time-Invariant Frequency Operator (\method) for stationarity-aware representation learning, which consists of two stages.
 
 \textbf{Stage-I}: We apply the Discrete Fourier Transform (DFT) to all samples in a given time series dataset to obtain their frequency components. 
 \reviewtext{For each frequency, we then conduct cross-sample statistical analysis and use a lightweight neural network layer to learn a weight that quantifies its time-invariant relevance for mitigating distributional shift.}
@@ -2249,7 +2249,7 @@ input adapter on cross-window dataset statistics and leaves the forecasting
 backbone intact. This distinction narrows the novelty claim to the source and
 deployment of the spectral weights, not to frequency filtering itself.
 However, these methods typically focus on optimizing architecture efficiency (FITS), output-side loss constraints (FreDF), or representation expressiveness (Dynamic Fusion). 
-They do not explicitly estimate dataset-level frequency statioanrity to guide input adaptation.
+They do not explicitly estimate dataset-level frequency stationarity to guide input adaptation.
 In contrast, \method is designed as a universal preprocessing layer decoupled from the backbone architecture.
 %It focuses specifically on learning frequency stationarity from training statistics to mitigate input-side spectral distribution shift. 
 Therefore, \method is complementary to, rather than repetitive of, these architecture-level frequency domain models.
