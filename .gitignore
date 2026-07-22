@@ -17,6 +17,7 @@ results/
 test_results/
 result_*.txt
 experiment_records/
+release_artifacts/
 
 # Reproducibly fetched upstream baselines (see project_management/baselines/)
 third_party/
