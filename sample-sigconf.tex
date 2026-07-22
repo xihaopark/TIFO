@@ -1581,7 +1581,10 @@ All promoted results use seeds 2021--2023. TIFO choices are selected using the
 validation split and frozen before the final test aggregation. ACN and WDAN are
 executed from their official repositories with their published dataset-level
 settings; the missing Traffic setting is likewise selected using validation
-data only. Since those repositories contain different training engines, their
+data only. We do not claim identical search budgets: the external plug-ins use
+official settings wherever available, while the complete validation-only TIFO
+candidate lineages are disclosed in the accompanying reproducibility ledger.
+Since those repositories contain different training engines, their
 absolute errors mix plug-in and engine effects. We therefore also disable each
 plug-in and rerun its bare iTransformer within the same engine, yielding the
 paired effect comparison in Table~\ref{table:plugin_effects}. In particular,
@@ -1594,10 +1597,9 @@ implementation concern that independently weighted coefficients need not obey
 Hermitian symmetry, we added an rFFT/iRFFT path that preserves real-valued
 reconstruction by construction. Raw and window-normalized stationarity scores,
 zero padding, and filter width are compared only on validation data. The selected
-ETTh1 and ETTm2 configurations are then frozen for the three-seed test runs; a
-larger filter that improved ETTm2 validation error but degraded the frozen test
-aggregate is not adopted. This separation prevents the test set from becoming a
-hyperparameter search objective.
+ETTh1 and ETTm2 configurations are then frozen for the reported three-seed test
+runs. Later diagnostic variants are not used to replace these preregistered main
+configurations.
 
 \noindent\textbf{Scope and limitations.}
 The current evidence supports a robust plug-in claim, not a universal or
