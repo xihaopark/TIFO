@@ -1,14 +1,14 @@
 import os
 import torch
-from models import iTransformer
+from models import iTransformer, DLinear, PatchTST
 
 class Exp_Basic(object):
     def __init__(self, args):
         self.args = args
         self.model_dict = {
-            
+            'DLinear': DLinear,
             'iTransformer': iTransformer,
-            
+            'PatchTST': PatchTST
         }
         if args.model == 'Mamba':
             print('Please make sure you have successfully installed mamba_ssm')

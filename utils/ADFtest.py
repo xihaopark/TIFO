@@ -48,7 +48,7 @@ if __name__ == '__main__':
     print("Exchange ADF metric", ADFmetric)
 
     # * Illness - result: -5.33416661870624 | report: -5.406
-    ADFmetric = archADF(root_path="./dataset/illness/",data_path="national_illness.csv") 
+    ADFmetric = archADF(root_path="./dataset/illness/",data_path="national_illness.csv")
     print("Illness ADF metric", ADFmetric)
 
     # * ETTm2 - result: -5.663628743471695 | report: -6.225

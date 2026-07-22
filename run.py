@@ -19,6 +19,35 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='TimesNet')
 
     parser.add_argument('--filter_dim',     type=int, default=512)
+    parser.add_argument('--tifo_prior_strength', type=float, default=0.0,
+                        help='strength of the normalized stationarity-score prior in TIFO weights')
+    parser.add_argument('--tifo_variant', type=str, default='historical',
+                        choices=[
+                            'historical',
+                            'identity_prior',
+                            'hermitian_raw',
+                            'hermitian_aligned',
+                        ],
+                        help=(
+                            'TIFO operator; historical exactly matches the result-producing '
+                            'full-FFT path, while hermitian variants use rFFT/iRFFT and either '
+                            'raw or backbone-aligned stationarity statistics'
+                        ))
+    parser.add_argument('--tifo_dropout', type=float, default=0.5,
+                        help='dropout inside the historical TIFO weight MLPs')
+    parser.add_argument('--tifo_lr_scale', type=float, default=1.0,
+                        help='TIFO filter learning-rate multiplier relative to the backbone')
+    parser.add_argument('--tifo_residual_alpha', type=float, default=1.0,
+                        help='blend strength from the identity input to the TIFO-filtered input')
+    parser.add_argument('--tifo_zero_pad_ratio', type=float, default=0.0,
+                        help='right-side zero padding as a fraction of seq_len; statistics and weights use the padded FFT grid')
+    parser.add_argument('--tifo_score_mode', type=str, default='data',
+                        choices=['data', 'permuted', 'ones'],
+                        help='dataset score or an auditable score-conditioning control')
+    parser.add_argument('--tifo_score_seed', type=int, default=1729,
+                        help='fixed local seed for the permuted-score control')
+    parser.add_argument('--method', type=str, default='tifo', choices=['ori', 'tifo'],
+                        help='representation method; ori disables TIFO and is the matched backbone control')
 
     #Fredformer:
     parser.add_argument('--cf_dim',         type=int, default=48)   #feature dimension
@@ -40,7 +69,7 @@ if __name__ == '__main__':
     parser.add_argument('--pct_start', type=float, default=0.3, help='pct_start')
     parser.add_argument('--individual', type=int, default=1, help='individual head; True 1 False 0')
     parser.add_argument('--stride', type=int, default=8, help='stride')
-    
+
     # basic config
     parser.add_argument('--task_name', type=str, required=True, default='long_term_forecast',
                         help='task name, options:[long_term_forecast, short_term_forecast, imputation, classification, anomaly_detection]')
@@ -71,7 +100,7 @@ if __name__ == '__main__':
     parser.add_argument('--mask_rate', type=float, default=0.25, help='mask ratio')
 
     # anomaly detection task
-    parser.add_argument('--anomaly_ratio', type=float, default=0.25, help='prior anomaly ratio (%)')
+    parser.add_argument('--anomaly_ratio', type=float, default=0.25, help='prior anomaly ratio (%%)')
 
     # model define
     parser.add_argument('--expand', type=int, default=2, help='expansion factor for Mamba')
@@ -109,6 +138,8 @@ if __name__ == '__main__':
                         help='the length of segmen-wise iteration of SegRNN')
 
     # optimization
+    parser.add_argument('--cpu_threads', type=int, default=4,
+                        help='PyTorch CPU intra/inter-op threads; keep small for concurrent GPU runs')
     parser.add_argument('--num_workers', type=int, default=10, help='data loader num workers')
     parser.add_argument('--itr', type=int, default=1, help='experiments times')
     parser.add_argument('--train_epochs', type=int, default=100, help='train epochs')
@@ -132,9 +163,9 @@ if __name__ == '__main__':
     parser.add_argument('--p_hidden_layers', type=int, default=2, help='number of hidden layers in projector')
 
     # metrics (dtw)
-    parser.add_argument('--use_dtw', type=bool, default=False, 
+    parser.add_argument('--use_dtw', type=bool, default=False,
                         help='the controller of using dtw metric (dtw is time consuming, not suggested unless necessary)')
-    
+
     # Augmentation
     parser.add_argument('--augmentation_ratio', type=int, default=0, help="How many times to augment")
     parser.add_argument('--seed', type=int, default=2, help="Randomization seed")
@@ -154,8 +185,38 @@ if __name__ == '__main__':
     parser.add_argument('--discdtw', default=False, action="store_true", help="Discrimitive DTW warp preset augmentation")
     parser.add_argument('--discsdtw', default=False, action="store_true", help="Discrimitive shapeDTW warp preset augmentation")
     parser.add_argument('--extra_tag', type=str, default="", help="Anything extra")
+    parser.add_argument('--skip_final_test', action='store_true',
+                        help='validation-only tuning run; do not inspect the test split')
+    parser.add_argument('--save_arrays', action='store_true',
+                        help='save large prediction/target arrays in addition to metrics')
+    parser.add_argument('--spectral_shift_strength', type=float, default=0.0,
+                        help='evaluation-only gain applied to the upper half of non-DC rFFT bins over the combined input/future window')
+    parser.add_argument('--evaluation_tag', type=str, default='',
+                        help='suffix for evaluation outputs; does not alter the checkpoint setting')
 
     args = parser.parse_args()
+    if args.cpu_threads < 1:
+        parser.error('--cpu_threads must be at least 1')
+    if args.tifo_lr_scale <= 0:
+        parser.error('--tifo_lr_scale must be positive')
+    if not 0 <= args.tifo_residual_alpha <= 1:
+        parser.error('--tifo_residual_alpha must be in [0, 1]')
+    if args.tifo_zero_pad_ratio < 0:
+        parser.error('--tifo_zero_pad_ratio must be non-negative')
+    if args.spectral_shift_strength < 0:
+        parser.error('--spectral_shift_strength must be non-negative')
+    if args.is_training and args.spectral_shift_strength != 0:
+        parser.error('--spectral_shift_strength is evaluation-only; use --is_training 0')
+    if args.evaluation_tag and not args.evaluation_tag.replace('_', '').replace('-', '').isalnum():
+        parser.error('--evaluation_tag may contain only letters, numbers, underscores, and hyphens')
+    torch.set_num_threads(args.cpu_threads)
+    torch.set_num_interop_threads(args.cpu_threads)
+    fix_seed = args.random_seed
+    random.seed(fix_seed)
+    torch.manual_seed(fix_seed)
+    np.random.seed(fix_seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(fix_seed)
     # args.use_gpu = True if torch.cuda.is_available() and args.use_gpu else False
     args.use_gpu = True if torch.cuda.is_available() else False
 
@@ -187,11 +248,13 @@ if __name__ == '__main__':
         for ii in range(args.itr):
             # setting record of experiments
             exp = Exp(args)  # set experiments
-            setting = '{}_{}_{}_{}_ft{}_sl{}_ll{}_pl{}_dm{}_nh{}_el{}_dl{}_df{}_expand{}_dc{}_fc{}_eb{}_dt{}_{}_{}'.format(
+            setting = '{}_{}_{}_{}_{}_seed{}_ft{}_sl{}_ll{}_pl{}_dm{}_nh{}_el{}_dl{}_df{}_expand{}_dc{}_fc{}_eb{}_dt{}_{}_{}'.format(
                 args.task_name,
                 args.model_id,
                 args.model,
                 args.data,
+                args.method,
+                args.random_seed,
                 args.features,
                 args.seq_len,
                 args.label_len,
@@ -211,16 +274,19 @@ if __name__ == '__main__':
             print('>>>>>>>start training : {}>>>>>>>>>>>>>>>>>>>>>>>>>>'.format(setting))
             exp.train(setting)
 
-            print('>>>>>>>testing : {}<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<'.format(setting))
-            exp.test(setting)
+            if not args.skip_final_test:
+                print('>>>>>>>testing : {}<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<'.format(setting))
+                exp.test(setting)
             torch.cuda.empty_cache()
     else:
         ii = 0
-        setting = '{}_{}_{}_{}_ft{}_sl{}_ll{}_pl{}_dm{}_nh{}_el{}_dl{}_df{}_expand{}_dc{}_fc{}_eb{}_dt{}_{}_{}'.format(
+        setting = '{}_{}_{}_{}_{}_seed{}_ft{}_sl{}_ll{}_pl{}_dm{}_nh{}_el{}_dl{}_df{}_expand{}_dc{}_fc{}_eb{}_dt{}_{}_{}'.format(
             args.task_name,
             args.model_id,
             args.model,
             args.data,
+            args.method,
+            args.random_seed,
             args.features,
             args.seq_len,
             args.label_len,

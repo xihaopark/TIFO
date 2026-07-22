@@ -6,7 +6,7 @@ from layers.SelfAttention_Family import FullAttention, AttentionLayer
 from layers.Embed import DataEmbedding_inverted
 import numpy as np
 
-from utils.frequency_domain_filter import FrequencyDomainFilter
+from utils.frequency_domain_filter import build_frequency_domain_filter
 
 
 class Model(nn.Module):
@@ -17,9 +17,9 @@ class Model(nn.Module):
     def __init__(self, configs, global_mask):
         super(Model, self).__init__()
         self.global_mask = global_mask
-        self.filter = FrequencyDomainFilter(configs, self.global_mask)
+        self.use_tifo = getattr(configs, 'method', 'tifo') == 'tifo'
         self.channels = configs.enc_in
-        
+
         self.task_name = configs.task_name
         self.seq_len = configs.seq_len
         self.pred_len = configs.pred_len
@@ -53,7 +53,9 @@ class Model(nn.Module):
             self.act = F.gelu
             self.dropout = nn.Dropout(configs.dropout)
             self.projection = nn.Linear(configs.d_model * configs.enc_in, configs.num_class)
-    
+
+        self.filter = build_frequency_domain_filter(configs, self.global_mask) if self.use_tifo else None
+
     def forecast(self, x_enc, x_mark_enc, x_dec, x_mark_dec):
 
         means = x_enc.mean(1, keepdim=True).detach()
@@ -63,15 +65,14 @@ class Model(nn.Module):
 
         _, _, N = x_enc.shape
 
-        x_enc = self.filter(x_enc)
+        if self.use_tifo:
+            x_enc = self.filter(x_enc)
         save = x_enc
 
         # Embedding
         enc_out = self.enc_embedding(x_enc, x_mark_enc)
         enc_out, attns = self.encoder(enc_out, attn_mask=None)
-
         dec_out = self.projection(enc_out).permute(0, 2, 1)[:, :, :N]
-
         # De-Normalization from Non-stationary Transformer
         dec_out = dec_out * (stdev[:, 0, :].unsqueeze(1).repeat(1, self.pred_len, 1))
         dec_out = dec_out + (means[:, 0, :].unsqueeze(1).repeat(1, self.pred_len, 1))
