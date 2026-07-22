@@ -111,7 +111,8 @@ def enforce_complete_scope(cells: list[tuple[str, int]]) -> None:
 
 
 def fmt(value: tuple[float, float], best: bool = False) -> str:
-    rendered = f"{value[0]:.3f} {{\\small $\\pm$ {value[1]:.3f}}}"
+    # Five decimals keep the narrow Traffic-MAE win visible; four suffice for std.
+    rendered = f"{value[0]:.5f} {{\\small $\\pm$ {value[1]:.4f}}}"
     return f"\\textbf{{{rendered}}}" if best else rendered
 
 
