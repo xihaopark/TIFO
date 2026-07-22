@@ -27,15 +27,18 @@ class AdaptiveChannelNorm(nn.Module):
             raise ValueError("ACN temperature must be positive")
         self.temperature = float(temperature)
         self.eps = float(eps)
+        self.channels = int(channels)
         self.local_scale = nn.Parameter(torch.ones(channels, features))
         self.local_bias = nn.Parameter(torch.zeros(channels, features))
         self.global_scale = nn.Parameter(torch.ones(channels, features))
         self.global_bias = nn.Parameter(torch.ones(channels, features))
+        self.context_norm = nn.LayerNorm(features)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        mean = x.mean(dim=-1, keepdim=True)
-        variance = x.var(dim=-1, keepdim=True, unbiased=False)
-        normalized = (x - mean) / torch.sqrt(variance + self.eps)
+        variables = x[:, : self.channels, :]
+        mean = variables.mean(dim=-1, keepdim=True)
+        variance = variables.var(dim=-1, keepdim=True, unbiased=False)
+        normalized = (variables - mean) / torch.sqrt(variance + self.eps)
         unit = normalized / normalized.norm(dim=-1, keepdim=True).clamp_min(
             self.eps
         )
@@ -47,4 +50,14 @@ class AdaptiveChannelNorm(nn.Module):
         bias = torch.matmul(mixing, self.local_bias.unsqueeze(0).expand(
             x.size(0), -1, -1
         )) * self.global_bias.unsqueeze(0)
-        return scale * normalized + bias
+        normalized_variables = scale * normalized + bias
+        if x.size(1) == self.channels:
+            return normalized_variables
+        if x.size(1) < self.channels:
+            raise ValueError(
+                f"ACN expected at least {self.channels} tokens, got {x.size(1)}"
+            )
+        return torch.cat(
+            (normalized_variables, self.context_norm(x[:, self.channels :, :])),
+            dim=1,
+        )

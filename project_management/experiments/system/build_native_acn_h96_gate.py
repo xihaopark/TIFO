@@ -10,7 +10,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 SOURCE = HERE / "coverage_h96_itransformer.json"
 ETTM2_SOURCE = HERE / "final_tifo_hermitian_h96.json"
-OUTPUT = HERE / "tune_native_acn_h96.json"
+OUTPUT = HERE / "tune_native_acn_h96_v2.json"
 TEMPERATURES = (0.025, 0.05, 0.075, 0.1, 0.2, 0.35, 0.5, 1.0)
 
 
@@ -49,7 +49,7 @@ def main() -> None:
                 {
                     **shared,
                     "run_id": (
-                        f"tune_native_acn_{dataset_id}_h96_t{tag(temperature)}_s2022"
+                        f"tune_native_acn_v2_{dataset_id}_h96_t{tag(temperature)}_s2022"
                     ),
                     "engine": "native",
                     "backbone": "iTransformer",
@@ -63,7 +63,7 @@ def main() -> None:
                 }
             )
     output = {
-        "protocol_id": "kdd_resubmit_native_acn_h96_gate_v1",
+        "protocol_id": "kdd_resubmit_native_acn_h96_gate_v2",
         "selection_rule": (
             "For each dataset, select temperature by seed-2022 validation MSE. "
             "The backbone, data pipeline, optimizer, epoch budget, early stopping, "

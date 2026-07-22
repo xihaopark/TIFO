@@ -104,16 +104,23 @@ def assert_paired_initialization(mask: torch.Tensor) -> None:
             raise AssertionError(f"paired Ori/ACN backbone initialization differs at {key}")
 
     sample = torch.randn(4, 96, 7)
-    output, _ = acn(sample, None, None, None)
+    sample_mark = torch.randn(4, 96, 4)
+    output, _ = acn(sample, sample_mark, None, None)
     if output.shape != (4, 96, 7) or not torch.isfinite(output).all():
         raise AssertionError("native ACN returned an invalid output")
     output.square().mean().backward()
-    if not all(
-        parameter.grad is not None and torch.isfinite(parameter.grad).all()
+    invalid_gradients = [
+        name
         for name, parameter in acn.named_parameters()
-        if "norm" in name and parameter.requires_grad
-    ):
-        raise AssertionError("native ACN normalization parameters lack finite gradients")
+        if "norm" in name
+        and parameter.requires_grad
+        and (parameter.grad is None or not torch.isfinite(parameter.grad).all())
+    ]
+    if invalid_gradients:
+        raise AssertionError(
+            "native ACN normalization parameters lack finite gradients: "
+            + ", ".join(invalid_gradients)
+        )
     print("native ACN ok: paired backbone initialization and finite gradients")
 
 
