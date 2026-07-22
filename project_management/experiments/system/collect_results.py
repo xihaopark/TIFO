@@ -42,6 +42,9 @@ def method_label(record: dict) -> str:
                 qualifiers.append(f"lr={lr_scale:g}")
             if residual_alpha != 1.0:
                 qualifiers.append(f"alpha={residual_alpha:g}")
+            score_mode = model_args.get("tifo_score_mode")
+            if score_mode is not None:
+                qualifiers.append(f"score={score_mode}")
             label += f"[{','.join(qualifiers)}]"
         return label
     labels = {"timeemb": "TimeEmb", "tfps": "TFPS", "acn": "ACN", "wdan": "WDAN"}
