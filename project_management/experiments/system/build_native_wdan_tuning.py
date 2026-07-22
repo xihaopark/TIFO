@@ -71,7 +71,7 @@ def build(source_path: Path, extra_path: Path, extra_horizon: int, output: Path,
             runs.append(
                 {
                     **shared,
-                    "run_id": f"tune_native_wdan_v2_{dataset_id}_h{horizon}_{name}_s2022",
+                    "run_id": f"tune_native_wdan_v3_{dataset_id}_h{horizon}_{name}_s2022",
                     "engine": "native",
                     "backbone": "iTransformer",
                     "method": "wdan",
@@ -111,14 +111,14 @@ def main() -> None:
         ETTM2_H96_SOURCE,
         96,
         HERE / "tune_native_wdan_h96.json",
-        "kdd_resubmit_native_wdan_h96_gate_v2",
+        "kdd_resubmit_native_wdan_h96_gate_v3",
     )
     build(
         REMAINING_SOURCE,
         ETTM2_H192_SOURCE,
         192,
         HERE / "tune_native_wdan_remaining_horizons.json",
-        "kdd_resubmit_native_wdan_remaining_horizons_gate_v2",
+        "kdd_resubmit_native_wdan_remaining_horizons_gate_v3",
     )
 
 

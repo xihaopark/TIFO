@@ -23,8 +23,9 @@ def build_wdan_adapter(args):
     return WDANModel(
         seq_len=int(args.seq_len),
         pred_len=int(args.pred_len),
-        wavelet="haar",
-        filter_learn=True,
+        # Match the untouched defaults used by WDAN_iTransformer.sh.
+        wavelet="coif3",
+        filter_learn=False,
         dwt_levels=int(getattr(args, "wdan_levels", 2)),
         window_len=int(getattr(args, "wdan_window", 5)),
         d_model=int(getattr(args, "wdan_d_model", 128)),
