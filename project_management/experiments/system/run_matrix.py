@@ -171,7 +171,11 @@ def build_command(config: dict[str, Any], protocol_id: str) -> list[str]:
     command = [config["python"], config["entrypoint"]]
     if engine == "wdan":
         dataset = "ECL" if config["dataset"] == "Electricity" else config["dataset"]
-        command.extend(("--model", "WDAN_iTransformer"))
+        # Allow a same-engine bare-iTransformer control.  Without this switch,
+        # WDAN would be compared against a backbone produced by a different
+        # training framework, confounding plug-in gain with runner drift.
+        model_name = str(config["model_args"].get("model", "WDAN_iTransformer"))
+        command.extend(("--model", model_name))
         command.extend(("--data", dataset, "--fix_seed", str(config["seed"])))
         command.extend(("--gpu_id", "0", "--itr", "1"))
         command.extend(("--machine", "local", "--server_name", "server25"))
@@ -206,7 +210,10 @@ def build_command(config: dict[str, Any], protocol_id: str) -> list[str]:
         default_model = "TimeEmb" if engine == "timeemb" else "PatchTST_MoE_cluster"
         command.extend(("--model", str(config["model_args"].get("model", default_model))))
     elif engine == "acn":
-        command.extend(("--task_name", "long_term_forecast", "--model", "iTransformer_ACN"))
+        # ACN's official checkout also exposes its unmodified iTransformer;
+        # use model_args.model for paired framework controls.
+        model_name = str(config["model_args"].get("model", "iTransformer_ACN"))
+        command.extend(("--task_name", "long_term_forecast", "--model", model_name))
 
     for name in COMMON_FLAGS:
         if engine == "acn" and name == "cpu_threads":
