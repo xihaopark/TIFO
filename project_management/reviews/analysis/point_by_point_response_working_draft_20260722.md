@@ -134,11 +134,19 @@ identical splits and seeds, and validation-only configuration selection. Every
 promoted run records the command, seed, dataset hash, code state, log, and final
 metrics. For ACN and WDAN, we preserve official dataset-level configurations
 and run the bare backbone in the same official engine. Missing Traffic settings
-were selected only from validation data. We removed earlier headline values
-that could not be traced to complete multi-seed artifacts.
+were each selected from four validation-only candidates. We do not claim an
+identical search budget: the disclosed promoted TIFO validation lineages contain
+4 candidates on ETTh1, 50 on ETTh2, 17 on ETTm1, 4 on ETTm2, 31 on Traffic, and
+no new search on Electricity or Weather. We therefore separate absolute
+cross-engine values from paired within-engine plug-in effects and retain all
+negative cases. We removed earlier headline values that could not be traced to
+complete multi-seed artifacts.
 
 **Location.** Summary of Changes items 1--3 and 5; Experiment Settings; Tables
-1--3. `[FINAL_RESPONSE_NEEDS_EXACT_SEARCH_COUNTS_AND_PINNED_COMMITS]`.
+1--3; provenance record
+`baseline_and_tifo_search_provenance_20260722.md`. Official base commits are ACN
+`2d6ce2f2c771fec5296870416844d995c23e31a2` and WDAN
+`f01994ada4980729eb6af14c35778f480f9c0c47`.
 
 ### R2.3 / R4.1 / R4.2: implementation clarity
 
@@ -220,7 +228,7 @@ build audit remains necessary after the theory-facing prose is replaced.
 - [ ] Align the Introduction's Stage-I/Stage-II description with the Method.
 - [ ] Change every active “eigenvalue” reference for MLP outputs to “spectral
   gain” or “weight.”
-- [ ] Add exact ACN/WDAN/TIFO search counts and pinned source commits to the
+- [x] Add exact ACN/WDAN/TIFO search counts and pinned source commits to the
   response/provenance statement.
 - [x] Report all nine frozen ACN+TIFO runs as a bounded normalization
   complementarity diagnostic without replacing standalone TIFO.
