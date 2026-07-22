@@ -19,6 +19,8 @@ from pathlib import Path
 
 METHODS = ("TIFO", "ACN", "WDAN")
 SEEDS = {2021, 2022, 2023}
+DATASETS = ("ETTh1", "ETTh2", "ETTm1", "ETTm2", "Electricity", "Traffic", "Weather")
+EXPECTED_CELLS = {(dataset, 96) for dataset in DATASETS}
 REQUIRED_FIELDS = {"dataset", "pred_len", "method", "seed", "mse", "mae"}
 
 
@@ -97,6 +99,17 @@ def enforce_tifo_all_win(cells: list[tuple[str, int]], summary: dict) -> None:
         )
 
 
+def enforce_complete_scope(cells: list[tuple[str, int]]) -> None:
+    observed = set(cells)
+    missing = sorted(EXPECTED_CELLS - observed)
+    unexpected = sorted(observed - EXPECTED_CELLS)
+    if missing or unexpected:
+        raise SystemExit(
+            "refusing to generate a partial or off-scope table; "
+            f"missing={missing}, unexpected={unexpected}"
+        )
+
+
 def fmt(value: tuple[float, float], best: bool = False) -> str:
     rendered = f"{value[0]:.3f} {{\\small $\\pm$ {value[1]:.3f}}}"
     return f"\\textbf{{{rendered}}}" if best else rendered
@@ -141,6 +154,7 @@ def main() -> None:
     args = parser.parse_args()
 
     cells, summary = summarize(load_evidence(args.evidence))
+    enforce_complete_scope(cells)
     enforce_tifo_all_win(cells, summary)
     tex, markdown = render(cells, summary)
     args.tex_output.parent.mkdir(parents=True, exist_ok=True)

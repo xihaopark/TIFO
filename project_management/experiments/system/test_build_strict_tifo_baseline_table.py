@@ -54,6 +54,12 @@ class StrictTableTest(unittest.TestCase):
             STRICT_TABLE.summarize(rows)
         self.assertIn("expected exactly seeds", str(caught.exception))
 
+    def test_rejects_partial_dataset_scope(self):
+        cells, _ = STRICT_TABLE.summarize(evidence())
+        with self.assertRaises(SystemExit) as caught:
+            STRICT_TABLE.enforce_complete_scope(cells)
+        self.assertIn("partial or off-scope", str(caught.exception))
+
 
 if __name__ == "__main__":
     unittest.main()
