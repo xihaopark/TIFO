@@ -1,0 +1,113 @@
+{
+  "protocol_id": "kdd_resubmit_acn_tifo_ettm1_joint_h96_final_v1",
+  "selection_rule": "For every dataset-horizon cell, freeze the lowest seed-2022 validation MSE among exactly eight candidates before reading final-test metrics; evaluate the frozen configuration on seeds 2021, 2022, and 2023.",
+  "validation_selection": {
+    "ETTm1/H96": {
+      "selected_run": "joint_acnt_ettm1_h96_t0p075_lr2em4_s2022",
+      "selected_validation_mse": 0.3797413,
+      "candidate_count": 8
+    }
+  },
+  "defaults": {
+    "python": "/mnt/data1/park/Time Series/Forecasting/TKDE/envs/fredformer-cu128/bin/python",
+    "features": "M",
+    "seq_len": 96,
+    "label_len": 48,
+    "pred_len": 96,
+    "train_epochs": 30,
+    "patience": 5,
+    "batch_size": 32,
+    "learning_rate": 0.0001,
+    "num_workers": 0,
+    "cpu_threads": 4
+  },
+  "runs": [
+    {
+      "dataset": "ETTm1",
+      "data_type": "ETTm1",
+      "root_path": "/home/park/TS/FredNormer/dataset/ETT-small",
+      "data_path": "ETTm1.csv",
+      "enc_in": 7,
+      "dec_in": 7,
+      "c_out": 7,
+      "engine": "native",
+      "backbone": "iTransformer",
+      "method": "acn_tifo",
+      "learning_rate": 0.0002,
+      "run_id": "final_native_acn_tifo_joint_ettm1_h96_s2021",
+      "seed": 2021,
+      "model_args": {
+        "d_model": 128,
+        "d_ff": 128,
+        "e_layers": 2,
+        "n_heads": 8,
+        "factor": 3,
+        "acn_temperature": 0.075,
+        "tifo_variant": "hermitian_diagonal",
+        "tifo_prior_strength": 1.0,
+        "tifo_gain_limit": 0.5,
+        "tifo_lr_scale": 1.0,
+        "tifo_residual_alpha": 1.0,
+        "tifo_zero_pad_ratio": 0.0
+      }
+    },
+    {
+      "dataset": "ETTm1",
+      "data_type": "ETTm1",
+      "root_path": "/home/park/TS/FredNormer/dataset/ETT-small",
+      "data_path": "ETTm1.csv",
+      "enc_in": 7,
+      "dec_in": 7,
+      "c_out": 7,
+      "engine": "native",
+      "backbone": "iTransformer",
+      "method": "acn_tifo",
+      "learning_rate": 0.0002,
+      "run_id": "final_native_acn_tifo_joint_ettm1_h96_s2022",
+      "seed": 2022,
+      "model_args": {
+        "d_model": 128,
+        "d_ff": 128,
+        "e_layers": 2,
+        "n_heads": 8,
+        "factor": 3,
+        "acn_temperature": 0.075,
+        "tifo_variant": "hermitian_diagonal",
+        "tifo_prior_strength": 1.0,
+        "tifo_gain_limit": 0.5,
+        "tifo_lr_scale": 1.0,
+        "tifo_residual_alpha": 1.0,
+        "tifo_zero_pad_ratio": 0.0
+      }
+    },
+    {
+      "dataset": "ETTm1",
+      "data_type": "ETTm1",
+      "root_path": "/home/park/TS/FredNormer/dataset/ETT-small",
+      "data_path": "ETTm1.csv",
+      "enc_in": 7,
+      "dec_in": 7,
+      "c_out": 7,
+      "engine": "native",
+      "backbone": "iTransformer",
+      "method": "acn_tifo",
+      "learning_rate": 0.0002,
+      "run_id": "final_native_acn_tifo_joint_ettm1_h96_s2023",
+      "seed": 2023,
+      "model_args": {
+        "d_model": 128,
+        "d_ff": 128,
+        "e_layers": 2,
+        "n_heads": 8,
+        "factor": 3,
+        "acn_temperature": 0.075,
+        "tifo_variant": "hermitian_diagonal",
+        "tifo_prior_strength": 1.0,
+        "tifo_gain_limit": 0.5,
+        "tifo_lr_scale": 1.0,
+        "tifo_residual_alpha": 1.0,
+        "tifo_zero_pad_ratio": 0.0
+      }
+    }
+  ]
+}
