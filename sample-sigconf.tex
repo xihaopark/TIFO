@@ -106,6 +106,10 @@
 \newcommand{\innerProduct}[2]{\left\langle #1, #2\right\rangle}
 \newcommand{\expectation}[2]{\mathbb{E}_{#1}\left[#2\right]}
 
+\acmConference[KDD '27]{The 33rd ACM SIGKDD Conference on Knowledge Discovery and Data Mining}{August 2027}{San Jose, CA, USA}
+\acmYear{2027}
+\copyrightyear{2027}
+
 \newcommand\DoToC{%
   \startcontents
   \printcontents{}{1}{\textbf{Contents}\vskip3pt\hrule\vskip5pt}
@@ -263,16 +267,14 @@
 </ccs2012>
 \end{CCSXML}
 
-\ccsdesc[500]{Do Not Use This Code~Generate the Correct Terms for Your Paper}
-\ccsdesc[300]{Do Not Use This Code~Generate the Correct Terms for Your Paper}
-\ccsdesc{Do Not Use This Code~Generate the Correct Terms for Your Paper}
-\ccsdesc[100]{Do Not Use This Code~Generate the Correct Terms for Your Paper}
+\ccsdesc[500]{Computing methodologies~Machine learning}
+\ccsdesc[300]{Information systems~Data mining}
 
 %%
 %% Keywords. The author(s) should pick words that accurately describe
 %% the work being presented. Separate the keywords with commas.
-\keywords{Do, Not, Use, This, Code, Put, the, Correct, Terms, for,
-  Your, Paper}
+\keywords{time series forecasting, non-stationarity, frequency-domain learning,
+  plug-in adaptation}
 %% A "teaser" image appears between the author and affiliation
 %% information and the body of the document, and typically spans the
 %% page.
@@ -521,7 +523,8 @@ In practice, this shift is often quite large, since testing or future time serie
 \label{Normalization_weaken_x_on_t}
 \reviewtext{Methods such as RevIN \citep{kim2021RevIN} and SAN \citep{liu2023SAN} are based on a key concept: they aim to estimate time-dependent statistics (e.g., mean and variance) and remove them from the input time series.}
 \reviewtext{This process reduces the conditional dependence on $t$, transforming the time-varying distribution $p(x |t)$ closer to a stationary form $p(x)$.}
-We provide more discussion in Appendix \ref{app:more_discussion}.
+This motivates a complementary dataset-level statistic that is not available
+to independently normalized input windows.
 
 Formally, take a Gaussian distribution $\mathcal{N}(\mu_t, \sigma_t^2)$ for example, its mean and standard deviation are subject to time changes.
 They estimate $(\mu_t, \sigma_t)$ for each time segment $x_t$ via a function $f_\theta(x_t)$, where $f_\theta(\cdot)$ can be either a numerical computation \citep{kim2021RevIN} or a neural network \citep{fan2023dish, liu2023SAN, han2024sin}.
@@ -961,14 +964,21 @@ This design is supported by a detailed theoretical analysis in Section \ref{sec:
 
 \begin{figure*}[t]
   \centering
-  \includegraphics[width=0.83\linewidth]{pics/model.pdf}
+  \fbox{\begin{minipage}{0.94\linewidth}\centering
+  Training windows $\rightarrow$ amplitude spectra $\rightarrow$
+  cross-window score $\mathbf S=\mu/(\sigma+\epsilon)$ $\rightarrow$
+  learned global spectral gains $\boldsymbol\lambda$\\[3pt]
+  Input window $\rightarrow$ Fourier transform $\rightarrow$
+  coefficient-wise reweighting $\rightarrow$ inverse transform $\rightarrow$
+  forecasting backbone
+  \end{minipage}}
   \caption{
     Overview of \method. 
     %Before training, we measure the stationarity for each frequency across the training set. %scores from the training set, and through MLPs, output weights for the real and imaginary DFT coefficients. 
     % During the training stage, each input time series is transformed into the frequency domain. Using these weights, we weight the frequencies. 
     % The weighted spectrum is then transformed into the time domain and serves as the input for the forecasting backbone model.
     \reviewtext{Before training, we first transfer all samples into the frequency domain and measure their cross-sample stationarity at the dataset level (steps 1 \& 2).}
-    \reviewtext{These features are then used to learn frequency weights that measure frequency stationarity (step 3).}
+    \reviewtext{These fixed dataset-level features condition trainable global frequency weights (step 3).}
     \reviewtext{During training, each input sample is transformed into the frequency domain and then weighted by the learned stationarity weights.}
     Finally, they are transformed to the time domain to serve as input to the forecasting models (steps 4 \& 5). 
     \method is optimized using the forecasting loss along with the backbone model.
@@ -1062,7 +1072,7 @@ It includes a two-stage modeling:
     %Here, $S$ is a reasonable way to summarize the observations of frequency $k$ across multiple samples. 
 \end{itemize}
 
-\noindent\textbf{Stage-II: Sample-specific Learning \& Forecasting}
+\noindent\textbf{Stage-II: Global Spectral Reweighting \& Forecasting}
 \begin{itemize}[leftmargin=1.5em]
     \item \emph{Step 4.} In the training stage, given an input sample $\mathbf{X}\in\mathbb{R}^{L\times C}$, we compute its DFT and obtain real and imaginary coefficients $\mathbf{R},\mathbf{I}\in\mathbb{R}^{K\times C}$. 
     \reviewtext{Based on the pre-computed stationarity $\mathbf{S}\in\mathbb{R}^{K\times C}$, we use two independent MLPs to generate frequency weights:}
@@ -1073,12 +1083,16 @@ It includes a two-stage modeling:
     The weighted coefficients are then obtained by element-wise multiplication:
     $\mathbf{R}_w=\mathbf{R}\odot\mathbf{\lambda}_r,\quad
     \mathbf{I}_w=\mathbf{I}\odot\mathbf{\lambda}_i.$
-    We model the real and imaginary parts separately to ensure that when the weighted coefficients are mapped to the time domain through the inverse DFT, the resulting amplitudes remain non-negative, allowing the inverse DFT to output real-valued sequences. 
-    \reviewtext{In this stage, \method serves as a lightweight frequency stationarity filter, enhancing stationary components (those with a high stationarity score) while suppressing non-stationary ones, thereby addressing the distribution shift problem defined in Section~\ref{sec:Preliminary Analysis}.}
+    The weights are shared by all samples rather than inferred per sample. In the
+    Hermitian implementation, a one-sided rFFT spectrum is reweighted and iRFFT
+    guarantees a real reconstruction; the reconstruction choice is selected on
+    validation data only. \reviewtext{The resulting module is a lightweight
+    stationarity-conditioned spectral filter; whether high-score components
+    receive larger gains is evaluated empirically rather than imposed by design.}
     \item \emph{Step 5.} Finally, the weighted coefficients $(\mathbf{R}_w,\mathbf{I}_w)$ are transformed to the time domain via inverse DFT 
     $\widetilde{\mathbf{X}}=\mathrm{iDFT}(\mathbf{R}_w+i\,\mathbf{I}_w)$,
     and fed into the backbone forecasting models. 
-    $\widetilde{\mathbf{X}}\in\mathbb{R}^{H\times C}$ is the final output of \method and the input of the backbone model, where $H$ denotes the forecasting horizon.
+    $\widetilde{\mathbf{X}}\in\mathbb{R}^{L\times C}$ is the transformed input to the backbone; the backbone then produces the $H$-step forecast.
     The whole framework is optimized end-to-end using the forecasting MSE loss.  
 \end{itemize}
 
@@ -1559,11 +1573,45 @@ We followed the implementation and setup provided in \citep{liu2023SAN} and \cit
 \noindent\textbf{Experiments Details.} 
 All experiments were implemented on a single NVIDIA RTX A6000 48GB GPU. 
 %More details of experimental settings can be found in Appendix \ref{appendix:exp}.
-More details of the datasets are in Appendix \ref{appendix:exp_datasets}, the preprocessing are in \ref{appendix:preprocess_detailes}, the baselines are in \ref{appendix:exp_baselines}, the backbones and setup are in \ref{appendix:exp_backbones_setup}, and other details of the experiments are in \ref{appendix:exp_other_detailes}.
+Dataset splits, preprocessing, commands, seeds, hashes, and final metrics are
+recorded by the reproducibility ledger accompanying the anonymous code release.
 
-\subsection{Experiment Results}
+\noindent\textbf{Model selection and baseline fairness.}
+All promoted results use seeds 2021--2023. TIFO choices are selected using the
+validation split and frozen before the final test aggregation. ACN and WDAN are
+executed from their official repositories with their published dataset-level
+settings; the missing Traffic setting is likewise selected using validation
+data only. Since those repositories contain different training engines, their
+absolute errors mix plug-in and engine effects. We therefore also disable each
+plug-in and rerun its bare iTransformer within the same engine, yielding the
+paired effect comparison in Table~\ref{table:plugin_effects}. In particular,
+the WDAN-engine control retains the backbone's native instance normalization,
+whereas the WDAN plug-in replaces that path as specified by its implementation.
 
-\begin{table*}[t]
+\noindent\textbf{Reconstruction validation.}
+The historical operator uses full-spectrum complex coefficients. To test the
+implementation concern that independently weighted coefficients need not obey
+Hermitian symmetry, we added an rFFT/iRFFT path that preserves real-valued
+reconstruction by construction. Raw and window-normalized stationarity scores,
+zero padding, and filter width are compared only on validation data. The selected
+ETTh1 and ETTm2 configurations are then frozen for the three-seed test runs; a
+larger filter that improved ETTm2 validation error but degraded the frozen test
+aggregate is not adopted. This separation prevents the test set from becoming a
+hyperparameter search objective.
+
+\noindent\textbf{Scope and limitations.}
+The current evidence supports a robust plug-in claim, not a universal or
+dataset-wise state-of-the-art claim. TIFO improves six of seven paired
+iTransformer datasets, but Traffic remains negative and ACN or WDAN has lower
+absolute MSE on several individual datasets. Moreover, the public benchmarks
+use chronological splits rather than controlled interventions on spectral
+shift. The current study therefore does not establish robustness under arbitrary
+out-of-distribution frequency changes; targeted synthetic or naturally shifted
+evaluation remains necessary for that stronger claim.
+
+\clearpage
+\onecolumn
+\begin{table}[H]
 \centering
 \caption{\resubmitchange{Verified matched forecasting results over three seeds. PatchTST values average the four horizons $H\in\{96,192,336,720\}$; iTransformer values use $H=96$. Bold marks the better result within each TIFO--backbone pair.}}
 \label{table:verified_main_results}
@@ -1591,9 +1639,9 @@ Dataset & \multicolumn{2}{c|}{+TIFO} & \multicolumn{2}{c}{Ori} \\
 \input{generated_tables/main_itransformer_h96_rows.tex}
 \end{tabular}}
 \end{minipage}
-\end{table*}
+\end{table}
 
-\begin{table*}[t]
+\begin{table}[H]
 \centering
 \caption{\resubmitchange{Comparison with recent model-agnostic plug-ins on iTransformer with $H=96$ over three seeds. Bold and underline mark the best and second-best result per dataset, respectively.}}
 \label{table:recent_baselines}
@@ -1605,7 +1653,45 @@ Dataset & \multicolumn{2}{c|}{iTransformer} & \multicolumn{2}{c|}{+ACN \citep{le
 \midrule
 \input{generated_tables/plugin_baselines_h96_rows.tex}
 \end{tabular}}
-\end{table*}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Paired plug-in effect relative to the bare backbone in each official
+engine. Positive $\Delta$MSE denotes error reduction; Std is across datasets.}
+\label{table:plugin_effects}
+\small
+\begin{tabular}{lcccc}
+\toprule
+Plug-in & Improves & Mean $\Delta$MSE$\uparrow$ & Worst $\Delta$MSE$\uparrow$ & Std$\downarrow$ \\
+\midrule
+ACN & \textbf{6/7} & \textbf{+2.44\%} & -7.47\% & 5.71 \\
+WDAN & 5/7 & -1.23\% & -22.17\% & 9.44 \\
+TIFO & \textbf{6/7} & +1.47\% & \textbf{-1.02\%} & \textbf{1.59} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Alignment between the dataset-level stationarity score and learned
+spectral gain over three frozen checkpoints. The gain ratio compares the
+highest- and lowest-score quartiles.}
+\label{table:weight_alignment}
+\small
+\begin{tabular}{lcc}
+\toprule
+Dataset & Spearman $\rho\uparrow$ & High/low gain ratio$\uparrow$ \\
+\midrule
+ETTh1 & $0.248 \pm 0.075$ & $1.592 \pm 0.226$ \\
+ETTm2 & $0.425 \pm 0.019$ & $1.807 \pm 0.108$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\clearpage
+\twocolumn
+\subsection{Experiment Results}
 
 \iffalse % Historical Table 1: retained only for provenance audit; not compiled.
 \begin{table*}[ht]
@@ -1693,7 +1779,9 @@ Multivariate forecasting results (average) with forecasting lengths $ H \in \{96
 %Table \ref{table: 1st_results} presents the overall forecasting results using iTransformer and PatchTST as the backbone across seven datasets. 
 \resubmitchange{For PatchTST, TIFO improves average MSE on ETTh2, ETTm1, ETTm2, and Weather, with its clearest gain on ETTm2; ETTh1, Electricity, and Traffic are neutral or negative. At $H=96$, validation-selected TIFO configurations improve iTransformer on ETTh1, ETTh2, ETTm1, ETTm2, Electricity, and Weather; Traffic is the sole negative case, with a modest 1.0\% MSE increase. These results support TIFO as a useful plug-in in selected settings rather than a universally improving transformation.}
 %, as shown in all bold results.
-\resubmitchange{Table~\ref{table:recent_baselines} further compares against ACN \citep{lee2025channel} and WDAN \citep{lin2025wdan}, two recent model-agnostic normalization plug-ins, across all seven datasets under the same iTransformer, $H=96$, three-seed protocol. TIFO improves its fixed backbone on six of seven datasets, compared with five of seven for both ACN and WDAN, and ranks second in absolute MSE on five datasets. Its worst relative MSE change is also limited to $-1.0\%$ on Traffic, whereas ACN and WDAN reach $-8.8\%$ and $-23.1\%$, respectively. Thus, although ACN or WDAN obtains the lowest error on individual datasets, TIFO provides the broadest improvement coverage and the smallest worst-case degradation.}
+\resubmitchange{Table~\ref{table:recent_baselines} compares against ACN \citep{lee2025channel} and WDAN \citep{lin2025wdan}, two recent model-agnostic plug-ins, over seven datasets with iTransformer, $H=96$, and three seeds. Because their official repositories use different training engines, absolute values are reported for completeness but do not by themselves isolate the plug-in effect. We therefore rerun the bare backbone in each engine and report paired effects in Table~\ref{table:plugin_effects}. TIFO and ACN each improve 6/7 paired datasets. ACN has the largest mean improvement (+2.44\%), whereas TIFO has the smallest worst-case degradation (-1.02\%) and lowest across-dataset effect standard deviation (1.59 percentage points). In the absolute comparison, TIFO ranks second on five datasets but is not the overall winner.}
+
+\resubmitchange{Table~\ref{table:weight_alignment} provides a direct diagnostic of the proposed mechanism on the frozen ETTh1 and ETTm2 checkpoints. Positive rank correlations and high/low quartile gain ratios above one show that higher stationarity scores tend to receive larger learned gains. This evidence supports the intended conditioning behavior, but it is not a proof of monotonicity and does not eliminate the negative Traffic case.}
 
 
 
@@ -1713,6 +1801,7 @@ Similarly,  in the Traffic dataset, \method improves the MSE value to $0.430$, c
 \fi
 
 
+\iffalse % Legacy analyses lack complete run-level provenance and are excluded.
 \noindent\textbf{Frequency Domain Shift Analysis.}
 \reviewtext{To answer RQ2, we further measure the frequency-domain distribution difference between the train and test dataset amplitude spectra to link accuracy gains to reduced spectral distributional shift.}
 For each frequency $\omega_j$, we gather its amplitudes across all training and testing samples to build two empirical distributions.
@@ -2032,6 +2121,7 @@ The STFT variant using a $\sqrt{\text{Hann}}$ window fails to outperform the ori
 % \subsection{Frequnecy domain models}
 
 
+\fi
 \section{Related Works}
 
 \textbf{Time-domain normalization.}
@@ -2066,6 +2156,7 @@ However, these methods rely on an attention mechanism or top-$k$ selection deriv
 % Therefore, \method is complementary to, rather than repetitive of, these architecture-level frequency domain models.
 
 
+\iffalse % Historical reconstruction ablations are not in the traceable ledger.
 \begin{table}[t]
 \centering
 \caption{Ablation on window functions and frequency resolution under the DFT setting (ETTh1, iTransformer).}
@@ -2103,9 +2194,17 @@ STFT ($\sqrt{\text{Hann}}$, 50\% ovlp) & $0.4005 \pm 0.0024$ & $0.4148 \pm 0.002
 \end{table}
 
 \noindent\textbf{Frequency domain models.}
+\fi
+\noindent\textbf{Frequency domain models.}
 Frequency domain modeling has proven highly effective for capturing global dependencies and improving efficiency.
 Mainstream architectures, such as Autoformer \citep{Autoformer}, Fedformer \citep{ICMLFedformer}, TimesNet \citep{Timesnet}, and Frequency MLP \citep{yi2023frequencyMLP}, move primary operators (e.g., attention or convolution) into the frequency domain.
 Recent works have further explored spectral properties: FITS \citep{xu2024fits} utilizes frequency interpolation and low-pass filtering for parameter-efficient modeling; FreDF \citep{2025fredf} introduces a frequency-domain loss function to debias direct forecasting against label autocorrelation; and Dynamic Fusion \citep{zhang2024not_all_fre} optimizes the combination of independent frequency predictions.
+FilterNet \citep{yi2024filternet} is the closest architecture-level comparison:
+it replaces core temporal mappings with plain or contextual learnable frequency
+filters and includes instance normalization. TIFO instead conditions a compact
+input adapter on cross-window dataset statistics and leaves the forecasting
+backbone intact. This distinction narrows the novelty claim to the source and
+deployment of the spectral weights, not to frequency filtering itself.
 However, these methods typically focus on optimizing architecture efficiency (FITS), output-side loss constraints (FreDF), or representation expressiveness (Dynamic Fusion). 
 They do not explicitly estimate dataset-level frequency statioanrity to guide input adaptation.
 In contrast, \method is designed as a universal preprocessing layer decoupled from the backbone architecture.
@@ -2227,7 +2326,7 @@ As a result, a model trained on the training data may perform poorly on the test
 \bibliographystyle{ACM-Reference-Format}
 \bibliography{sample-base}
 
-
+\iffalse % Legacy appendix retained in source for provenance, not in submission PDF.
 \newpage
 %%
 %% If your work has an appendix, this is the place to put it.
@@ -4062,8 +4161,7 @@ hop0.25\_zpad1.0  & 0.3940 & 0.4090 & 0.3960 & 0.4110 & 0.3970 & 0.4120 & 0.3957
 %   }
 % \end{table}
 
-
-
+\fi
 
 \end{document}
 \endinput

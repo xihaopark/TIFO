@@ -16,20 +16,24 @@ claims that match the observed results. The completed changes are:
   seed, dataset hash, code state, log, and final metrics. Results are reported
   over seeds 2021--2023 and include the original backbone as a matched control.
 
-  \item \textbf{Replaced unsupported headline results.}
+  \item \textbf{Replaced unsupported headline results and validated reconstruction.}
   The previous large-gain table could not be traced to complete multi-seed
   artifacts. We replaced it with mechanically generated evidence in
   Table~\ref{table:verified_main_results}: PatchTST over seven datasets and four
   horizons, and iTransformer over seven datasets at $H=96$. The revision reports
-  both improvements and negative cases, including the Traffic limitation.
+  both improvements and negative cases, including the Traffic limitation. A
+  validation-only gate also tested a Hermitian rFFT/iRFFT implementation; the
+  selected ETTh1 and ETTm2 settings were frozen before three-seed evaluation.
 
   \item \textbf{Added recent baselines.}
   Table~\ref{table:recent_baselines} adds ACN (ICML 2025) and WDAN (2025),
   two recent model-agnostic normalization plug-ins, across all seven datasets
   under the same iTransformer, $H=96$, three-seed protocol. Their official
   dataset-level settings are retained; missing Traffic settings are selected
-  on validation data only. TIFO improves 6/7 datasets versus 5/7 for each new
-  baseline and has the smallest worst-case degradation (1.0\%).
+  on validation data only. Because the official repositories use different
+  training engines, we reran a bare iTransformer inside each engine. In these
+  paired controls, TIFO and ACN improve 6/7 datasets, while TIFO has the
+  smallest worst-case degradation (1.02\%) and effect variance.
 
   \item \textbf{Calibrated empirical claims.}
   We removed the unverified 33.3\%/55.3\% gains, the universal-improvement
@@ -41,4 +45,9 @@ claims that match the observed results. The completed changes are:
   Historical tables whose configurations or artifacts are incomplete are no
   longer compiled into the revised manuscript. Only mechanically aggregated,
   traceable values are eligible for the final paper tables.
+
+  \item \textbf{Added a direct mechanism diagnostic.}
+  Across frozen ETTh1 and ETTm2 checkpoints, learned spectral gains are
+  positively associated with the precomputed stationarity scores. We report
+  this as empirical alignment rather than a monotonic guarantee.
 \end{enumerate}
