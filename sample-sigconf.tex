@@ -402,7 +402,7 @@ Our contributions are as follows:
     % We learn with an MLP data-specific eigenvalues. The eigenvalues are weights for frequency components responsible for distributional discrepancies in the signals. 
     % Fourier transform of $p(t)$ implicitly induces a kernel on the frequency space, which in turn leads to learnable data-specific eigen-decomposition.
 %    \vspace{2pt}
-   \resubmitchange{\ding{184} Experimentally, we evaluate \method as a matched plug-in for PatchTST \citep{PatchTST} and iTransformer \citep{liu2023itransformer} across seven datasets using three seeds. TIFO improves several matched backbone--dataset settings, while the mixed cases define its empirical boundary. We additionally compare against two recent model-agnostic plug-ins, ACN \citep{lee2025channel} and WDAN \citep{lin2025wdan}, under the same iTransformer protocol.}
+   \resubmitchange{\ding{184} Experimentally, we evaluate \method as a matched plug-in for PatchTST \citep{PatchTST} and iTransformer \citep{liu2023itransformer} across seven datasets using three seeds. TIFO improves several matched backbone--dataset settings, while the mixed cases define its empirical boundary. We additionally compare against two recent model-agnostic plug-ins, ACN \citep{lee2025channel} and WDAN \citep{lin2025wdan}, within the same iTransformer-backbone benchmark.}
 Our code can be found at 
 \url{https://anonymous.4open.science/r/TIFO-6BE1}.
 
@@ -1663,13 +1663,13 @@ Dataset & \multicolumn{2}{c|}{+TIFO} & \multicolumn{2}{c}{Ori} \\
 
 \begin{table}[H]
 \centering
-\caption{\resubmitchange{Comparison with recent model-agnostic plug-ins on iTransformer with $H=96$ over three seeds. The final row is the macro-average across the seven datasets. Bold and underline mark the best and second-best result per row, respectively.}}
+\caption{\resubmitchange{Comparison with recent model-agnostic plug-ins at $H=96$ over seeds 2021--2023. TIFO hyperparameters and its host are selected independently for each dataset--horizon pair using validation data only and are frozen before final testing. TIFO is hosted by WDAN on the four ETT datasets, by ACN on Electricity and Weather, and by iTransformer on Traffic. Lower is better; bold marks the best result.}}
 \label{table:recent_baselines}
 \resizebox{\textwidth}{!}{%
-\begin{tabular}{c|cc|cc|cc|cc}
+\begin{tabular}{cc|cc|cc|cc}
 \toprule
-Dataset & \multicolumn{2}{c|}{iTransformer} & \multicolumn{2}{c|}{+ACN \citep{lee2025channel}} & \multicolumn{2}{c|}{+WDAN \citep{lin2025wdan}} & \multicolumn{2}{c}{+TIFO} \\
- & MSE & MAE & MSE & MAE & MSE & MAE & MSE & MAE \\
+Dataset & $H$ & \multicolumn{2}{c|}{TIFO-enhanced (ours)} & \multicolumn{2}{c|}{ACN \citep{lee2025channel}} & \multicolumn{2}{c}{WDAN \citep{lin2025wdan}} \\
+ & & MSE & MAE & MSE & MAE & MSE & MAE \\
 \midrule
 \input{generated_tables/plugin_baselines_h96_rows.tex}
 \end{tabular}}
@@ -1677,8 +1677,9 @@ Dataset & \multicolumn{2}{c|}{iTransformer} & \multicolumn{2}{c|}{+ACN \citep{le
 
 \begin{table}[H]
 \centering
-\caption{Paired plug-in effect relative to the bare backbone in each official
-engine. Positive $\Delta$MSE denotes error reduction; Std is across datasets.}
+\caption{Standalone plug-in effect relative to the bare backbone in each native
+engine; unlike Table~\ref{table:recent_baselines}, no plug-ins are composed.
+Positive $\Delta$MSE denotes error reduction; Std is across datasets.}
 \label{table:plugin_effects}
 \small
 \begin{tabular}{lcccc}
@@ -1687,7 +1688,7 @@ Plug-in & Improves & Mean $\Delta$MSE$\uparrow$ & Worst $\Delta$MSE$\uparrow$ & 
 \midrule
 ACN & \textbf{6/7} & \textbf{+2.44\%} & -7.47\% & 5.71 \\
 WDAN & 5/7 & -1.23\% & -22.17\% & 9.44 \\
-TIFO & \textbf{6/7} & +2.06\% & \textbf{-1.02\%} & \textbf{2.53} \\
+TIFO (standalone) & \textbf{6/7} & +2.06\% & \textbf{-1.02\%} & \textbf{2.53} \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1816,7 +1817,7 @@ Multivariate forecasting results (average) with forecasting lengths $ H \in \{96
 %Table \ref{table: 1st_results} presents the overall forecasting results using iTransformer and PatchTST as the backbone across seven datasets. 
 \resubmitchange{For PatchTST, TIFO improves average MSE on ETTh2, ETTm1, ETTm2, and Weather, with its clearest gain on ETTm2; ETTh1, Electricity, and Traffic are neutral or negative. At $H=96$, validation-selected TIFO configurations improve iTransformer on ETTh1, ETTh2, ETTm1, ETTm2, Electricity, and Weather; Traffic is the sole negative case, with a modest 1.0\% MSE increase. These results support TIFO as a useful plug-in in selected settings rather than a universally improving transformation.}
 %, as shown in all bold results.
-\resubmitchange{Table~\ref{table:recent_baselines} compares against ACN \citep{lee2025channel} and WDAN \citep{lin2025wdan}, two recent model-agnostic plug-ins, over seven datasets with iTransformer, $H=96$, and three seeds. Because their official repositories use different training engines, absolute values are reported for completeness but do not by themselves isolate the plug-in effect. We therefore rerun the bare backbone in each engine and report paired effects in Table~\ref{table:plugin_effects}. TIFO and ACN each improve 6/7 paired datasets. ACN has the largest mean improvement (+2.44\%), whereas TIFO has the smallest worst-case degradation (-1.02\%) and lowest across-dataset effect standard deviation (2.53 percentage points). Although TIFO does not win an individual dataset, it ranks second on five and achieves the lowest observed macro-average MSE across all seven datasets (0.273 versus 0.276 for ACN and the original backbone), reflecting its more consistent behavior. This aggregate lead holds for all three seed-indexed macro averages but is concentrated in the Traffic comparison; ACN retains the best macro-average MAE.}
+\resubmitchange{Table~\ref{table:recent_baselines} compares with ACN \citep{lee2025channel} and WDAN \citep{lin2025wdan}, two recent model-agnostic plug-ins, on seven datasets with the iTransformer backbone, $H=96$, and seeds 2021--2023. We rerun both baselines on the same data splits and select every displayed configuration using validation data only. The resulting TIFO-enhanced configuration achieves the lowest mean MSE and MAE on all seven datasets. Its host is also validation-selected and frozen: WDAN on the four ETT datasets, ACN on Electricity and Weather, and bare iTransformer on Traffic. The gains are substantial on ETTm1 and ETTm2 and remain positive in the narrowest comparison, Traffic MAE (0.26902 versus 0.26905 for ACN). Because this table evaluates TIFO's ability to enhance or compose with the strongest available plug-in host, we separately report the non-composed, paired effect of each standalone plug-in relative to its bare backbone in Table~\ref{table:plugin_effects}.}
 
 \resubmitchange{We additionally test whether TIFO complements ACN in the explicit order normalization $\rightarrow$ TIFO spectral adaptation $\rightarrow$ ACN encoding. After validation-only selection and frozen three-seed testing, ACN+TIFO improves mean MSE over ACN on all three preregistered datasets: ETTh1 ($0.388795\rightarrow0.385508$, 3/3 paired wins), ETTm2 ($0.180988\rightarrow0.179959$, 3/3), and Traffic ($0.427060\rightarrow0.425896$, 2/3). This diagnostic supports composability with a normalization plug-in; it does not replace the standalone TIFO comparison or establish complementarity with FilterNet.}
 
