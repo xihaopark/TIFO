@@ -1597,9 +1597,9 @@ implementation concern that independently weighted coefficients need not obey
 Hermitian symmetry, we added an rFFT/iRFFT path that preserves real-valued
 reconstruction by construction. Raw and window-normalized stationarity scores,
 zero padding, and filter width are compared only on validation data. The selected
-ETTh1 and ETTm2 configurations are then frozen for the reported three-seed test
-runs. Later diagnostic variants are not used to replace these preregistered main
-configurations.
+ETTh1, ETTm2, Electricity, and Weather configurations are then frozen for the
+reported three-seed test runs. Later diagnostic variants are not used to replace
+these frozen main configurations.
 
 \noindent\textbf{Scope and limitations.}
 The current evidence supports a robust plug-in claim, not a universal or
@@ -1687,7 +1687,7 @@ Plug-in & Improves & Mean $\Delta$MSE$\uparrow$ & Worst $\Delta$MSE$\uparrow$ & 
 \midrule
 ACN & \textbf{6/7} & \textbf{+2.44\%} & -7.47\% & 5.71 \\
 WDAN & 5/7 & -1.23\% & -22.17\% & 9.44 \\
-TIFO & \textbf{6/7} & +1.47\% & \textbf{-1.02\%} & \textbf{1.59} \\
+TIFO & \textbf{6/7} & +2.06\% & \textbf{-1.02\%} & \textbf{2.53} \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1816,7 +1816,7 @@ Multivariate forecasting results (average) with forecasting lengths $ H \in \{96
 %Table \ref{table: 1st_results} presents the overall forecasting results using iTransformer and PatchTST as the backbone across seven datasets. 
 \resubmitchange{For PatchTST, TIFO improves average MSE on ETTh2, ETTm1, ETTm2, and Weather, with its clearest gain on ETTm2; ETTh1, Electricity, and Traffic are neutral or negative. At $H=96$, validation-selected TIFO configurations improve iTransformer on ETTh1, ETTh2, ETTm1, ETTm2, Electricity, and Weather; Traffic is the sole negative case, with a modest 1.0\% MSE increase. These results support TIFO as a useful plug-in in selected settings rather than a universally improving transformation.}
 %, as shown in all bold results.
-\resubmitchange{Table~\ref{table:recent_baselines} compares against ACN \citep{lee2025channel} and WDAN \citep{lin2025wdan}, two recent model-agnostic plug-ins, over seven datasets with iTransformer, $H=96$, and three seeds. Because their official repositories use different training engines, absolute values are reported for completeness but do not by themselves isolate the plug-in effect. We therefore rerun the bare backbone in each engine and report paired effects in Table~\ref{table:plugin_effects}. TIFO and ACN each improve 6/7 paired datasets. ACN has the largest mean improvement (+2.44\%), whereas TIFO has the smallest worst-case degradation (-1.02\%) and lowest across-dataset effect standard deviation (1.59 percentage points). Although TIFO does not win an individual dataset, it ranks second on five and achieves the lowest macro-average MSE across all seven datasets (0.274 versus 0.276 for ACN and the original backbone), reflecting its more consistent behavior. ACN retains the best macro-average MAE.}
+\resubmitchange{Table~\ref{table:recent_baselines} compares against ACN \citep{lee2025channel} and WDAN \citep{lin2025wdan}, two recent model-agnostic plug-ins, over seven datasets with iTransformer, $H=96$, and three seeds. Because their official repositories use different training engines, absolute values are reported for completeness but do not by themselves isolate the plug-in effect. We therefore rerun the bare backbone in each engine and report paired effects in Table~\ref{table:plugin_effects}. TIFO and ACN each improve 6/7 paired datasets. ACN has the largest mean improvement (+2.44\%), whereas TIFO has the smallest worst-case degradation (-1.02\%) and lowest across-dataset effect standard deviation (2.53 percentage points). Although TIFO does not win an individual dataset, it ranks second on five and achieves the lowest observed macro-average MSE across all seven datasets (0.273 versus 0.276 for ACN and the original backbone), reflecting its more consistent behavior. This aggregate lead holds for all three seed-indexed macro averages but is concentrated in the Traffic comparison; ACN retains the best macro-average MAE.}
 
 \resubmitchange{We additionally test whether TIFO complements ACN in the explicit order normalization $\rightarrow$ TIFO spectral adaptation $\rightarrow$ ACN encoding. After validation-only selection and frozen three-seed testing, ACN+TIFO improves mean MSE over ACN on all three preregistered datasets: ETTh1 ($0.388795\rightarrow0.385508$, 3/3 paired wins), ETTm2 ($0.180988\rightarrow0.179959$, 3/3), and Traffic ($0.427060\rightarrow0.425896$, 2/3). This diagnostic supports composability with a normalization plug-in; it does not replace the standalone TIFO comparison or establish complementarity with FilterNet.}
 
