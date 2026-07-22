@@ -42,7 +42,11 @@ def main() -> None:
     plugins = load("plugin_h96_final.json")
     historical = load("kdd_resubmit_h96_original_and_stabilized.json")
     tuned = load("tifo_final_h96.json")
+    hermitian = load("tifo_hermitian_final_h96.json")
+    acn_controls = load("plugin_engine_controls_h96_v1.json")
+    wdan_controls = load("wdan_engine_controls_h96.json")
     tuned_datasets = {row["dataset"] for row in tuned}
+    hermitian_datasets = {row["dataset"] for row in hermitian}
 
     markdown = [
         "# Recent plug-in comparison (H=96)", "",
@@ -54,19 +58,39 @@ def main() -> None:
     wins = {method: 0 for method in ("Ori", "ACN", "WDAN", "TIFO")}
     improves = {method: 0 for method in ("ACN", "WDAN", "TIFO")}
     worst_relative = {method: float("inf") for method in improves}
+    relative_effects = {method: [] for method in improves}
 
     for dataset in DATASETS:
+        if dataset in hermitian_datasets:
+            tifo_source = hermitian
+            tifo_method = next(
+                row["method"]
+                for row in hermitian
+                if row["dataset"] == dataset
+                and row["method"].startswith("iTransformer+TIFO[")
+            )
+        elif dataset in tuned_datasets:
+            tifo_source = tuned
+            tifo_method = next(
+                row["method"]
+                for row in tuned
+                if row["dataset"] == dataset
+                and row["method"].startswith("iTransformer+TIFO[")
+            )
+        else:
+            tifo_source = historical
+            tifo_method = "iTransformer+TIFO[historical]"
+
         groups = {
             "Ori": select(historical, dataset, "iTransformer+ORI"),
             "ACN": select(plugins, dataset, "ACN"),
             "WDAN": select(plugins, dataset, "WDAN"),
-            "TIFO": select(
-                tuned if dataset in tuned_datasets else historical,
-                dataset,
-                next(row["method"] for row in (tuned if dataset in tuned_datasets else historical)
-                     if row["dataset"] == dataset and row["method"].startswith("iTransformer+TIFO[")
-                     and (dataset in tuned_datasets or row["method"] == "iTransformer+TIFO[historical]")),
-            ),
+            "TIFO": select(tifo_source, dataset, tifo_method),
+        }
+        controls = {
+            "ACN": select(acn_controls, dataset, "ACN-engine Ori"),
+            "WDAN": select(wdan_controls, dataset, "WDAN-engine Ori"),
+            "TIFO": groups["Ori"],
         }
         mse = {name: stats(rows, "mse") for name, rows in groups.items()}
         mae = {name: stats(rows, "mae") for name, rows in groups.items()}
@@ -77,7 +101,9 @@ def main() -> None:
         for name in groups:
             wins[name] += int(mse[name][0] == best_mse)
         for name in improves:
-            relative = (mse["Ori"][0] - mse[name][0]) / mse["Ori"][0] * 100.0
+            control_mse = stats(controls[name], "mse")[0]
+            relative = (control_mse - mse[name][0]) / control_mse * 100.0
+            relative_effects[name].append(relative)
             improves[name] += int(relative > 0)
             worst_relative[name] = min(worst_relative[name], relative)
         markdown.append(
@@ -103,12 +129,50 @@ def main() -> None:
     markdown.extend((
         "",
         "MSE wins: " + ", ".join(f"{key}={value}" for key, value in wins.items()),
-        "Improves Ori (MSE): " + ", ".join(f"{key}={value}/7" for key, value in improves.items()),
-        "Worst relative MSE change: "
-        + ", ".join(f"{key}={value:+.1f}%" for key, value in worst_relative.items()),
+        "",
+        "## Paired plug-in effect within each official training engine",
+        "",
+        "| Plug-in | Improves own backbone | Mean relative MSE change | Worst relative MSE change | Across-dataset std |",
+        "|---|---:|---:|---:|---:|",
     ))
+    effect_tex = ["% Generated from paired plug-in/control runs within each engine."]
+    effect_stats = {}
+    for name in ("ACN", "WDAN", "TIFO"):
+        values = relative_effects[name]
+        effect_stats[name] = {
+            "coverage": improves[name],
+            "mean": statistics.mean(values),
+            "worst": min(values),
+            "std": statistics.stdev(values),
+        }
+        markdown.append(
+            f"| {name} | {improves[name]}/7 | {effect_stats[name]['mean']:+.2f}% | "
+            f"{effect_stats[name]['worst']:+.2f}% | {effect_stats[name]['std']:.2f} pp |"
+        )
+
+    best_coverage = max(value["coverage"] for value in effect_stats.values())
+    best_mean = max(value["mean"] for value in effect_stats.values())
+    best_worst = max(value["worst"] for value in effect_stats.values())
+    best_std = min(value["std"] for value in effect_stats.values())
+
+    def emphasize(text: str, condition: bool) -> str:
+        return f"\\textbf{{{text}}}" if condition else text
+
+    for name in ("ACN", "WDAN", "TIFO"):
+        value = effect_stats[name]
+        cells = (
+            emphasize(f"{value['coverage']}/7", value["coverage"] == best_coverage),
+            emphasize(f"{value['mean']:+.2f}\\%", value["mean"] == best_mean),
+            emphasize(f"{value['worst']:+.2f}\\%", value["worst"] == best_worst),
+            emphasize(f"{value['std']:.2f}", value["std"] == best_std),
+        )
+        effect_tex.append(f"{name} & " + " & ".join(cells) + r" \\")
+
     (RESULTS / "plugin_comparison_h96.md").write_text("\n".join(markdown) + "\n", encoding="utf-8")
     (RESULTS / "plugin_comparison_h96_rows.tex").write_text("\n".join(tex) + "\n", encoding="utf-8")
+    (RESULTS / "plugin_effect_summary_h96_rows.tex").write_text(
+        "\n".join(effect_tex) + "\n", encoding="utf-8"
+    )
     print(f"wrote {RESULTS / 'plugin_comparison_h96.md'}")
 
 
