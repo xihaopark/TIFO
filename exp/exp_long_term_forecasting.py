@@ -136,8 +136,18 @@ class Exp_Long_Term_Forecast(Exp_Basic):
         )
 
     def _select_criterion(self):
-        criterion = nn.MSELoss()
-        return criterion
+        mse = nn.MSELoss()
+        mae_weight = float(getattr(self.args, 'mae_loss_weight', 0.0))
+        if mae_weight < 0:
+            raise ValueError('mae_loss_weight must be non-negative')
+        if mae_weight == 0:
+            return mse
+        mae = nn.L1Loss()
+
+        def weighted_loss(prediction, target):
+            return mse(prediction, target) + mae_weight * mae(prediction, target)
+
+        return weighted_loss
 
     def _pretrain_wdan_adapter(self, train_loader, vali_loader):
         """Match WDAN's official five-epoch statistics pretraining stage."""
