@@ -52,6 +52,9 @@ if __name__ == '__main__':
                         help='dataset score or an auditable score-conditioning control')
     parser.add_argument('--tifo_score_seed', type=int, default=1729,
                         help='fixed local seed for the permuted-score control')
+    parser.add_argument('--tifo_score_alignment', type=str, default='auto',
+                        choices=['auto', 'normalized', 'raw'],
+                        help='input normalization used only when estimating the training-set stationarity score')
     parser.add_argument('--acn_temperature', type=float, default=0.1,
                         help='temperature for the native adaptive channel-normalization plug-in')
     parser.add_argument('--wdan_levels', type=int, default=2)
@@ -62,7 +65,7 @@ if __name__ == '__main__':
     parser.add_argument('--wdan_dropout', type=float, default=0.1)
     parser.add_argument('--wdan_stats_epochs', type=int, default=5)
     parser.add_argument('--wdan_lr_scale', type=float, default=1.0)
-    parser.add_argument('--method', type=str, default='tifo', choices=['ori', 'tifo', 'acn', 'wdan'],
+    parser.add_argument('--method', type=str, default='tifo', choices=['ori', 'tifo', 'acn', 'wdan', 'wdan_tifo'],
                         help='matched representation plug-in; ori is the bare backbone control')
 
     #Fredformer:

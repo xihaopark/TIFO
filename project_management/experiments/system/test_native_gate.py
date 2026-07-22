@@ -145,6 +145,36 @@ def assert_paired_initialization(mask: torch.Tensor) -> None:
         raise AssertionError("native WDAN adapter lacks finite gradients")
     print("native WDAN ok: real forecast, auxiliary statistics, finite gradients")
 
+    composition_args = make_args("wdan_tifo", "hermitian_diagonal")
+    composition_args.tifo_score_alignment = "raw"
+    composition_args.tifo_gain_limit = 0.5
+    composition_args.wdan_levels = 2
+    composition_args.wdan_window = 5
+    composition_args.wdan_d_model = 32
+    composition_args.wdan_d_ff = 32
+    composition_args.wdan_layers = 1
+    composition_args.wdan_dropout = 0.0
+    composition = iTransformer.Model(composition_args, mask)
+    output, statistics = composition(sample, sample_mark, None, None)
+    if output.shape != (4, 96, 7) or not torch.isfinite(output).all():
+        raise AssertionError("native WDAN+TIFO returned an invalid output")
+    loss = output.square().mean() + composition.wdan_statistics_loss(
+        statistics, sample
+    )
+    loss.backward()
+    required = [
+        parameter.grad
+        for name, parameter in composition.named_parameters()
+        if "wdan_adapter" in name or "diagonal_log_gain" in name
+        if parameter.requires_grad
+    ]
+    if not required or not all(
+        gradient is not None and torch.isfinite(gradient).all()
+        for gradient in required
+    ):
+        raise AssertionError("native WDAN+TIFO lacks finite plug-in gradients")
+    print("native WDAN+TIFO ok: valid output and finite plug-in gradients")
+
 
 def assert_yamabuki_candidates(device: torch.device) -> None:
     """Check the alpha-shrinkage and zero-padding candidates imported from server 25."""

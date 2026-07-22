@@ -71,7 +71,7 @@ class Exp_Long_Term_Forecast(Exp_Basic):
 
     def _build_model(self):
         self.global_mask = None
-        if getattr(self.args, 'method', 'tifo') == 'tifo':
+        if getattr(self.args, 'method', 'tifo') in {'tifo', 'wdan_tifo'}:
             self._compute_global_mask()
         model = self.model_dict[self.args.model].Model(self.args, self.global_mask).float()
 
@@ -88,6 +88,26 @@ class Exp_Long_Term_Forecast(Exp_Basic):
             # Official stats_bb_union trains the statistics module separately,
             # then jointly optimizes backbone and statistics at the backbone LR.
             return optim.Adam(self.model.parameters(), lr=self.args.learning_rate)
+        if getattr(self.args, 'method', 'ori') == 'wdan_tifo':
+            lr_scale = float(getattr(self.args, 'tifo_lr_scale', 1.0))
+            backbone_params, filter_params = [], []
+            for name, parameter in self.model.named_parameters():
+                if not parameter.requires_grad:
+                    continue
+                (filter_params if 'filter.' in name else backbone_params).append(parameter)
+            if not filter_params:
+                raise RuntimeError('WDAN+TIFO mode has no TIFO filter parameters')
+            return optim.Adam(
+                [
+                    {'params': backbone_params, 'lr': self.args.learning_rate, 'lr_scale': 1.0},
+                    {
+                        'params': filter_params,
+                        'lr': self.args.learning_rate * lr_scale,
+                        'lr_scale': lr_scale,
+                    },
+                ],
+                lr=self.args.learning_rate,
+            )
         lr_scale = float(getattr(self.args, 'tifo_lr_scale', 1.0))
         if getattr(self.args, 'method', 'ori') != 'tifo' or lr_scale == 1.0:
             return optim.Adam(self.model.parameters(), lr=self.args.learning_rate)
@@ -121,7 +141,7 @@ class Exp_Long_Term_Forecast(Exp_Basic):
 
     def _pretrain_wdan_adapter(self, train_loader, vali_loader):
         """Match WDAN's official five-epoch statistics pretraining stage."""
-        if getattr(self.args, 'method', 'ori') != 'wdan':
+        if getattr(self.args, 'method', 'ori') not in {'wdan', 'wdan_tifo'}:
             return
         model = self.model.module if isinstance(self.model, nn.DataParallel) else self.model
         epochs = int(getattr(self.args, 'wdan_stats_epochs', 5))

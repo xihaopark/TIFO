@@ -43,12 +43,17 @@ class GlobalMaskCalculator:
                 if variant == "historical":
                     amplitude = torch.abs(torch.fft.fft(x, n=fft_size, dim=1))
                 else:
-                    if variant in {
-                        "identity_prior",
-                        "hermitian_aligned",
-                        "hermitian_shared",
-                        "hermitian_diagonal",
-                    }:
+                    alignment = getattr(self.args, "tifo_score_alignment", "auto")
+                    normalize_score_input = alignment == "normalized" or (
+                        alignment == "auto"
+                        and variant in {
+                            "identity_prior",
+                            "hermitian_aligned",
+                            "hermitian_shared",
+                            "hermitian_diagonal",
+                        }
+                    )
+                    if normalize_score_input:
                         # Match the per-window normalization applied by the
                         # iTransformer/PatchTST input path before TIFO.
                         x = (x - x.mean(1, keepdim=True)) / torch.sqrt(
