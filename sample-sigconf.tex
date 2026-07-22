@@ -1707,6 +1707,23 @@ ETTm2 & $0.425 \pm 0.019$ & $1.807 \pm 0.108$ \\
 \end{tabular}
 \end{table}
 
+\begin{table}[H]
+\centering
+\caption{Three-seed MSE ablation of the statistic used to condition TIFO. The
+permuted control preserves each channel's score distribution but breaks its
+frequency correspondence; Ones removes score variation.}
+\label{table:score_ablation}
+\small
+\begin{tabular}{lccc}
+\toprule
+Dataset & Data score & Permuted & Ones \\
+\midrule
+ETTh1 & $\mathbf{0.388955 \pm 0.000866}$ & $0.389214 \pm 0.000510$ & $0.391507 \pm 0.000450$ \\
+ETTm2 & $\mathbf{0.181120 \pm 0.000950}$ & $0.182516 \pm 0.002504$ & $0.186016 \pm 0.000259$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \clearpage
 \twocolumn
 \subsection{Experiment Results}
@@ -1800,6 +1817,8 @@ Multivariate forecasting results (average) with forecasting lengths $ H \in \{96
 \resubmitchange{Table~\ref{table:recent_baselines} compares against ACN \citep{lee2025channel} and WDAN \citep{lin2025wdan}, two recent model-agnostic plug-ins, over seven datasets with iTransformer, $H=96$, and three seeds. Because their official repositories use different training engines, absolute values are reported for completeness but do not by themselves isolate the plug-in effect. We therefore rerun the bare backbone in each engine and report paired effects in Table~\ref{table:plugin_effects}. TIFO and ACN each improve 6/7 paired datasets. ACN has the largest mean improvement (+2.44\%), whereas TIFO has the smallest worst-case degradation (-1.02\%) and lowest across-dataset effect standard deviation (1.59 percentage points). Although TIFO does not win an individual dataset, it ranks second on five and achieves the lowest macro-average MSE across all seven datasets (0.274 versus 0.276 for ACN and the original backbone), reflecting its more consistent behavior. ACN retains the best macro-average MAE.}
 
 \resubmitchange{Table~\ref{table:weight_alignment} provides a direct diagnostic of the proposed mechanism on the frozen ETTh1 and ETTm2 checkpoints. Positive rank correlations and high/low quartile gain ratios above one show that higher stationarity scores tend to receive larger learned gains. This evidence supports the intended conditioning behavior, but it is not a proof of monotonicity and does not eliminate the negative Traffic case.}
+
+\resubmitchange{Table~\ref{table:score_ablation} separates the value of data-dependent conditioning from the capacity of the additional MLP. Replacing the score by Ones degrades MSE in all six paired runs. The frequency-permuted control is mixed: the data score wins two of three ETTh1 seeds and one of three ETTm2 seeds, although its mean MSE is lower on both datasets. We therefore interpret the statistic as a useful non-uniform conditioning signal, while not claiming that its precise frequency ordering is uniformly optimal.}
 
 \resubmitchange{The controlled-shift stress table evaluates the frozen ETTh1 and Traffic checkpoints under a preregistered high-frequency intervention. As shift strength increases from 0 to 1, TIFO's relative effect over Ori improves monotonically from +1.09\% to +1.97\% on ETTh1 and from -1.02\% to -0.51\% on Traffic. Thus TIFO is less sensitive to this intervention in both cases, but it does not reverse the clean-data Traffic failure.}
 
