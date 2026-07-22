@@ -19,9 +19,11 @@ class Model(nn.Module):
     def __init__(self, configs, global_mask):
         super(Model, self).__init__()
         self.global_mask = global_mask
-        self.use_tifo = getattr(configs, 'method', 'tifo') == 'tifo'
+        method = getattr(configs, 'method', 'tifo')
+        self.use_tifo = method in {'tifo', 'wdan_tifo'}
         self.use_acn = getattr(configs, 'method', 'tifo') == 'acn'
-        self.use_wdan = getattr(configs, 'method', 'tifo') == 'wdan'
+        self.use_wdan = method in {'wdan', 'wdan_tifo'}
+        self.tifo_before_wdan = method == 'wdan_tifo'
         self.channels = configs.enc_in
 
         self.task_name = configs.task_name
@@ -75,6 +77,8 @@ class Model(nn.Module):
 
         wdan_statistics = None
         if self.use_wdan:
+            if self.tifo_before_wdan:
+                x_enc = self.filter(x_enc)
             x_enc, wdan_statistics = self.wdan_adapter.normalize(x_enc)
             means = stdev = None
         else:
@@ -85,7 +89,7 @@ class Model(nn.Module):
 
         _, _, N = x_enc.shape
 
-        if self.use_tifo:
+        if self.use_tifo and not self.tifo_before_wdan:
             x_enc = self.filter(x_enc)
         save = x_enc
 

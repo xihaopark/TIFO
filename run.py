@@ -28,6 +28,7 @@ if __name__ == '__main__':
                             'hermitian_raw',
                             'hermitian_aligned',
                             'hermitian_shared',
+                            'hermitian_diagonal',
                         ],
                         help=(
                             'TIFO operator; historical exactly matches the result-producing '
@@ -38,6 +39,8 @@ if __name__ == '__main__':
                         ))
     parser.add_argument('--tifo_dropout', type=float, default=0.5,
                         help='dropout inside the historical TIFO weight MLPs')
+    parser.add_argument('--tifo_gain_limit', type=float, default=0.5,
+                        help='maximum log-gain scale for the diagonal phase-preserving TIFO variant')
     parser.add_argument('--tifo_lr_scale', type=float, default=1.0,
                         help='TIFO filter learning-rate multiplier relative to the backbone')
     parser.add_argument('--tifo_residual_alpha', type=float, default=1.0,
@@ -49,6 +52,9 @@ if __name__ == '__main__':
                         help='dataset score or an auditable score-conditioning control')
     parser.add_argument('--tifo_score_seed', type=int, default=1729,
                         help='fixed local seed for the permuted-score control')
+    parser.add_argument('--tifo_score_alignment', type=str, default='auto',
+                        choices=['auto', 'normalized', 'raw'],
+                        help='input normalization used only when estimating the training-set stationarity score')
     parser.add_argument('--acn_temperature', type=float, default=0.1,
                         help='temperature for the native adaptive channel-normalization plug-in')
     parser.add_argument('--wdan_levels', type=int, default=2)
@@ -59,7 +65,7 @@ if __name__ == '__main__':
     parser.add_argument('--wdan_dropout', type=float, default=0.1)
     parser.add_argument('--wdan_stats_epochs', type=int, default=5)
     parser.add_argument('--wdan_lr_scale', type=float, default=1.0)
-    parser.add_argument('--method', type=str, default='tifo', choices=['ori', 'tifo', 'acn', 'wdan'],
+    parser.add_argument('--method', type=str, default='tifo', choices=['ori', 'tifo', 'acn', 'wdan', 'wdan_tifo'],
                         help='matched representation plug-in; ori is the bare backbone control')
 
     #Fredformer:
@@ -161,6 +167,8 @@ if __name__ == '__main__':
     parser.add_argument('--learning_rate', type=float, default=0.0001, help='optimizer learning rate')
     parser.add_argument('--des', type=str, default='test', help='exp description')
     parser.add_argument('--loss', type=str, default='MSE', help='loss function')
+    parser.add_argument('--mae_loss_weight', type=float, default=0.0,
+                        help='optional L1 weight added to the MSE training/validation loss')
     parser.add_argument('--lradj', type=str, default='type1', help='adjust learning rate')
     parser.add_argument('--use_amp', action='store_true', help='use automatic mixed precision training', default=False)
 
@@ -200,6 +208,8 @@ if __name__ == '__main__':
     parser.add_argument('--extra_tag', type=str, default="", help="Anything extra")
     parser.add_argument('--skip_final_test', action='store_true',
                         help='validation-only tuning run; do not inspect the test split')
+    parser.add_argument('--validation_metrics_checkpoint', type=str, default='',
+                        help='load this frozen checkpoint and report validation MSE/MAE only')
     parser.add_argument('--save_arrays', action='store_true',
                         help='save large prediction/target arrays in addition to metrics')
     parser.add_argument('--spectral_shift_strength', type=float, default=0.0,
@@ -256,6 +266,17 @@ if __name__ == '__main__':
         Exp = Exp_Classification
     else:
         Exp = Exp_Long_Term_Forecast
+
+    if args.validation_metrics_checkpoint:
+        exp = Exp(args)
+        state = torch.load(
+            args.validation_metrics_checkpoint,
+            map_location=exp.device,
+        )
+        exp.model.load_state_dict(state)
+        exp.validation_metrics()
+        torch.cuda.empty_cache()
+        raise SystemExit(0)
 
     if args.is_training:
         for ii in range(args.itr):

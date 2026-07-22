@@ -71,7 +71,7 @@ class Exp_Long_Term_Forecast(Exp_Basic):
 
     def _build_model(self):
         self.global_mask = None
-        if getattr(self.args, 'method', 'tifo') == 'tifo':
+        if getattr(self.args, 'method', 'tifo') in {'tifo', 'wdan_tifo'}:
             self._compute_global_mask()
         model = self.model_dict[self.args.model].Model(self.args, self.global_mask).float()
 
@@ -88,6 +88,26 @@ class Exp_Long_Term_Forecast(Exp_Basic):
             # Official stats_bb_union trains the statistics module separately,
             # then jointly optimizes backbone and statistics at the backbone LR.
             return optim.Adam(self.model.parameters(), lr=self.args.learning_rate)
+        if getattr(self.args, 'method', 'ori') == 'wdan_tifo':
+            lr_scale = float(getattr(self.args, 'tifo_lr_scale', 1.0))
+            backbone_params, filter_params = [], []
+            for name, parameter in self.model.named_parameters():
+                if not parameter.requires_grad:
+                    continue
+                (filter_params if 'filter.' in name else backbone_params).append(parameter)
+            if not filter_params:
+                raise RuntimeError('WDAN+TIFO mode has no TIFO filter parameters')
+            return optim.Adam(
+                [
+                    {'params': backbone_params, 'lr': self.args.learning_rate, 'lr_scale': 1.0},
+                    {
+                        'params': filter_params,
+                        'lr': self.args.learning_rate * lr_scale,
+                        'lr_scale': lr_scale,
+                    },
+                ],
+                lr=self.args.learning_rate,
+            )
         lr_scale = float(getattr(self.args, 'tifo_lr_scale', 1.0))
         if getattr(self.args, 'method', 'ori') != 'tifo' or lr_scale == 1.0:
             return optim.Adam(self.model.parameters(), lr=self.args.learning_rate)
@@ -116,12 +136,22 @@ class Exp_Long_Term_Forecast(Exp_Basic):
         )
 
     def _select_criterion(self):
-        criterion = nn.MSELoss()
-        return criterion
+        mse = nn.MSELoss()
+        mae_weight = float(getattr(self.args, 'mae_loss_weight', 0.0))
+        if mae_weight < 0:
+            raise ValueError('mae_loss_weight must be non-negative')
+        if mae_weight == 0:
+            return mse
+        mae = nn.L1Loss()
+
+        def weighted_loss(prediction, target):
+            return mse(prediction, target) + mae_weight * mae(prediction, target)
+
+        return weighted_loss
 
     def _pretrain_wdan_adapter(self, train_loader, vali_loader):
         """Match WDAN's official five-epoch statistics pretraining stage."""
-        if getattr(self.args, 'method', 'ori') != 'wdan':
+        if getattr(self.args, 'method', 'ori') not in {'wdan', 'wdan_tifo'}:
             return
         model = self.model.module if isinstance(self.model, nn.DataParallel) else self.model
         epochs = int(getattr(self.args, 'wdan_stats_epochs', 5))
@@ -208,6 +238,44 @@ class Exp_Long_Term_Forecast(Exp_Basic):
         total_loss = np.average(total_loss)
         self.model.train()
         return total_loss
+
+    def validation_metrics(self):
+        """Report sample-weighted validation MSE and MAE for a frozen checkpoint."""
+        _, validation_loader = self._get_data(flag='val')
+        squared_error = 0.0
+        absolute_error = 0.0
+        element_count = 0
+        self.model.eval()
+        with torch.no_grad():
+            for batch_x, batch_y, batch_x_mark, batch_y_mark in validation_loader:
+                batch_x = batch_x.float().to(self.device)
+                batch_y = batch_y.float().to(self.device)
+                batch_x_mark = batch_x_mark.float().to(self.device)
+                batch_y_mark = batch_y_mark.float().to(self.device)
+                dec_inp = torch.cat(
+                    [
+                        batch_y[:, :self.args.label_len, :],
+                        torch.zeros_like(batch_y[:, -self.args.pred_len:, :]),
+                    ],
+                    dim=1,
+                )
+                outputs, _ = self.model(
+                    batch_x, batch_x_mark, dec_inp, batch_y_mark
+                )
+                feature_start = -1 if self.args.features == 'MS' else 0
+                outputs = outputs[:, -self.args.pred_len:, feature_start:]
+                targets = batch_y[:, -self.args.pred_len:, feature_start:]
+                error = outputs - targets
+                squared_error += error.square().sum().item()
+                absolute_error += error.abs().sum().item()
+                element_count += error.numel()
+        if element_count == 0:
+            raise RuntimeError('validation loader produced no elements')
+        mse = squared_error / element_count
+        mae = absolute_error / element_count
+        print(f'VALIDATION_METRICS mse={mse:.10f} mae={mae:.10f} n={element_count}')
+        self.model.train()
+        return mse, mae
 
     def train(self, setting):
         train_data, train_loader = self._get_data(flag='train')

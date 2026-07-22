@@ -43,11 +43,17 @@ class GlobalMaskCalculator:
                 if variant == "historical":
                     amplitude = torch.abs(torch.fft.fft(x, n=fft_size, dim=1))
                 else:
-                    if variant in {
-                        "identity_prior",
-                        "hermitian_aligned",
-                        "hermitian_shared",
-                    }:
+                    alignment = getattr(self.args, "tifo_score_alignment", "auto")
+                    normalize_score_input = alignment == "normalized" or (
+                        alignment == "auto"
+                        and variant in {
+                            "identity_prior",
+                            "hermitian_aligned",
+                            "hermitian_shared",
+                            "hermitian_diagonal",
+                        }
+                    )
+                    if normalize_score_input:
                         # Match the per-window normalization applied by the
                         # iTransformer/PatchTST input path before TIFO.
                         x = (x - x.mean(1, keepdim=True)) / torch.sqrt(
@@ -149,6 +155,16 @@ class FrequencyDomainFilter(nn.Module):
         score_prior = normalized_score.clamp_min(1e-4).pow(prior_strength)
         self.register_buffer("score_prior", score_prior.clamp(0.25, 4.0))
 
+        if self.variant == "hermitian_diagonal":
+            self.gain_limit = float(getattr(args, "tifo_gain_limit", 0.5))
+            if self.gain_limit <= 0:
+                raise ValueError("tifo_gain_limit must be positive")
+            # One phase-preserving gain per frequency and channel.  The fixed
+            # stationarity score scales the learnable log-gain, while zero
+            # initialization keeps the complete transform exactly at identity.
+            self.diagonal_log_gain = nn.Parameter(torch.zeros_like(self.stationarity_score))
+            return
+
         def weight_mlp():
             network = nn.Sequential(
                 nn.Linear(frequencies, hidden_dim),
@@ -179,6 +195,11 @@ class FrequencyDomainFilter(nn.Module):
             )
         score_by_channel = self.stationarity_score.transpose(0, 1)
         prior = self.score_prior.transpose(0, 1)
+        if self.variant == "hermitian_diagonal":
+            log_gain = self.gain_limit * torch.tanh(self.diagonal_log_gain)
+            log_gain = (log_gain * self.score_prior).clamp(-1.38629436, 1.38629436)
+            shared_weight = torch.exp(log_gain)
+            return shared_weight, shared_weight
         if self.variant == "hermitian_shared":
             shared_weight = prior * 2.0 * torch.sigmoid(
                 self.shared_weight_mlp(score_by_channel)
