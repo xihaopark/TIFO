@@ -140,6 +140,32 @@ def assert_yamabuki_candidates(device: torch.device) -> None:
     print("server-25 candidates ok: padded FFT shape/gradient and alpha=0 identity")
 
 
+def assert_hermitian_candidates(device: torch.device) -> None:
+    """Check real reconstruction and finite gradients for both new variants."""
+
+    synthetic_loader = [(torch.randn(3, 96, 7),) for _ in range(2)]
+    for variant in ("hermitian_raw", "hermitian_aligned"):
+        args = make_args("tifo", variant)
+        mask = run_filter(args, synthetic_loader, device)
+        if mask.shape != (49, 7) or not torch.isfinite(mask).all():
+            raise AssertionError(
+                f"{variant} returned invalid statistics: {tuple(mask.shape)}"
+            )
+        transform = FrequencyDomainFilter(args, mask).to(device)
+        x = torch.randn(2, 96, 7, device=device, requires_grad=True)
+        output = transform(x)
+        if output.shape != x.shape or output.is_complex() or not torch.isfinite(output).all():
+            raise AssertionError(f"{variant} returned an invalid real output")
+        output.square().mean().backward()
+        if not any(
+            parameter.grad is not None and torch.isfinite(parameter.grad).all()
+            for parameter in transform.parameters()
+            if parameter.requires_grad
+        ):
+            raise AssertionError(f"{variant} did not produce finite gradients")
+    print("Hermitian TIFO candidates ok: real output and finite gradients")
+
+
 def main() -> int:
     if not torch.cuda.is_available():
         raise RuntimeError("native gate requires CUDA")
@@ -152,6 +178,7 @@ def main() -> int:
         f"torch={torch.__version__}"
     )
     assert_yamabuki_candidates(device)
+    assert_hermitian_candidates(device)
 
     args = make_args("tifo")
     _, mask_loader = data_provider(args, "train", shuffle_override=False)

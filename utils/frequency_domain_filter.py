@@ -1,9 +1,9 @@
 """Dataset-level TIFO stationarity statistics and input transformation.
 
-The implementation mirrors the paper pipeline: compute a frequency-wise
-stationarity score from the training split, learn independent real/imaginary
-weights from that score, and transform each input back to the time domain before
-the forecasting backbone.  TIFO does not transform the backbone prediction.
+The historical operator is preserved for result reproducibility.  The
+Hermitian variants use the non-redundant real FFT so independently learned
+real/imaginary coefficient scales reconstruct a real sequence without dropping
+an imaginary residual.  TIFO does not transform the backbone prediction.
 """
 
 from __future__ import annotations
@@ -32,9 +32,7 @@ class GlobalMaskCalculator:
         channels = self.args.enc_in
         variant = getattr(self.args, "tifo_variant", "historical")
         fft_size = _tifo_fft_size(self.args)
-        frequencies = (
-            fft_size if variant == "historical" else fft_size // 2 + 1
-        )
+        frequencies = fft_size if variant == "historical" else fft_size // 2 + 1
         amp_sum = torch.zeros(frequencies, channels, device=self.device)
         amp2_sum = torch.zeros_like(amp_sum)
         sample_count = 0
@@ -45,9 +43,12 @@ class GlobalMaskCalculator:
                 if variant == "historical":
                     amplitude = torch.abs(torch.fft.fft(x, n=fft_size, dim=1))
                 else:
-                    x = (x - x.mean(1, keepdim=True)) / torch.sqrt(
-                        x.var(1, keepdim=True, unbiased=False) + 1e-5
-                    )
+                    if variant in {"identity_prior", "hermitian_aligned"}:
+                        # Match the per-window normalization applied by the
+                        # iTransformer/PatchTST input path before TIFO.
+                        x = (x - x.mean(1, keepdim=True)) / torch.sqrt(
+                            x.var(1, keepdim=True, unbiased=False) + 1e-5
+                        )
                     amplitude = torch.abs(torch.fft.rfft(x, n=fft_size, dim=1))
                 amp_sum += amplitude.sum(0)
                 amp2_sum += amplitude.square().sum(0)
@@ -99,7 +100,11 @@ class FrequencyDomainFilter(nn.Module):
         )
         hidden_dim = int(getattr(args, "filter_dim", 512))
 
-        if self.variant == "historical":
+        if self.variant in {
+            "historical",
+            "hermitian_raw",
+            "hermitian_aligned",
+        }:
             dropout = float(getattr(args, "tifo_dropout", 0.5))
 
             def historical_mlp():
@@ -138,7 +143,11 @@ class FrequencyDomainFilter(nn.Module):
         self.imag_weight_mlp = weight_mlp()
 
     def frequency_weights(self):
-        if self.variant == "historical":
+        if self.variant in {
+            "historical",
+            "hermitian_raw",
+            "hermitian_aligned",
+        }:
             score_by_channel = self.stationarity_score.transpose(0, 1)
             return (
                 self.linear_r(score_by_channel).transpose(0, 1),

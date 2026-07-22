@@ -22,8 +22,17 @@ if __name__ == '__main__':
     parser.add_argument('--tifo_prior_strength', type=float, default=0.0,
                         help='strength of the normalized stationarity-score prior in TIFO weights')
     parser.add_argument('--tifo_variant', type=str, default='historical',
-                        choices=['historical', 'identity_prior'],
-                        help='TIFO operator; historical exactly matches the result-producing real/imag path')
+                        choices=[
+                            'historical',
+                            'identity_prior',
+                            'hermitian_raw',
+                            'hermitian_aligned',
+                        ],
+                        help=(
+                            'TIFO operator; historical exactly matches the result-producing '
+                            'full-FFT path, while hermitian variants use rFFT/iRFFT and either '
+                            'raw or backbone-aligned stationarity statistics'
+                        ))
     parser.add_argument('--tifo_dropout', type=float, default=0.5,
                         help='dropout inside the historical TIFO weight MLPs')
     parser.add_argument('--tifo_lr_scale', type=float, default=1.0,
