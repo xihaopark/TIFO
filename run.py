@@ -65,7 +65,8 @@ if __name__ == '__main__':
     parser.add_argument('--wdan_dropout', type=float, default=0.1)
     parser.add_argument('--wdan_stats_epochs', type=int, default=5)
     parser.add_argument('--wdan_lr_scale', type=float, default=1.0)
-    parser.add_argument('--method', type=str, default='tifo', choices=['ori', 'tifo', 'acn', 'wdan', 'wdan_tifo'],
+    parser.add_argument('--method', type=str, default='tifo',
+                        choices=['ori', 'tifo', 'acn', 'acn_tifo', 'wdan', 'wdan_tifo'],
                         help='matched representation plug-in; ori is the bare backbone control')
 
     #Fredformer:

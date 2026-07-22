@@ -27,6 +27,8 @@ def method_label(record: dict) -> str:
     if record["engine"] == "native":
         if config["method"] == "wdan_tifo":
             return f"{config['backbone']}+WDAN+TIFO"
+        if config["method"] == "acn_tifo":
+            return f"{config['backbone']}+ACN+TIFO"
         label = f"{config['backbone']}+{config['method'].upper()}"
         variant = config.get("model_args", {}).get("tifo_variant")
         if (
