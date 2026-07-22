@@ -1,5 +1,5 @@
 {
-  "protocol_id": "kdd_resubmit_native_wdan_h96_gate_v1",
+  "protocol_id": "kdd_resubmit_native_wdan_h96_gate_v2",
   "selection_rule": "For each dataset-horizon cell, select one of eight WDAN configurations by seed-2022 validation MSE. The native data pipeline, iTransformer backbone, optimizer schedule, epoch budget, early stopping, and metric code are shared with TIFO and ACN; final test is disabled.",
   "defaults": {
     "python": "/mnt/data1/park/Time Series/Forecasting/TKDE/envs/fredformer-cu128/bin/python",
@@ -35,7 +35,7 @@
       "dec_in": 7,
       "c_out": 7,
       "seed": 2022,
-      "run_id": "tune_native_wdan_etth1_h96_l2_w5_d0_lr1_s2022",
+      "run_id": "tune_native_wdan_v2_etth1_h96_l2_w5_d0_lr1_s2022",
       "engine": "native",
       "backbone": "iTransformer",
       "method": "wdan",
@@ -51,7 +51,7 @@
         "wdan_d_ff": 128,
         "wdan_layers": 0,
         "wdan_dropout": 0.1,
-        "wdan_aux_weight": 1.0,
+        "wdan_stats_epochs": 5,
         "wdan_lr_scale": 1.0,
         "skip_final_test": true
       }
@@ -76,7 +76,7 @@
       "dec_in": 7,
       "c_out": 7,
       "seed": 2022,
-      "run_id": "tune_native_wdan_etth1_h96_l2_w12_d0_lr1_s2022",
+      "run_id": "tune_native_wdan_v2_etth1_h96_l2_w12_d0_lr1_s2022",
       "engine": "native",
       "backbone": "iTransformer",
       "method": "wdan",
@@ -92,7 +92,7 @@
         "wdan_d_ff": 128,
         "wdan_layers": 0,
         "wdan_dropout": 0.1,
-        "wdan_aux_weight": 1.0,
+        "wdan_stats_epochs": 5,
         "wdan_lr_scale": 1.0,
         "skip_final_test": true
       }
@@ -117,7 +117,7 @@
       "dec_in": 7,
       "c_out": 7,
       "seed": 2022,
-      "run_id": "tune_native_wdan_etth1_h96_l3_w5_d1_lr1_s2022",
+      "run_id": "tune_native_wdan_v2_etth1_h96_l3_w5_d1_lr1_s2022",
       "engine": "native",
       "backbone": "iTransformer",
       "method": "wdan",
@@ -133,7 +133,7 @@
         "wdan_d_ff": 128,
         "wdan_layers": 1,
         "wdan_dropout": 0.1,
-        "wdan_aux_weight": 1.0,
+        "wdan_stats_epochs": 5,
         "wdan_lr_scale": 1.0,
         "skip_final_test": true
       }
@@ -158,7 +158,7 @@
       "dec_in": 7,
       "c_out": 7,
       "seed": 2022,
-      "run_id": "tune_native_wdan_etth1_h96_l3_w24_d1_lr1_s2022",
+      "run_id": "tune_native_wdan_v2_etth1_h96_l3_w24_d1_lr1_s2022",
       "engine": "native",
       "backbone": "iTransformer",
       "method": "wdan",
@@ -174,7 +174,7 @@
         "wdan_d_ff": 128,
         "wdan_layers": 1,
         "wdan_dropout": 0.1,
-        "wdan_aux_weight": 1.0,
+        "wdan_stats_epochs": 5,
         "wdan_lr_scale": 1.0,
         "skip_final_test": true
       }
@@ -199,7 +199,7 @@
       "dec_in": 7,
       "c_out": 7,
       "seed": 2022,
-      "run_id": "tune_native_wdan_etth1_h96_l3_w5_d2_lr1_s2022",
+      "run_id": "tune_native_wdan_v2_etth1_h96_l3_w5_d2_lr1_s2022",
       "engine": "native",
       "backbone": "iTransformer",
       "method": "wdan",
@@ -215,7 +215,7 @@
         "wdan_d_ff": 128,
         "wdan_layers": 2,
         "wdan_dropout": 0.1,
-        "wdan_aux_weight": 1.0,
+        "wdan_stats_epochs": 5,
         "wdan_lr_scale": 1.0,
         "skip_final_test": true
       }
@@ -240,7 +240,7 @@
       "dec_in": 7,
       "c_out": 7,
       "seed": 2022,
-      "run_id": "tune_native_wdan_etth1_h96_l3_w24_d2_lr1_s2022",
+      "run_id": "tune_native_wdan_v2_etth1_h96_l3_w24_d2_lr1_s2022",
       "engine": "native",
       "backbone": "iTransformer",
       "method": "wdan",
@@ -256,7 +256,7 @@
         "wdan_d_ff": 128,
         "wdan_layers": 2,
         "wdan_dropout": 0.1,
-        "wdan_aux_weight": 1.0,
+        "wdan_stats_epochs": 5,
         "wdan_lr_scale": 1.0,
         "skip_final_test": true
       }
@@ -281,7 +281,7 @@
       "dec_in": 7,
       "c_out": 7,
       "seed": 2022,
-      "run_id": "tune_native_wdan_etth1_h96_l2_w5_d0_lr10_s2022",
+      "run_id": "tune_native_wdan_v2_etth1_h96_l2_w5_d0_lr10_s2022",
       "engine": "native",
       "backbone": "iTransformer",
       "method": "wdan",
@@ -297,7 +297,7 @@
         "wdan_d_ff": 128,
         "wdan_layers": 0,
         "wdan_dropout": 0.1,
-        "wdan_aux_weight": 1.0,
+        "wdan_stats_epochs": 5,
         "wdan_lr_scale": 10.0,
         "skip_final_test": true
       }
@@ -322,7 +322,7 @@
       "dec_in": 7,
       "c_out": 7,
       "seed": 2022,
-      "run_id": "tune_native_wdan_etth1_h96_l3_w5_d2_lr10_s2022",
+      "run_id": "tune_native_wdan_v2_etth1_h96_l3_w5_d2_lr10_s2022",
       "engine": "native",
       "backbone": "iTransformer",
       "method": "wdan",
@@ -338,7 +338,7 @@
         "wdan_d_ff": 128,
         "wdan_layers": 2,
         "wdan_dropout": 0.1,
-        "wdan_aux_weight": 1.0,
+        "wdan_stats_epochs": 5,
         "wdan_lr_scale": 10.0,
         "skip_final_test": true
       }
@@ -363,7 +363,7 @@
       "dec_in": 7,
       "c_out": 7,
       "seed": 2022,
-      "run_id": "tune_native_wdan_etth2_h96_l2_w5_d0_lr1_s2022",
+      "run_id": "tune_native_wdan_v2_etth2_h96_l2_w5_d0_lr1_s2022",
       "engine": "native",
       "backbone": "iTransformer",
       "method": "wdan",
@@ -379,7 +379,7 @@
         "wdan_d_ff": 128,
         "wdan_layers": 0,
         "wdan_dropout": 0.1,
-        "wdan_aux_weight": 1.0,
+        "wdan_stats_epochs": 5,
         "wdan_lr_scale": 1.0,
         "skip_final_test": true
       }
@@ -404,7 +404,7 @@
       "dec_in": 7,
       "c_out": 7,
       "seed": 2022,
-      "run_id": "tune_native_wdan_etth2_h96_l2_w12_d0_lr1_s2022",
+      "run_id": "tune_native_wdan_v2_etth2_h96_l2_w12_d0_lr1_s2022",
       "engine": "native",
       "backbone": "iTransformer",
       "method": "wdan",
@@ -420,7 +420,7 @@
         "wdan_d_ff": 128,
         "wdan_layers": 0,
         "wdan_dropout": 0.1,
-        "wdan_aux_weight": 1.0,
+        "wdan_stats_epochs": 5,
         "wdan_lr_scale": 1.0,
         "skip_final_test": true
       }
@@ -445,7 +445,7 @@
       "dec_in": 7,
       "c_out": 7,
       "seed": 2022,
-      "run_id": "tune_native_wdan_etth2_h96_l3_w5_d1_lr1_s2022",
+      "run_id": "tune_native_wdan_v2_etth2_h96_l3_w5_d1_lr1_s2022",
       "engine": "native",
       "backbone": "iTransformer",
       "method": "wdan",
@@ -461,7 +461,7 @@
         "wdan_d_ff": 128,
         "wdan_layers": 1,
         "wdan_dropout": 0.1,
-        "wdan_aux_weight": 1.0,
+        "wdan_stats_epochs": 5,
         "wdan_lr_scale": 1.0,
         "skip_final_test": true
       }
@@ -486,7 +486,7 @@
       "dec_in": 7,
       "c_out": 7,
       "seed": 2022,
-      "run_id": "tune_native_wdan_etth2_h96_l3_w24_d1_lr1_s2022",
+      "run_id": "tune_native_wdan_v2_etth2_h96_l3_w24_d1_lr1_s2022",
       "engine": "native",
       "backbone": "iTransformer",
       "method": "wdan",
@@ -502,7 +502,7 @@
         "wdan_d_ff": 128,
         "wdan_layers": 1,
         "wdan_dropout": 0.1,
-        "wdan_aux_weight": 1.0,
+        "wdan_stats_epochs": 5,
         "wdan_lr_scale": 1.0,
         "skip_final_test": true
       }
@@ -527,7 +527,7 @@
       "dec_in": 7,
       "c_out": 7,
       "seed": 2022,
-      "run_id": "tune_native_wdan_etth2_h96_l3_w5_d2_lr1_s2022",
+      "run_id": "tune_native_wdan_v2_etth2_h96_l3_w5_d2_lr1_s2022",
       "engine": "native",
       "backbone": "iTransformer",
       "method": "wdan",
@@ -543,7 +543,7 @@
         "wdan_d_ff": 128,
         "wdan_layers": 2,
         "wdan_dropout": 0.1,
-        "wdan_aux_weight": 1.0,
+        "wdan_stats_epochs": 5,
         "wdan_lr_scale": 1.0,
         "skip_final_test": true
       }
@@ -568,7 +568,7 @@
       "dec_in": 7,
       "c_out": 7,
       "seed": 2022,
-      "run_id": "tune_native_wdan_etth2_h96_l3_w24_d2_lr1_s2022",
+      "run_id": "tune_native_wdan_v2_etth2_h96_l3_w24_d2_lr1_s2022",
       "engine": "native",
       "backbone": "iTransformer",
       "method": "wdan",
@@ -584,7 +584,7 @@
         "wdan_d_ff": 128,
         "wdan_layers": 2,
         "wdan_dropout": 0.1,
-        "wdan_aux_weight": 1.0,
+        "wdan_stats_epochs": 5,
         "wdan_lr_scale": 1.0,
         "skip_final_test": true
       }
@@ -609,7 +609,7 @@
       "dec_in": 7,
       "c_out": 7,
       "seed": 2022,
-      "run_id": "tune_native_wdan_etth2_h96_l2_w5_d0_lr10_s2022",
+      "run_id": "tune_native_wdan_v2_etth2_h96_l2_w5_d0_lr10_s2022",
       "engine": "native",
       "backbone": "iTransformer",
       "method": "wdan",
@@ -625,7 +625,7 @@
         "wdan_d_ff": 128,
         "wdan_layers": 0,
         "wdan_dropout": 0.1,
-        "wdan_aux_weight": 1.0,
+        "wdan_stats_epochs": 5,
         "wdan_lr_scale": 10.0,
         "skip_final_test": true
       }
@@ -650,7 +650,7 @@
       "dec_in": 7,
       "c_out": 7,
       "seed": 2022,
-      "run_id": "tune_native_wdan_etth2_h96_l3_w5_d2_lr10_s2022",
+      "run_id": "tune_native_wdan_v2_etth2_h96_l3_w5_d2_lr10_s2022",
       "engine": "native",
       "backbone": "iTransformer",
       "method": "wdan",
@@ -666,7 +666,7 @@
         "wdan_d_ff": 128,
         "wdan_layers": 2,
         "wdan_dropout": 0.1,
-        "wdan_aux_weight": 1.0,
+        "wdan_stats_epochs": 5,
         "wdan_lr_scale": 10.0,
         "skip_final_test": true
       }
@@ -691,7 +691,7 @@
       "dec_in": 7,
       "c_out": 7,
       "seed": 2022,
-      "run_id": "tune_native_wdan_ettm1_h96_l2_w5_d0_lr1_s2022",
+      "run_id": "tune_native_wdan_v2_ettm1_h96_l2_w5_d0_lr1_s2022",
       "engine": "native",
       "backbone": "iTransformer",
       "method": "wdan",
@@ -707,7 +707,7 @@
         "wdan_d_ff": 128,
         "wdan_layers": 0,
         "wdan_dropout": 0.1,
-        "wdan_aux_weight": 1.0,
+        "wdan_stats_epochs": 5,
         "wdan_lr_scale": 1.0,
         "skip_final_test": true
       }
@@ -732,7 +732,7 @@
       "dec_in": 7,
       "c_out": 7,
       "seed": 2022,
-      "run_id": "tune_native_wdan_ettm1_h96_l2_w12_d0_lr1_s2022",
+      "run_id": "tune_native_wdan_v2_ettm1_h96_l2_w12_d0_lr1_s2022",
       "engine": "native",
       "backbone": "iTransformer",
       "method": "wdan",
@@ -748,7 +748,7 @@
         "wdan_d_ff": 128,
         "wdan_layers": 0,
         "wdan_dropout": 0.1,
-        "wdan_aux_weight": 1.0,
+        "wdan_stats_epochs": 5,
         "wdan_lr_scale": 1.0,
         "skip_final_test": true
       }
@@ -773,7 +773,7 @@
       "dec_in": 7,
       "c_out": 7,
       "seed": 2022,
-      "run_id": "tune_native_wdan_ettm1_h96_l3_w5_d1_lr1_s2022",
+      "run_id": "tune_native_wdan_v2_ettm1_h96_l3_w5_d1_lr1_s2022",
       "engine": "native",
       "backbone": "iTransformer",
       "method": "wdan",
@@ -789,7 +789,7 @@
         "wdan_d_ff": 128,
         "wdan_layers": 1,
         "wdan_dropout": 0.1,
-        "wdan_aux_weight": 1.0,
+        "wdan_stats_epochs": 5,
         "wdan_lr_scale": 1.0,
         "skip_final_test": true
       }
@@ -814,7 +814,7 @@
       "dec_in": 7,
       "c_out": 7,
       "seed": 2022,
-      "run_id": "tune_native_wdan_ettm1_h96_l3_w24_d1_lr1_s2022",
+      "run_id": "tune_native_wdan_v2_ettm1_h96_l3_w24_d1_lr1_s2022",
       "engine": "native",
       "backbone": "iTransformer",
       "method": "wdan",
@@ -830,7 +830,7 @@
         "wdan_d_ff": 128,
         "wdan_layers": 1,
         "wdan_dropout": 0.1,
-        "wdan_aux_weight": 1.0,
+        "wdan_stats_epochs": 5,
         "wdan_lr_scale": 1.0,
         "skip_final_test": true
       }
@@ -855,7 +855,7 @@
       "dec_in": 7,
       "c_out": 7,
       "seed": 2022,
-      "run_id": "tune_native_wdan_ettm1_h96_l3_w5_d2_lr1_s2022",
+      "run_id": "tune_native_wdan_v2_ettm1_h96_l3_w5_d2_lr1_s2022",
       "engine": "native",
       "backbone": "iTransformer",
       "method": "wdan",
@@ -871,7 +871,7 @@
         "wdan_d_ff": 128,
         "wdan_layers": 2,
         "wdan_dropout": 0.1,
-        "wdan_aux_weight": 1.0,
+        "wdan_stats_epochs": 5,
         "wdan_lr_scale": 1.0,
         "skip_final_test": true
       }
@@ -896,7 +896,7 @@
       "dec_in": 7,
       "c_out": 7,
       "seed": 2022,
-      "run_id": "tune_native_wdan_ettm1_h96_l3_w24_d2_lr1_s2022",
+      "run_id": "tune_native_wdan_v2_ettm1_h96_l3_w24_d2_lr1_s2022",
       "engine": "native",
       "backbone": "iTransformer",
       "method": "wdan",
@@ -912,7 +912,7 @@
         "wdan_d_ff": 128,
         "wdan_layers": 2,
         "wdan_dropout": 0.1,
-        "wdan_aux_weight": 1.0,
+        "wdan_stats_epochs": 5,
         "wdan_lr_scale": 1.0,
         "skip_final_test": true
       }
@@ -937,7 +937,7 @@
       "dec_in": 7,
       "c_out": 7,
       "seed": 2022,
-      "run_id": "tune_native_wdan_ettm1_h96_l2_w5_d0_lr10_s2022",
+      "run_id": "tune_native_wdan_v2_ettm1_h96_l2_w5_d0_lr10_s2022",
       "engine": "native",
       "backbone": "iTransformer",
       "method": "wdan",
@@ -953,7 +953,7 @@
         "wdan_d_ff": 128,
         "wdan_layers": 0,
         "wdan_dropout": 0.1,
-        "wdan_aux_weight": 1.0,
+        "wdan_stats_epochs": 5,
         "wdan_lr_scale": 10.0,
         "skip_final_test": true
       }
@@ -978,7 +978,7 @@
       "dec_in": 7,
       "c_out": 7,
       "seed": 2022,
-      "run_id": "tune_native_wdan_ettm1_h96_l3_w5_d2_lr10_s2022",
+      "run_id": "tune_native_wdan_v2_ettm1_h96_l3_w5_d2_lr10_s2022",
       "engine": "native",
       "backbone": "iTransformer",
       "method": "wdan",
@@ -994,7 +994,7 @@
         "wdan_d_ff": 128,
         "wdan_layers": 2,
         "wdan_dropout": 0.1,
-        "wdan_aux_weight": 1.0,
+        "wdan_stats_epochs": 5,
         "wdan_lr_scale": 10.0,
         "skip_final_test": true
       }
@@ -1019,7 +1019,7 @@
       "dec_in": 321,
       "c_out": 321,
       "seed": 2022,
-      "run_id": "tune_native_wdan_electricity_h96_l2_w5_d0_lr1_s2022",
+      "run_id": "tune_native_wdan_v2_electricity_h96_l2_w5_d0_lr1_s2022",
       "engine": "native",
       "backbone": "iTransformer",
       "method": "wdan",
@@ -1035,7 +1035,7 @@
         "wdan_d_ff": 128,
         "wdan_layers": 0,
         "wdan_dropout": 0.1,
-        "wdan_aux_weight": 1.0,
+        "wdan_stats_epochs": 5,
         "wdan_lr_scale": 1.0,
         "skip_final_test": true
       }
@@ -1060,7 +1060,7 @@
       "dec_in": 321,
       "c_out": 321,
       "seed": 2022,
-      "run_id": "tune_native_wdan_electricity_h96_l2_w12_d0_lr1_s2022",
+      "run_id": "tune_native_wdan_v2_electricity_h96_l2_w12_d0_lr1_s2022",
       "engine": "native",
       "backbone": "iTransformer",
       "method": "wdan",
@@ -1076,7 +1076,7 @@
         "wdan_d_ff": 128,
         "wdan_layers": 0,
         "wdan_dropout": 0.1,
-        "wdan_aux_weight": 1.0,
+        "wdan_stats_epochs": 5,
         "wdan_lr_scale": 1.0,
         "skip_final_test": true
       }
@@ -1101,7 +1101,7 @@
       "dec_in": 321,
       "c_out": 321,
       "seed": 2022,
-      "run_id": "tune_native_wdan_electricity_h96_l3_w5_d1_lr1_s2022",
+      "run_id": "tune_native_wdan_v2_electricity_h96_l3_w5_d1_lr1_s2022",
       "engine": "native",
       "backbone": "iTransformer",
       "method": "wdan",
@@ -1117,7 +1117,7 @@
         "wdan_d_ff": 128,
         "wdan_layers": 1,
         "wdan_dropout": 0.1,
-        "wdan_aux_weight": 1.0,
+        "wdan_stats_epochs": 5,
         "wdan_lr_scale": 1.0,
         "skip_final_test": true
       }
@@ -1142,7 +1142,7 @@
       "dec_in": 321,
       "c_out": 321,
       "seed": 2022,
-      "run_id": "tune_native_wdan_electricity_h96_l3_w24_d1_lr1_s2022",
+      "run_id": "tune_native_wdan_v2_electricity_h96_l3_w24_d1_lr1_s2022",
       "engine": "native",
       "backbone": "iTransformer",
       "method": "wdan",
@@ -1158,7 +1158,7 @@
         "wdan_d_ff": 128,
         "wdan_layers": 1,
         "wdan_dropout": 0.1,
-        "wdan_aux_weight": 1.0,
+        "wdan_stats_epochs": 5,
         "wdan_lr_scale": 1.0,
         "skip_final_test": true
       }
@@ -1183,7 +1183,7 @@
       "dec_in": 321,
       "c_out": 321,
       "seed": 2022,
-      "run_id": "tune_native_wdan_electricity_h96_l3_w5_d2_lr1_s2022",
+      "run_id": "tune_native_wdan_v2_electricity_h96_l3_w5_d2_lr1_s2022",
       "engine": "native",
       "backbone": "iTransformer",
       "method": "wdan",
@@ -1199,7 +1199,7 @@
         "wdan_d_ff": 128,
         "wdan_layers": 2,
         "wdan_dropout": 0.1,
-        "wdan_aux_weight": 1.0,
+        "wdan_stats_epochs": 5,
         "wdan_lr_scale": 1.0,
         "skip_final_test": true
       }
@@ -1224,7 +1224,7 @@
       "dec_in": 321,
       "c_out": 321,
       "seed": 2022,
-      "run_id": "tune_native_wdan_electricity_h96_l3_w24_d2_lr1_s2022",
+      "run_id": "tune_native_wdan_v2_electricity_h96_l3_w24_d2_lr1_s2022",
       "engine": "native",
       "backbone": "iTransformer",
       "method": "wdan",
@@ -1240,7 +1240,7 @@
         "wdan_d_ff": 128,
         "wdan_layers": 2,
         "wdan_dropout": 0.1,
-        "wdan_aux_weight": 1.0,
+        "wdan_stats_epochs": 5,
         "wdan_lr_scale": 1.0,
         "skip_final_test": true
       }
@@ -1265,7 +1265,7 @@
       "dec_in": 321,
       "c_out": 321,
       "seed": 2022,
-      "run_id": "tune_native_wdan_electricity_h96_l2_w5_d0_lr10_s2022",
+      "run_id": "tune_native_wdan_v2_electricity_h96_l2_w5_d0_lr10_s2022",
       "engine": "native",
       "backbone": "iTransformer",
       "method": "wdan",
@@ -1281,7 +1281,7 @@
         "wdan_d_ff": 128,
         "wdan_layers": 0,
         "wdan_dropout": 0.1,
-        "wdan_aux_weight": 1.0,
+        "wdan_stats_epochs": 5,
         "wdan_lr_scale": 10.0,
         "skip_final_test": true
       }
@@ -1306,7 +1306,7 @@
       "dec_in": 321,
       "c_out": 321,
       "seed": 2022,
-      "run_id": "tune_native_wdan_electricity_h96_l3_w5_d2_lr10_s2022",
+      "run_id": "tune_native_wdan_v2_electricity_h96_l3_w5_d2_lr10_s2022",
       "engine": "native",
       "backbone": "iTransformer",
       "method": "wdan",
@@ -1322,7 +1322,7 @@
         "wdan_d_ff": 128,
         "wdan_layers": 2,
         "wdan_dropout": 0.1,
-        "wdan_aux_weight": 1.0,
+        "wdan_stats_epochs": 5,
         "wdan_lr_scale": 10.0,
         "skip_final_test": true
       }
@@ -1347,7 +1347,7 @@
       "dec_in": 862,
       "c_out": 862,
       "seed": 2022,
-      "run_id": "tune_native_wdan_traffic_h96_l2_w5_d0_lr1_s2022",
+      "run_id": "tune_native_wdan_v2_traffic_h96_l2_w5_d0_lr1_s2022",
       "engine": "native",
       "backbone": "iTransformer",
       "method": "wdan",
@@ -1363,7 +1363,7 @@
         "wdan_d_ff": 128,
         "wdan_layers": 0,
         "wdan_dropout": 0.1,
-        "wdan_aux_weight": 1.0,
+        "wdan_stats_epochs": 5,
         "wdan_lr_scale": 1.0,
         "skip_final_test": true
       }
@@ -1388,7 +1388,7 @@
       "dec_in": 862,
       "c_out": 862,
       "seed": 2022,
-      "run_id": "tune_native_wdan_traffic_h96_l2_w12_d0_lr1_s2022",
+      "run_id": "tune_native_wdan_v2_traffic_h96_l2_w12_d0_lr1_s2022",
       "engine": "native",
       "backbone": "iTransformer",
       "method": "wdan",
@@ -1404,7 +1404,7 @@
         "wdan_d_ff": 128,
         "wdan_layers": 0,
         "wdan_dropout": 0.1,
-        "wdan_aux_weight": 1.0,
+        "wdan_stats_epochs": 5,
         "wdan_lr_scale": 1.0,
         "skip_final_test": true
       }
@@ -1429,7 +1429,7 @@
       "dec_in": 862,
       "c_out": 862,
       "seed": 2022,
-      "run_id": "tune_native_wdan_traffic_h96_l3_w5_d1_lr1_s2022",
+      "run_id": "tune_native_wdan_v2_traffic_h96_l3_w5_d1_lr1_s2022",
       "engine": "native",
       "backbone": "iTransformer",
       "method": "wdan",
@@ -1445,7 +1445,7 @@
         "wdan_d_ff": 128,
         "wdan_layers": 1,
         "wdan_dropout": 0.1,
-        "wdan_aux_weight": 1.0,
+        "wdan_stats_epochs": 5,
         "wdan_lr_scale": 1.0,
         "skip_final_test": true
       }
@@ -1470,7 +1470,7 @@
       "dec_in": 862,
       "c_out": 862,
       "seed": 2022,
-      "run_id": "tune_native_wdan_traffic_h96_l3_w24_d1_lr1_s2022",
+      "run_id": "tune_native_wdan_v2_traffic_h96_l3_w24_d1_lr1_s2022",
       "engine": "native",
       "backbone": "iTransformer",
       "method": "wdan",
@@ -1486,7 +1486,7 @@
         "wdan_d_ff": 128,
         "wdan_layers": 1,
         "wdan_dropout": 0.1,
-        "wdan_aux_weight": 1.0,
+        "wdan_stats_epochs": 5,
         "wdan_lr_scale": 1.0,
         "skip_final_test": true
       }
@@ -1511,7 +1511,7 @@
       "dec_in": 862,
       "c_out": 862,
       "seed": 2022,
-      "run_id": "tune_native_wdan_traffic_h96_l3_w5_d2_lr1_s2022",
+      "run_id": "tune_native_wdan_v2_traffic_h96_l3_w5_d2_lr1_s2022",
       "engine": "native",
       "backbone": "iTransformer",
       "method": "wdan",
@@ -1527,7 +1527,7 @@
         "wdan_d_ff": 128,
         "wdan_layers": 2,
         "wdan_dropout": 0.1,
-        "wdan_aux_weight": 1.0,
+        "wdan_stats_epochs": 5,
         "wdan_lr_scale": 1.0,
         "skip_final_test": true
       }
@@ -1552,7 +1552,7 @@
       "dec_in": 862,
       "c_out": 862,
       "seed": 2022,
-      "run_id": "tune_native_wdan_traffic_h96_l3_w24_d2_lr1_s2022",
+      "run_id": "tune_native_wdan_v2_traffic_h96_l3_w24_d2_lr1_s2022",
       "engine": "native",
       "backbone": "iTransformer",
       "method": "wdan",
@@ -1568,7 +1568,7 @@
         "wdan_d_ff": 128,
         "wdan_layers": 2,
         "wdan_dropout": 0.1,
-        "wdan_aux_weight": 1.0,
+        "wdan_stats_epochs": 5,
         "wdan_lr_scale": 1.0,
         "skip_final_test": true
       }
@@ -1593,7 +1593,7 @@
       "dec_in": 862,
       "c_out": 862,
       "seed": 2022,
-      "run_id": "tune_native_wdan_traffic_h96_l2_w5_d0_lr10_s2022",
+      "run_id": "tune_native_wdan_v2_traffic_h96_l2_w5_d0_lr10_s2022",
       "engine": "native",
       "backbone": "iTransformer",
       "method": "wdan",
@@ -1609,7 +1609,7 @@
         "wdan_d_ff": 128,
         "wdan_layers": 0,
         "wdan_dropout": 0.1,
-        "wdan_aux_weight": 1.0,
+        "wdan_stats_epochs": 5,
         "wdan_lr_scale": 10.0,
         "skip_final_test": true
       }
@@ -1634,7 +1634,7 @@
       "dec_in": 862,
       "c_out": 862,
       "seed": 2022,
-      "run_id": "tune_native_wdan_traffic_h96_l3_w5_d2_lr10_s2022",
+      "run_id": "tune_native_wdan_v2_traffic_h96_l3_w5_d2_lr10_s2022",
       "engine": "native",
       "backbone": "iTransformer",
       "method": "wdan",
@@ -1650,7 +1650,7 @@
         "wdan_d_ff": 128,
         "wdan_layers": 2,
         "wdan_dropout": 0.1,
-        "wdan_aux_weight": 1.0,
+        "wdan_stats_epochs": 5,
         "wdan_lr_scale": 10.0,
         "skip_final_test": true
       }
@@ -1675,7 +1675,7 @@
       "dec_in": 21,
       "c_out": 21,
       "seed": 2022,
-      "run_id": "tune_native_wdan_weather_h96_l2_w5_d0_lr1_s2022",
+      "run_id": "tune_native_wdan_v2_weather_h96_l2_w5_d0_lr1_s2022",
       "engine": "native",
       "backbone": "iTransformer",
       "method": "wdan",
@@ -1691,7 +1691,7 @@
         "wdan_d_ff": 128,
         "wdan_layers": 0,
         "wdan_dropout": 0.1,
-        "wdan_aux_weight": 1.0,
+        "wdan_stats_epochs": 5,
         "wdan_lr_scale": 1.0,
         "skip_final_test": true
       }
@@ -1716,7 +1716,7 @@
       "dec_in": 21,
       "c_out": 21,
       "seed": 2022,
-      "run_id": "tune_native_wdan_weather_h96_l2_w12_d0_lr1_s2022",
+      "run_id": "tune_native_wdan_v2_weather_h96_l2_w12_d0_lr1_s2022",
       "engine": "native",
       "backbone": "iTransformer",
       "method": "wdan",
@@ -1732,7 +1732,7 @@
         "wdan_d_ff": 128,
         "wdan_layers": 0,
         "wdan_dropout": 0.1,
-        "wdan_aux_weight": 1.0,
+        "wdan_stats_epochs": 5,
         "wdan_lr_scale": 1.0,
         "skip_final_test": true
       }
@@ -1757,7 +1757,7 @@
       "dec_in": 21,
       "c_out": 21,
       "seed": 2022,
-      "run_id": "tune_native_wdan_weather_h96_l3_w5_d1_lr1_s2022",
+      "run_id": "tune_native_wdan_v2_weather_h96_l3_w5_d1_lr1_s2022",
       "engine": "native",
       "backbone": "iTransformer",
       "method": "wdan",
@@ -1773,7 +1773,7 @@
         "wdan_d_ff": 128,
         "wdan_layers": 1,
         "wdan_dropout": 0.1,
-        "wdan_aux_weight": 1.0,
+        "wdan_stats_epochs": 5,
         "wdan_lr_scale": 1.0,
         "skip_final_test": true
       }
@@ -1798,7 +1798,7 @@
       "dec_in": 21,
       "c_out": 21,
       "seed": 2022,
-      "run_id": "tune_native_wdan_weather_h96_l3_w24_d1_lr1_s2022",
+      "run_id": "tune_native_wdan_v2_weather_h96_l3_w24_d1_lr1_s2022",
       "engine": "native",
       "backbone": "iTransformer",
       "method": "wdan",
@@ -1814,7 +1814,7 @@
         "wdan_d_ff": 128,
         "wdan_layers": 1,
         "wdan_dropout": 0.1,
-        "wdan_aux_weight": 1.0,
+        "wdan_stats_epochs": 5,
         "wdan_lr_scale": 1.0,
         "skip_final_test": true
       }
@@ -1839,7 +1839,7 @@
       "dec_in": 21,
       "c_out": 21,
       "seed": 2022,
-      "run_id": "tune_native_wdan_weather_h96_l3_w5_d2_lr1_s2022",
+      "run_id": "tune_native_wdan_v2_weather_h96_l3_w5_d2_lr1_s2022",
       "engine": "native",
       "backbone": "iTransformer",
       "method": "wdan",
@@ -1855,7 +1855,7 @@
         "wdan_d_ff": 128,
         "wdan_layers": 2,
         "wdan_dropout": 0.1,
-        "wdan_aux_weight": 1.0,
+        "wdan_stats_epochs": 5,
         "wdan_lr_scale": 1.0,
         "skip_final_test": true
       }
@@ -1880,7 +1880,7 @@
       "dec_in": 21,
       "c_out": 21,
       "seed": 2022,
-      "run_id": "tune_native_wdan_weather_h96_l3_w24_d2_lr1_s2022",
+      "run_id": "tune_native_wdan_v2_weather_h96_l3_w24_d2_lr1_s2022",
       "engine": "native",
       "backbone": "iTransformer",
       "method": "wdan",
@@ -1896,7 +1896,7 @@
         "wdan_d_ff": 128,
         "wdan_layers": 2,
         "wdan_dropout": 0.1,
-        "wdan_aux_weight": 1.0,
+        "wdan_stats_epochs": 5,
         "wdan_lr_scale": 1.0,
         "skip_final_test": true
       }
@@ -1921,7 +1921,7 @@
       "dec_in": 21,
       "c_out": 21,
       "seed": 2022,
-      "run_id": "tune_native_wdan_weather_h96_l2_w5_d0_lr10_s2022",
+      "run_id": "tune_native_wdan_v2_weather_h96_l2_w5_d0_lr10_s2022",
       "engine": "native",
       "backbone": "iTransformer",
       "method": "wdan",
@@ -1937,7 +1937,7 @@
         "wdan_d_ff": 128,
         "wdan_layers": 0,
         "wdan_dropout": 0.1,
-        "wdan_aux_weight": 1.0,
+        "wdan_stats_epochs": 5,
         "wdan_lr_scale": 10.0,
         "skip_final_test": true
       }
@@ -1962,7 +1962,7 @@
       "dec_in": 21,
       "c_out": 21,
       "seed": 2022,
-      "run_id": "tune_native_wdan_weather_h96_l3_w5_d2_lr10_s2022",
+      "run_id": "tune_native_wdan_v2_weather_h96_l3_w5_d2_lr10_s2022",
       "engine": "native",
       "backbone": "iTransformer",
       "method": "wdan",
@@ -1978,7 +1978,7 @@
         "wdan_d_ff": 128,
         "wdan_layers": 2,
         "wdan_dropout": 0.1,
-        "wdan_aux_weight": 1.0,
+        "wdan_stats_epochs": 5,
         "wdan_lr_scale": 10.0,
         "skip_final_test": true
       }
@@ -2003,7 +2003,7 @@
       "data_type": "ETTm2",
       "data_path": "ETTm2.csv",
       "seed": 2022,
-      "run_id": "tune_native_wdan_ettm2_h96_l2_w5_d0_lr1_s2022",
+      "run_id": "tune_native_wdan_v2_ettm2_h96_l2_w5_d0_lr1_s2022",
       "engine": "native",
       "backbone": "iTransformer",
       "method": "wdan",
@@ -2019,7 +2019,7 @@
         "wdan_d_ff": 128,
         "wdan_layers": 0,
         "wdan_dropout": 0.1,
-        "wdan_aux_weight": 1.0,
+        "wdan_stats_epochs": 5,
         "wdan_lr_scale": 1.0,
         "skip_final_test": true
       }
@@ -2044,7 +2044,7 @@
       "data_type": "ETTm2",
       "data_path": "ETTm2.csv",
       "seed": 2022,
-      "run_id": "tune_native_wdan_ettm2_h96_l2_w12_d0_lr1_s2022",
+      "run_id": "tune_native_wdan_v2_ettm2_h96_l2_w12_d0_lr1_s2022",
       "engine": "native",
       "backbone": "iTransformer",
       "method": "wdan",
@@ -2060,7 +2060,7 @@
         "wdan_d_ff": 128,
         "wdan_layers": 0,
         "wdan_dropout": 0.1,
-        "wdan_aux_weight": 1.0,
+        "wdan_stats_epochs": 5,
         "wdan_lr_scale": 1.0,
         "skip_final_test": true
       }
@@ -2085,7 +2085,7 @@
       "data_type": "ETTm2",
       "data_path": "ETTm2.csv",
       "seed": 2022,
-      "run_id": "tune_native_wdan_ettm2_h96_l3_w5_d1_lr1_s2022",
+      "run_id": "tune_native_wdan_v2_ettm2_h96_l3_w5_d1_lr1_s2022",
       "engine": "native",
       "backbone": "iTransformer",
       "method": "wdan",
@@ -2101,7 +2101,7 @@
         "wdan_d_ff": 128,
         "wdan_layers": 1,
         "wdan_dropout": 0.1,
-        "wdan_aux_weight": 1.0,
+        "wdan_stats_epochs": 5,
         "wdan_lr_scale": 1.0,
         "skip_final_test": true
       }
@@ -2126,7 +2126,7 @@
       "data_type": "ETTm2",
       "data_path": "ETTm2.csv",
       "seed": 2022,
-      "run_id": "tune_native_wdan_ettm2_h96_l3_w24_d1_lr1_s2022",
+      "run_id": "tune_native_wdan_v2_ettm2_h96_l3_w24_d1_lr1_s2022",
       "engine": "native",
       "backbone": "iTransformer",
       "method": "wdan",
@@ -2142,7 +2142,7 @@
         "wdan_d_ff": 128,
         "wdan_layers": 1,
         "wdan_dropout": 0.1,
-        "wdan_aux_weight": 1.0,
+        "wdan_stats_epochs": 5,
         "wdan_lr_scale": 1.0,
         "skip_final_test": true
       }
@@ -2167,7 +2167,7 @@
       "data_type": "ETTm2",
       "data_path": "ETTm2.csv",
       "seed": 2022,
-      "run_id": "tune_native_wdan_ettm2_h96_l3_w5_d2_lr1_s2022",
+      "run_id": "tune_native_wdan_v2_ettm2_h96_l3_w5_d2_lr1_s2022",
       "engine": "native",
       "backbone": "iTransformer",
       "method": "wdan",
@@ -2183,7 +2183,7 @@
         "wdan_d_ff": 128,
         "wdan_layers": 2,
         "wdan_dropout": 0.1,
-        "wdan_aux_weight": 1.0,
+        "wdan_stats_epochs": 5,
         "wdan_lr_scale": 1.0,
         "skip_final_test": true
       }
@@ -2208,7 +2208,7 @@
       "data_type": "ETTm2",
       "data_path": "ETTm2.csv",
       "seed": 2022,
-      "run_id": "tune_native_wdan_ettm2_h96_l3_w24_d2_lr1_s2022",
+      "run_id": "tune_native_wdan_v2_ettm2_h96_l3_w24_d2_lr1_s2022",
       "engine": "native",
       "backbone": "iTransformer",
       "method": "wdan",
@@ -2224,7 +2224,7 @@
         "wdan_d_ff": 128,
         "wdan_layers": 2,
         "wdan_dropout": 0.1,
-        "wdan_aux_weight": 1.0,
+        "wdan_stats_epochs": 5,
         "wdan_lr_scale": 1.0,
         "skip_final_test": true
       }
@@ -2249,7 +2249,7 @@
       "data_type": "ETTm2",
       "data_path": "ETTm2.csv",
       "seed": 2022,
-      "run_id": "tune_native_wdan_ettm2_h96_l2_w5_d0_lr10_s2022",
+      "run_id": "tune_native_wdan_v2_ettm2_h96_l2_w5_d0_lr10_s2022",
       "engine": "native",
       "backbone": "iTransformer",
       "method": "wdan",
@@ -2265,7 +2265,7 @@
         "wdan_d_ff": 128,
         "wdan_layers": 0,
         "wdan_dropout": 0.1,
-        "wdan_aux_weight": 1.0,
+        "wdan_stats_epochs": 5,
         "wdan_lr_scale": 10.0,
         "skip_final_test": true
       }
@@ -2290,7 +2290,7 @@
       "data_type": "ETTm2",
       "data_path": "ETTm2.csv",
       "seed": 2022,
-      "run_id": "tune_native_wdan_ettm2_h96_l3_w5_d2_lr10_s2022",
+      "run_id": "tune_native_wdan_v2_ettm2_h96_l3_w5_d2_lr10_s2022",
       "engine": "native",
       "backbone": "iTransformer",
       "method": "wdan",
@@ -2306,7 +2306,7 @@
         "wdan_d_ff": 128,
         "wdan_layers": 2,
         "wdan_dropout": 0.1,
-        "wdan_aux_weight": 1.0,
+        "wdan_stats_epochs": 5,
         "wdan_lr_scale": 10.0,
         "skip_final_test": true
       }

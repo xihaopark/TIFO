@@ -10,6 +10,7 @@ import time
 import warnings
 import numpy as np
 import random
+import copy
 from utils.dtw_metric import dtw,accelerated_dtw
 from utils.augmentation import run_augmentation,run_augmentation_single
 from utils.frequency_domain_filter import run_filter
@@ -84,25 +85,9 @@ class Exp_Long_Term_Forecast(Exp_Basic):
 
     def _select_optimizer(self):
         if getattr(self.args, 'method', 'ori') == 'wdan':
-            lr_scale = float(getattr(self.args, 'wdan_lr_scale', 1.0))
-            backbone_params, adapter_params = [], []
-            for name, parameter in self.model.named_parameters():
-                if not parameter.requires_grad:
-                    continue
-                (adapter_params if 'wdan_adapter.' in name else backbone_params).append(parameter)
-            if not adapter_params:
-                raise RuntimeError('WDAN mode has no statistics-adapter parameters')
-            return optim.Adam(
-                [
-                    {'params': backbone_params, 'lr': self.args.learning_rate, 'lr_scale': 1.0},
-                    {
-                        'params': adapter_params,
-                        'lr': self.args.learning_rate * lr_scale,
-                        'lr_scale': lr_scale,
-                    },
-                ],
-                lr=self.args.learning_rate,
-            )
+            # Official stats_bb_union trains the statistics module separately,
+            # then jointly optimizes backbone and statistics at the backbone LR.
+            return optim.Adam(self.model.parameters(), lr=self.args.learning_rate)
         lr_scale = float(getattr(self.args, 'tifo_lr_scale', 1.0))
         if getattr(self.args, 'method', 'ori') != 'tifo' or lr_scale == 1.0:
             return optim.Adam(self.model.parameters(), lr=self.args.learning_rate)
@@ -134,12 +119,53 @@ class Exp_Long_Term_Forecast(Exp_Basic):
         criterion = nn.MSELoss()
         return criterion
 
-    def _add_method_training_loss(self, loss, auxiliary, target):
+    def _pretrain_wdan_adapter(self, train_loader, vali_loader):
+        """Match WDAN's official five-epoch statistics pretraining stage."""
         if getattr(self.args, 'method', 'ori') != 'wdan':
-            return loss
+            return
         model = self.model.module if isinstance(self.model, nn.DataParallel) else self.model
-        weight = float(getattr(self.args, 'wdan_aux_weight', 1.0))
-        return loss + weight * model.wdan_statistics_loss(auxiliary, target)
+        epochs = int(getattr(self.args, 'wdan_stats_epochs', 5))
+        stats_lr = self.args.learning_rate * float(
+            getattr(self.args, 'wdan_lr_scale', 1.0)
+        )
+        optimizer = optim.Adam(model.wdan_adapter.parameters(), lr=stats_lr)
+        best_loss = float('inf')
+        best_state = None
+        for epoch in range(epochs):
+            model.wdan_adapter.train()
+            train_losses = []
+            for batch_x, batch_y, _, _ in train_loader:
+                batch_x = batch_x.float().to(self.device)
+                future = batch_y[:, -self.args.pred_len:, :].float().to(self.device)
+                optimizer.zero_grad()
+                _, statistics = model.wdan_adapter.normalize(batch_x)
+                loss = model.wdan_statistics_loss(statistics, future)
+                loss.backward()
+                optimizer.step()
+                train_losses.append(loss.item())
+
+            model.wdan_adapter.eval()
+            validation_losses = []
+            with torch.no_grad():
+                for batch_x, batch_y, _, _ in vali_loader:
+                    batch_x = batch_x.float().to(self.device)
+                    future = batch_y[:, -self.args.pred_len:, :].float().to(self.device)
+                    _, statistics = model.wdan_adapter.normalize(batch_x)
+                    validation_losses.append(
+                        model.wdan_statistics_loss(statistics, future).item()
+                    )
+            validation_loss = float(np.average(validation_losses))
+            print(
+                'WDAN stats epoch: {0} | Train Loss: {1:.7f} Vali Loss: {2:.7f}'.format(
+                    epoch + 1, float(np.average(train_losses)), validation_loss
+                )
+            )
+            if validation_loss < best_loss:
+                best_loss = validation_loss
+                best_state = copy.deepcopy(model.wdan_adapter.state_dict())
+        if best_state is None:
+            raise RuntimeError('WDAN statistics pretraining produced no checkpoint')
+        model.wdan_adapter.load_state_dict(best_state)
 
 
     def vali(self, vali_data, vali_loader, criterion):
@@ -196,6 +222,7 @@ class Exp_Long_Term_Forecast(Exp_Basic):
         train_steps = len(train_loader)
         early_stopping = EarlyStopping(patience=self.args.patience, verbose=True)
 
+        self._pretrain_wdan_adapter(train_loader, vali_loader)
         model_optim = self._select_optimizer()
         criterion = self._select_criterion()
 
@@ -232,7 +259,6 @@ class Exp_Long_Term_Forecast(Exp_Basic):
                         outputs = outputs[:, -self.args.pred_len:, f_dim:]
                         batch_y = batch_y[:, -self.args.pred_len:, f_dim:].to(self.device)
                         loss = criterion(outputs, batch_y)
-                        loss = self._add_method_training_loss(loss, save, batch_y)
                         train_loss.append(loss.item())
                 else:
                     if self.args.output_attention:
@@ -244,7 +270,6 @@ class Exp_Long_Term_Forecast(Exp_Basic):
                     outputs = outputs[:, -self.args.pred_len:, f_dim:]
                     batch_y = batch_y[:, -self.args.pred_len:, f_dim:].to(self.device)
                     loss = criterion(outputs, batch_y)
-                    loss = self._add_method_training_loss(loss, save, batch_y)
                     train_loss.append(loss.item())
 
                 if (i + 1) % 100 == 0:
