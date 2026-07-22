@@ -50,6 +50,12 @@ def method_label(record: dict) -> str:
     labels = {"timeemb": "TimeEmb", "tfps": "TFPS", "acn": "ACN", "wdan": "WDAN"}
     label = labels[record["engine"]]
     if (
+        record["engine"] == "acn"
+        and config.get("model_args", {}).get("model", "iTransformer_ACN") == "iTransformer_ACN"
+        and bool(config.get("model_args", {}).get("tifo_enabled", 0))
+    ):
+        return "ACN+TIFO"
+    if (
         record["engine"] in {"acn", "wdan"}
         and config.get("model_args", {}).get("model") == "iTransformer"
     ):
