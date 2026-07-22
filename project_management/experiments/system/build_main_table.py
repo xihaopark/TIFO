@@ -18,15 +18,25 @@ SOURCES = (
     "kdd_resubmit_patchtst_ettm2_h336_h720.csv",
     "kdd_resubmit_patchtst_custom_all_horizons.csv",
     "kdd_resubmit_h96_all_evidence.csv",
+    "tifo_final_h96.csv",
+    "tifo_hermitian_final_h96.csv",
+    "tifo_electricity_weather_h96_final.csv",
 )
+PROMOTED_TIFO_SOURCES = {
+    "tifo_final_h96.csv",
+    "tifo_hermitian_final_h96.csv",
+    "tifo_electricity_weather_h96_final.csv",
+}
 
 
-def backbone_and_method(label):
+def backbone_and_method(label, source_name):
     for backbone in ("PatchTST", "iTransformer"):
         if label.startswith(backbone + "+"):
             if "+ORI" in label:
                 return backbone, "Ori"
             if "+TIFO[historical]" in label:
+                return backbone, "TIFO"
+            if source_name in PROMOTED_TIFO_SOURCES and label.startswith(backbone + "+TIFO["):
                 return backbone, "TIFO"
             # Candidate and identity-prior variants are not paper-facing TIFO.
             return None, None
@@ -41,12 +51,15 @@ def load_rows():
             raise SystemExit(f"missing result source: {name}")
         with path.open(newline="") as handle:
             for row in csv.DictReader(handle):
-                backbone, method = backbone_and_method(row["method"])
+                backbone, method = backbone_and_method(row["method"], name)
                 if backbone is None:
                     continue
                 key = (backbone, method, row["dataset"], int(row["pred_len"]), int(row["seed"]))
                 value = (float(row["mse"]), float(row["mae"]), row["run_id"])
                 if key in rows and rows[key][:2] != value[:2]:
+                    if name in PROMOTED_TIFO_SOURCES and method == "TIFO":
+                        rows[key] = value
+                        continue
                     raise SystemExit(f"conflicting evidence for {key}: {rows[key]} vs {value}")
                 rows[key] = value
     return rows

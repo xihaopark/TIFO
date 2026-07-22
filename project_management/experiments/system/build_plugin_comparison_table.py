@@ -43,10 +43,12 @@ def main() -> None:
     historical = load("kdd_resubmit_h96_original_and_stabilized.json")
     tuned = load("tifo_final_h96.json")
     hermitian = load("tifo_hermitian_final_h96.json")
+    electricity_weather = load("tifo_electricity_weather_h96_final.json")
     acn_controls = load("plugin_engine_controls_h96_v1.json")
     wdan_controls = load("wdan_engine_controls_h96.json")
     tuned_datasets = {row["dataset"] for row in tuned}
     hermitian_datasets = {row["dataset"] for row in hermitian}
+    electricity_weather_datasets = {row["dataset"] for row in electricity_weather}
 
     markdown = [
         "# Recent plug-in comparison (H=96)", "",
@@ -65,7 +67,15 @@ def main() -> None:
     }
 
     for dataset in DATASETS:
-        if dataset in hermitian_datasets:
+        if dataset in electricity_weather_datasets:
+            tifo_source = electricity_weather
+            tifo_method = next(
+                row["method"]
+                for row in electricity_weather
+                if row["dataset"] == dataset
+                and row["method"].startswith("iTransformer+TIFO[")
+            )
+        elif dataset in hermitian_datasets:
             tifo_source = hermitian
             tifo_method = next(
                 row["method"]

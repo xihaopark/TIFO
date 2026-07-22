@@ -58,14 +58,19 @@ baseline budget.
 | ETTh2 | Weak-cell rounds 1, 2, and 3 | 8 + 12 + 30 = 50 | historical, LR scale 0.0625, residual alpha 0.5 |
 | ETTm1 | Weak-cell rounds 1 and 2 | 8 + 9 = 17 | historical, zero-pad ratio 1.5 |
 | ETTm2 | Hermitian gate: raw/aligned reconstruction and zero-padding choices | 4 | `hermitian_raw`, zero-pad ratio 0.0 |
-| Electricity | Fixed historical reconstruction from the matched coverage protocol | 0 | historical fixed setting |
+| Electricity | Final untuned-dataset gate: historical control, learning-rate/residual variants, zero padding, compact filter, and Hermitian-aligned reconstruction | 8 | `hermitian_aligned`, zero-pad ratio 1.0 |
 | Traffic | Weak-cell rounds 1 and 2, low-alpha, LR, and residual gates | 8 + 8 + 4 + 6 + 5 = 31 | historical, zero-pad ratio 1.5, LR scale 0.25, residual alpha 0.5 |
-| Weather | Fixed historical reconstruction from the matched coverage protocol | 0 | historical fixed setting |
+| Weather | Final untuned-dataset gate: historical control, learning-rate/residual variants, zero padding, compact filter, and Hermitian-aligned reconstruction | 8 | `hermitian_aligned`, zero-pad ratio 1.0 |
 
 The ETTh1/ETTm2 Hermitian configurations were frozen before their reported
 three-seed final matrix. A later ETTm2 validation refinement and three-seed
 diagnostic were run but were not used to replace the preregistered main result;
-the original frozen configuration remains the reported configuration.
+the original frozen configuration remains the reported configuration. Electricity
+and Weather had received no new TIFO search in the earlier matrix. Their final
+eight-candidate gates therefore included the historical setting as an explicit
+control, disabled final testing for every candidate, and independently selected
+the same `hermitian_aligned`, zero-pad-ratio-1.0 configuration. Only then were
+the three final seeds executed.
 
 ## ACN+TIFO composition selection
 
