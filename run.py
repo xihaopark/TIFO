@@ -184,6 +184,10 @@ if __name__ == '__main__':
                         help='validation-only tuning run; do not inspect the test split')
     parser.add_argument('--save_arrays', action='store_true',
                         help='save large prediction/target arrays in addition to metrics')
+    parser.add_argument('--spectral_shift_strength', type=float, default=0.0,
+                        help='evaluation-only gain applied to the upper half of non-DC rFFT bins over the combined input/future window')
+    parser.add_argument('--evaluation_tag', type=str, default='',
+                        help='suffix for evaluation outputs; does not alter the checkpoint setting')
 
     args = parser.parse_args()
     if args.cpu_threads < 1:
@@ -194,6 +198,12 @@ if __name__ == '__main__':
         parser.error('--tifo_residual_alpha must be in [0, 1]')
     if args.tifo_zero_pad_ratio < 0:
         parser.error('--tifo_zero_pad_ratio must be non-negative')
+    if args.spectral_shift_strength < 0:
+        parser.error('--spectral_shift_strength must be non-negative')
+    if args.is_training and args.spectral_shift_strength != 0:
+        parser.error('--spectral_shift_strength is evaluation-only; use --is_training 0')
+    if args.evaluation_tag and not args.evaluation_tag.replace('_', '').replace('-', '').isalnum():
+        parser.error('--evaluation_tag may contain only letters, numbers, underscores, and hyphens')
     torch.set_num_threads(args.cpu_threads)
     torch.set_num_interop_threads(args.cpu_threads)
     fix_seed = args.random_seed

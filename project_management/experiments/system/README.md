@@ -109,3 +109,21 @@ zero-padding design whose statistics and learned weights use the same padded
 FFT grid). Both options preserve the historical default at `1.0` and `0.0`,
 respectively. The collector parses only completed final-test records and reports both
 per-method seed statistics and matched TIFO-minus-Ori deltas.
+
+## Controlled spectral-shift stress test
+
+The frozen stress test coherently scales the upper half of non-DC rFFT bins
+over each combined input/future window. It does not retrain or select a model,
+and the zero-strength condition must reproduce the promoted main-table metric.
+
+```bash
+python project_management/experiments/system/run_spectral_shift_stress.py \
+  --gpu 0 --datasets ETTh1 Traffic --methods ori tifo \
+  --seeds 2021 2022 2023 --strengths 0.0 0.25 0.5 1.0
+
+python project_management/experiments/system/collect_spectral_shift_stress.py
+```
+
+Evaluation outputs receive an `evaluation_tag`, so stress-test metrics cannot
+overwrite the original frozen result directory. The paper-facing aggregate is
+`project_management/experiments/results/spectral_shift_stress.md`.

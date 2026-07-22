@@ -55,8 +55,9 @@ not a result database, and a result directory name is not a complete config.
 | matched Ori/TIFO experiments | iTransformer H96 complete on all seven datasets; PatchTST ETTm2/H96 gate passed | PatchTST coverage and additional horizons still required |
 | recent plug-in baselines | ACN/WDAN seven-dataset three-seed H96 matrices and paired official-engine controls complete | paper table/prose must be regenerated from the paired-control report |
 | TIFO refinement | Hermitian real-reconstruction variants validated; ETTh1/ETTm2 three-seed finals complete | no absolute per-dataset win; retain robustness claim and rejected fd1024 overfit record |
-| manuscript | highlighted draft with gaps | theory/figure mismatch, legacy unsupported appendix evidence, and internal red markup |
-| submission | not ready | scientific and formatting gates remain open |
+| controlled shift evidence | ETTh1/Traffic three-seed stress grid complete | bounded high-frequency robustness verified; arbitrary OOD invariance remains unsupported |
+| manuscript | clean nine-page resubmission baseline compiled and versioned | author-frozen theory still contains over-strong equivalence claims |
+| submission | format gate passed locally | theory decision and final Overleaf synchronization remain open |
 
 Overall readiness: `main_experiment_core_complete; broader_dataset_coverage_open`.
 
