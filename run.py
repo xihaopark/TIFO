@@ -206,6 +206,8 @@ if __name__ == '__main__':
     parser.add_argument('--extra_tag', type=str, default="", help="Anything extra")
     parser.add_argument('--skip_final_test', action='store_true',
                         help='validation-only tuning run; do not inspect the test split')
+    parser.add_argument('--validation_metrics_checkpoint', type=str, default='',
+                        help='load this frozen checkpoint and report validation MSE/MAE only')
     parser.add_argument('--save_arrays', action='store_true',
                         help='save large prediction/target arrays in addition to metrics')
     parser.add_argument('--spectral_shift_strength', type=float, default=0.0,
@@ -262,6 +264,17 @@ if __name__ == '__main__':
         Exp = Exp_Classification
     else:
         Exp = Exp_Long_Term_Forecast
+
+    if args.validation_metrics_checkpoint:
+        exp = Exp(args)
+        state = torch.load(
+            args.validation_metrics_checkpoint,
+            map_location=exp.device,
+        )
+        exp.model.load_state_dict(state)
+        exp.validation_metrics()
+        torch.cuda.empty_cache()
+        raise SystemExit(0)
 
     if args.is_training:
         for ii in range(args.itr):

@@ -229,6 +229,44 @@ class Exp_Long_Term_Forecast(Exp_Basic):
         self.model.train()
         return total_loss
 
+    def validation_metrics(self):
+        """Report sample-weighted validation MSE and MAE for a frozen checkpoint."""
+        _, validation_loader = self._get_data(flag='val')
+        squared_error = 0.0
+        absolute_error = 0.0
+        element_count = 0
+        self.model.eval()
+        with torch.no_grad():
+            for batch_x, batch_y, batch_x_mark, batch_y_mark in validation_loader:
+                batch_x = batch_x.float().to(self.device)
+                batch_y = batch_y.float().to(self.device)
+                batch_x_mark = batch_x_mark.float().to(self.device)
+                batch_y_mark = batch_y_mark.float().to(self.device)
+                dec_inp = torch.cat(
+                    [
+                        batch_y[:, :self.args.label_len, :],
+                        torch.zeros_like(batch_y[:, -self.args.pred_len:, :]),
+                    ],
+                    dim=1,
+                )
+                outputs, _ = self.model(
+                    batch_x, batch_x_mark, dec_inp, batch_y_mark
+                )
+                feature_start = -1 if self.args.features == 'MS' else 0
+                outputs = outputs[:, -self.args.pred_len:, feature_start:]
+                targets = batch_y[:, -self.args.pred_len:, feature_start:]
+                error = outputs - targets
+                squared_error += error.square().sum().item()
+                absolute_error += error.abs().sum().item()
+                element_count += error.numel()
+        if element_count == 0:
+            raise RuntimeError('validation loader produced no elements')
+        mse = squared_error / element_count
+        mae = absolute_error / element_count
+        print(f'VALIDATION_METRICS mse={mse:.10f} mae={mae:.10f} n={element_count}')
+        self.model.train()
+        return mse, mae
+
     def train(self, setting):
         train_data, train_loader = self._get_data(flag='train')
         vali_data, vali_loader = self._get_data(flag='val')
