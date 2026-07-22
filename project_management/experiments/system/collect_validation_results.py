@@ -13,7 +13,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[3]
 RESULTS = Path(__file__).resolve().parents[1] / "results"
 PATTERNS = (
-    re.compile(r"Vali Loss:\s*(?P<value>[-+0-9.eE]+)"),
+    re.compile(
+        r"^Epoch:.*?\|.*?Vali Loss:\s*(?P<value>[-+0-9.eE]+)",
+        re.MULTILINE,
+    ),
     re.compile(r"Val Epoch \d+: average loss:\s*(?P<value>[-+0-9.eE]+)"),
     re.compile(r"Best Validation MSE:\s*(?P<value>[-+0-9.eE]+)"),
 )
@@ -37,11 +40,16 @@ def main() -> None:
         rows.append({
             "run_id": record["run_id"], "engine": record["engine"],
             "dataset": cfg["dataset"], "seed": cfg["seed"],
+            "pred_len": int(cfg["pred_len"]),
             "validation_mse": min(values),
             "model_args": json.dumps(cfg.get("model_args", {}), sort_keys=True),
             "log_file": record["log_file"],
         })
-    rows.sort(key=lambda row: (row["dataset"], row["validation_mse"], row["run_id"]))
+    rows.sort(
+        key=lambda row: (
+            row["dataset"], row["pred_len"], row["validation_mse"], row["run_id"]
+        )
+    )
     RESULTS.mkdir(parents=True, exist_ok=True)
     stem = RESULTS / args.name
     with stem.with_suffix(".csv").open("w", newline="", encoding="utf-8") as handle:
@@ -49,8 +57,12 @@ def main() -> None:
         if rows:
             writer.writeheader(); writer.writerows(rows)
     stem.with_suffix(".json").write_text(json.dumps(rows, indent=2) + "\n", encoding="utf-8")
-    md = ["# Validation-only selection", "", "| Dataset | Run | Validation MSE |", "|---|---|---:|"]
-    md.extend(f"| {row['dataset']} | {row['run_id']} | {row['validation_mse']:.8f} |" for row in rows)
+    md = ["# Validation-only selection", "", "| Dataset | Horizon | Run | Validation MSE |", "|---|---:|---|---:|"]
+    md.extend(
+        f"| {row['dataset']} | {row['pred_len']} | {row['run_id']} | "
+        f"{row['validation_mse']:.8f} |"
+        for row in rows
+    )
     stem.with_suffix(".md").write_text("\n".join(md) + "\n", encoding="utf-8")
     print(f"collected {len(rows)} validation-only runs to {stem}.md")
 
