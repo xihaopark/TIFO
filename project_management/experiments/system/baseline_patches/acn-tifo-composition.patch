@@ -1,0 +1,202 @@
+diff --git a/exp/exp_long_term_forecasting.py b/exp/exp_long_term_forecasting.py
+--- a/exp/exp_long_term_forecasting.py
++++ b/exp/exp_long_term_forecasting.py
+@@ -9,6 +9,8 @@ import os
+ import time
+ import warnings
+ import numpy as np
++import random
++from utils.tifo_adapter import compute_stationarity_score
+ 
+ warnings.filterwarnings('ignore')
+ 
+@@ -18,7 +20,25 @@ class Exp_Long_Term_Forecast(Exp_Basic):
+         super(Exp_Long_Term_Forecast, self).__init__(args)
+ 
+     def _build_model(self):
+-        model = self.model_dict[self.args.model].Model(self.args).float()
++        global_mask = None
++        if bool(getattr(self.args, 'tifo_enabled', 0)):
++            python_state = random.getstate()
++            numpy_state = np.random.get_state()
++            torch_state = torch.get_rng_state()
++            cuda_states = torch.cuda.get_rng_state_all() if torch.cuda.is_available() else None
++            try:
++                _, train_loader = self._get_data(flag='train')
++                global_mask = compute_stationarity_score(self.args, train_loader, self.device)
++            finally:
++                random.setstate(python_state)
++                np.random.set_state(numpy_state)
++                torch.set_rng_state(torch_state)
++                if cuda_states is not None:
++                    torch.cuda.set_rng_state_all(cuda_states)
++        if self.args.model == 'iTransformer_ACN':
++            model = self.model_dict[self.args.model].Model(self.args, global_mask).float()
++        else:
++            model = self.model_dict[self.args.model].Model(self.args).float()
+ 
+         if self.args.use_multi_gpu and self.args.use_gpu:
+             model = nn.DataParallel(model, device_ids=self.args.device_ids)
+@@ -29,7 +49,18 @@ class Exp_Long_Term_Forecast(Exp_Basic):
+         return data_set, data_loader
+ 
+     def _select_optimizer(self):
+-        model_optim = optim.Adam(self.model.parameters(), lr=self.args.learning_rate)
++        scale = float(getattr(self.args, 'tifo_lr_scale', 1.0))
++        if not bool(getattr(self.args, 'tifo_enabled', 0)) or scale == 1.0:
++            return optim.Adam(self.model.parameters(), lr=self.args.learning_rate)
++        backbone, adapter = [], []
++        for name, parameter in self.model.named_parameters():
++            (adapter if name.startswith('filter.') else backbone).append(parameter)
++        if not adapter:
++            raise RuntimeError('tifo_enabled but no filter parameters were found')
++        model_optim = optim.Adam([
++            {'params': backbone, 'lr': self.args.learning_rate},
++            {'params': adapter, 'lr': self.args.learning_rate * scale},
++        ], lr=self.args.learning_rate)
+         return model_optim
+ 
+     def _select_criterion(self):
+diff --git a/models/iTransformer_ACN.py b/models/iTransformer_ACN.py
+--- a/models/iTransformer_ACN.py
++++ b/models/iTransformer_ACN.py
+@@ -6,6 +6,7 @@ from layers.SelfAttention_Family import FullAttention, AttentionLayer
+ from layers.Embed import DataEmbedding_inverted
+ from einops import rearrange, einsum, repeat
+ import numpy as np
++from utils.tifo_adapter import build_tifo_adapter
+ 
+ 
+ class Model(nn.Module):
+@@ -13,11 +14,12 @@ class Model(nn.Module):
+     Paper link: https://arxiv.org/abs/2310.06625
+     """
+ 
+-    def __init__(self, configs):
++    def __init__(self, configs, global_mask=None):
+         super(Model, self).__init__()
+         self.task_name = configs.task_name
+         self.seq_len = configs.seq_len
+         self.pred_len = configs.pred_len
+         self.output_attention = configs.output_attention
+         self.use_norm = configs.use_norm
++        self.use_tifo = bool(getattr(configs, 'tifo_enabled', 0))
+         ##
+@@ -60,6 +62,8 @@ class Model(nn.Module):
+             self.dropout = nn.Dropout(configs.dropout)
+             self.projection = nn.Linear(configs.d_model * configs.enc_in, configs.num_class)
+ 
++        self.filter = build_tifo_adapter(configs, global_mask) if self.use_tifo else None
++
+ 
+ 
+ 
+@@ -71,6 +75,9 @@ class Model(nn.Module):
+             stdev = torch.sqrt(torch.var(x_enc, dim=1, keepdim=True, unbiased=False) + 1e-5)
+             x_enc /= stdev
+ 
++        if self.use_tifo:
++            x_enc = self.filter(x_enc)
++
+         B, _, N = x_enc.shape
+ 
+         # Embedding
+diff --git a/run.py b/run.py
+--- a/run.py
++++ b/run.py
+@@ -27,6 +27,13 @@ if __name__ == '__main__':
+     parser.add_argument('--checkpoints', type=str, default='./checkpoints/', help='location of model checkpoints')
+     parser.add_argument('--temperature', type=float, default=777, help='adaptive channel-normalization temperature')
+     parser.add_argument('--random_seed', type=int, default=2021, help='random seed')
++    parser.add_argument('--tifo_enabled', type=int, default=0,
++                        help='compose the ACN model with a dataset-level TIFO input adapter')
++    parser.add_argument('--filter_dim', type=int, default=256)
++    parser.add_argument('--tifo_dropout', type=float, default=0.3)
++    parser.add_argument('--tifo_lr_scale', type=float, default=1.0)
++    parser.add_argument('--tifo_residual_alpha', type=float, default=1.0)
++    parser.add_argument('--tifo_zero_pad_ratio', type=float, default=0.0)
+ 
+     # forecasting task
+     parser.add_argument('--seq_len', type=int, default=96, help='input sequence length')
+diff --git a/utils/tifo_adapter.py b/utils/tifo_adapter.py
+new file mode 100644
+--- /dev/null
++++ b/utils/tifo_adapter.py
+@@ -0,0 +1,77 @@
++"""Minimal TIFO adapter used for the ACN+TIFO composition experiment."""
++
++from __future__ import annotations
++
++import torch
++import torch.nn as nn
++
++
++def fft_size(args):
++    ratio = float(getattr(args, "tifo_zero_pad_ratio", 0.0))
++    return int(args.seq_len) + int(int(args.seq_len) * ratio)
++
++
++def compute_stationarity_score(args, loader, device):
++    size = fft_size(args)
++    frequencies = size // 2 + 1
++    total = torch.zeros(frequencies, args.enc_in, device=device)
++    total2 = torch.zeros_like(total)
++    count = 0
++    with torch.no_grad():
++        for batch in loader:
++            x = batch[0].float().to(device)
++            # ACN's iTransformer applies this normalization before TIFO.
++            x = (x - x.mean(1, keepdim=True)) / torch.sqrt(
++                x.var(1, keepdim=True, unbiased=False) + 1e-5
++            )
++            amplitude = torch.abs(torch.fft.rfft(x, n=size, dim=1))
++            total += amplitude.sum(0)
++            total2 += amplitude.square().sum(0)
++            count += x.size(0)
++    if count == 0:
++        raise ValueError("cannot compute TIFO statistics from an empty loader")
++    mean = total / count
++    variance = (total2 / count - mean.square()).clamp_min(0.0)
++    return mean / (torch.sqrt(variance + 1e-5) + 1e-5)
++
++
++class TIFOAdapter(nn.Module):
++    def __init__(self, args, score):
++        super().__init__()
++        if score is None:
++            raise ValueError("ACN+TIFO requires a training-set stationarity score")
++        self.seq_len = int(args.seq_len)
++        self.fft_size = fft_size(args)
++        self.alpha = float(getattr(args, "tifo_residual_alpha", 1.0))
++        frequencies, channels = score.shape
++        if channels != args.enc_in or frequencies != self.fft_size // 2 + 1:
++            raise ValueError(f"invalid TIFO score shape: {tuple(score.shape)}")
++        self.register_buffer("stationarity_score", score.detach().clone().float())
++        hidden = int(getattr(args, "filter_dim", 256))
++        dropout = float(getattr(args, "tifo_dropout", 0.3))
++
++        def mlp():
++            return nn.Sequential(
++                nn.Linear(frequencies, hidden),
++                nn.RReLU(),
++                nn.Dropout(dropout),
++                nn.Linear(hidden, frequencies),
++            )
++
++        self.linear_r = mlp()
++        self.linear_i = mlp()
++
++    def forward(self, x):
++        score = self.stationarity_score.transpose(0, 1)
++        wr = self.linear_r(score).transpose(0, 1)
++        wi = self.linear_i(score).transpose(0, 1)
++        spectrum = torch.fft.rfft(x, n=self.fft_size, dim=1)
++        weighted = torch.complex(spectrum.real * wr, spectrum.imag * wi)
++        filtered = torch.fft.irfft(weighted, n=self.fft_size, dim=1)
++        filtered = filtered[:, : self.seq_len, :]
++        return x + self.alpha * (filtered - x)
++
++
++def build_tifo_adapter(args, score):
++    with torch.random.fork_rng(devices=[]):
++        return TIFOAdapter(args, score)

@@ -18,14 +18,18 @@ git -C third_party/TFPS-official apply \
   ../../project_management/experiments/system/baseline_patches/tfps-validation-only.patch
 git -C third_party/CN-official apply \
   ../../project_management/experiments/system/baseline_patches/cn-validation-seeds.patch
+git -C third_party/CN-official apply \
+  ../../project_management/experiments/system/baseline_patches/acn-tifo-composition.patch
 git -C third_party/WDAN-official apply \
   --ignore-space-change --ignore-whitespace \
   ../../project_management/experiments/system/baseline_patches/wdan-matched-runner.patch
 ```
 
-The CN patch exposes the random seed, removes per-epoch test evaluation, adds a
-validation-only tuning switch, and limits eager imports to the non-Mamba
-baselines used here. The WDAN patch uses the canonical dataset root supplied
+The first CN patch exposes the random seed, removes per-epoch test evaluation,
+adds a validation-only tuning switch, and limits eager imports to the non-Mamba
+baselines used here. The composition patch adds an explicitly ordered
+normalization -> TIFO -> ACN path for the validation-only complementarity gate.
+The WDAN patch uses the canonical dataset root supplied
 through `TIFO_DATA_ROOT`, adds the Traffic dataset configuration and a
 validation-only tuning switch, and logs final metrics at evidence-grade
 precision.
