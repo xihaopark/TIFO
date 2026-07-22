@@ -43,7 +43,11 @@ class GlobalMaskCalculator:
                 if variant == "historical":
                     amplitude = torch.abs(torch.fft.fft(x, n=fft_size, dim=1))
                 else:
-                    if variant in {"identity_prior", "hermitian_aligned"}:
+                    if variant in {
+                        "identity_prior",
+                        "hermitian_aligned",
+                        "hermitian_shared",
+                    }:
                         # Match the per-window normalization applied by the
                         # iTransformer/PatchTST input path before TIFO.
                         x = (x - x.mean(1, keepdim=True)) / torch.sqrt(
@@ -156,8 +160,11 @@ class FrequencyDomainFilter(nn.Module):
             nn.init.zeros_(network[-1].bias)
             return network
 
-        self.real_weight_mlp = weight_mlp()
-        self.imag_weight_mlp = weight_mlp()
+        if self.variant == "hermitian_shared":
+            self.shared_weight_mlp = weight_mlp()
+        else:
+            self.real_weight_mlp = weight_mlp()
+            self.imag_weight_mlp = weight_mlp()
 
     def frequency_weights(self):
         if self.variant in {
@@ -172,6 +179,12 @@ class FrequencyDomainFilter(nn.Module):
             )
         score_by_channel = self.stationarity_score.transpose(0, 1)
         prior = self.score_prior.transpose(0, 1)
+        if self.variant == "hermitian_shared":
+            shared_weight = prior * 2.0 * torch.sigmoid(
+                self.shared_weight_mlp(score_by_channel)
+            )
+            shared_weight = shared_weight.transpose(0, 1)
+            return shared_weight, shared_weight
         real_weight = prior * 2.0 * torch.sigmoid(
             self.real_weight_mlp(score_by_channel)
         )

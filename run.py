@@ -27,11 +27,14 @@ if __name__ == '__main__':
                             'identity_prior',
                             'hermitian_raw',
                             'hermitian_aligned',
+                            'hermitian_shared',
                         ],
                         help=(
                             'TIFO operator; historical exactly matches the result-producing '
                             'full-FFT path, while hermitian variants use rFFT/iRFFT and either '
-                            'raw or backbone-aligned stationarity statistics'
+                            'raw or backbone-aligned stationarity statistics; '
+                            'hermitian_shared applies one positive gain to each '
+                            'complex coefficient and therefore preserves phase'
                         ))
     parser.add_argument('--tifo_dropout', type=float, default=0.5,
                         help='dropout inside the historical TIFO weight MLPs')

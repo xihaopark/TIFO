@@ -146,7 +146,7 @@ def assert_hermitian_candidates(device: torch.device) -> None:
     """Check real reconstruction and finite gradients for both new variants."""
 
     synthetic_loader = [(torch.randn(3, 96, 7),) for _ in range(2)]
-    for variant in ("hermitian_raw", "hermitian_aligned"):
+    for variant in ("hermitian_raw", "hermitian_aligned", "hermitian_shared"):
         args = make_args("tifo", variant)
         mask = run_filter(args, synthetic_loader, device)
         if mask.shape != (49, 7) or not torch.isfinite(mask).all():
@@ -165,6 +165,10 @@ def assert_hermitian_candidates(device: torch.device) -> None:
             if parameter.requires_grad
         ):
             raise AssertionError(f"{variant} did not produce finite gradients")
+        if variant == "hermitian_shared":
+            real_gain, imag_gain = transform.frequency_weights()
+            torch.testing.assert_close(real_gain, imag_gain, rtol=0, atol=0)
+            torch.testing.assert_close(output, x, rtol=1e-5, atol=1e-5)
     print("Hermitian TIFO candidates ok: real output and finite gradients")
 
 
