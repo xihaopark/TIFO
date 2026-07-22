@@ -19,8 +19,9 @@ class Model(nn.Module):
     def __init__(self, configs, global_mask):
         super(Model, self).__init__()
         self.global_mask = global_mask
-        self.use_tifo = getattr(configs, 'method', 'tifo') == 'tifo'
-        self.use_acn = getattr(configs, 'method', 'tifo') == 'acn'
+        method = getattr(configs, 'method', 'tifo')
+        self.use_tifo = method in {'tifo', 'acn_tifo'}
+        self.use_acn = method in {'acn', 'acn_tifo'}
         self.use_wdan = getattr(configs, 'method', 'tifo') == 'wdan'
         self.channels = configs.enc_in
 

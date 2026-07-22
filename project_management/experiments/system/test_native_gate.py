@@ -123,6 +123,26 @@ def assert_paired_initialization(mask: torch.Tensor) -> None:
         )
     print("native ACN ok: paired backbone initialization and finite gradients")
 
+    composition_args = make_args("acn_tifo", "hermitian_diagonal")
+    composition_args.acn_temperature = 0.1
+    composition_args.tifo_gain_limit = 0.5
+    composition = iTransformer.Model(composition_args, mask)
+    output, _ = composition(sample, sample_mark, None, None)
+    if output.shape != (4, 96, 7) or not torch.isfinite(output).all():
+        raise AssertionError("native ACN+TIFO returned an invalid output")
+    output.square().mean().backward()
+    required = [
+        parameter.grad
+        for name, parameter in composition.named_parameters()
+        if "norm" in name or "diagonal_log_gain" in name
+    ]
+    if not required or not all(
+        gradient is not None and torch.isfinite(gradient).all()
+        for gradient in required
+    ):
+        raise AssertionError("native ACN+TIFO lacks finite plug-in gradients")
+    print("native ACN+TIFO ok: valid output and finite plug-in gradients")
+
     wdan_args = make_args("wdan")
     wdan_args.wdan_levels = 2
     wdan_args.wdan_window = 5

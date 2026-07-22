@@ -25,6 +25,8 @@ EPOCH_PATTERN = re.compile(r"Epoch:\s*(?P<epoch>\d+),\s*Steps:")
 def method_label(record: dict) -> str:
     config = record["resolved_config"]
     if record["engine"] == "native":
+        if config["method"] == "acn_tifo":
+            return f"{config['backbone']}+ACN+TIFO"
         label = f"{config['backbone']}+{config['method'].upper()}"
         variant = config.get("model_args", {}).get("tifo_variant")
         if (

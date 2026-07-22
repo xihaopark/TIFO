@@ -141,8 +141,10 @@ def validate(matrix: dict[str, Any]) -> list[dict[str, Any]]:
             raise ValueError(f"{run_id}: unsupported engine {engine!r}")
         if not isinstance(config.get("seed"), int):
             raise ValueError(f"{run_id}: seed must be an integer")
-        if engine == "native" and config.get("method") not in {"ori", "tifo", "acn", "wdan"}:
-            raise ValueError(f"{run_id}: native method must be ori, tifo, acn, or wdan")
+        if engine == "native" and config.get("method") not in {"ori", "tifo", "acn", "acn_tifo", "wdan"}:
+            raise ValueError(
+                f"{run_id}: native method must be ori, tifo, acn, acn_tifo, or wdan"
+            )
 
         python = Path(str(config.get("python", sys.executable))).expanduser()
         if not python.is_file() or not os.access(python, os.X_OK):

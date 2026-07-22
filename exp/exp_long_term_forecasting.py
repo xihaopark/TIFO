@@ -71,7 +71,7 @@ class Exp_Long_Term_Forecast(Exp_Basic):
 
     def _build_model(self):
         self.global_mask = None
-        if getattr(self.args, 'method', 'tifo') == 'tifo':
+        if getattr(self.args, 'method', 'tifo') in {'tifo', 'acn_tifo'}:
             self._compute_global_mask()
         model = self.model_dict[self.args.model].Model(self.args, self.global_mask).float()
 
@@ -89,7 +89,7 @@ class Exp_Long_Term_Forecast(Exp_Basic):
             # then jointly optimizes backbone and statistics at the backbone LR.
             return optim.Adam(self.model.parameters(), lr=self.args.learning_rate)
         lr_scale = float(getattr(self.args, 'tifo_lr_scale', 1.0))
-        if getattr(self.args, 'method', 'ori') != 'tifo' or lr_scale == 1.0:
+        if getattr(self.args, 'method', 'ori') not in {'tifo', 'acn_tifo'} or lr_scale == 1.0:
             return optim.Adam(self.model.parameters(), lr=self.args.learning_rate)
 
         backbone_params = []
