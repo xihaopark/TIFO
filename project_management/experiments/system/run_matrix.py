@@ -179,7 +179,15 @@ def build_command(config: dict[str, Any], protocol_id: str) -> list[str]:
         command.extend(("--data", dataset, "--fix_seed", str(config["seed"])))
         command.extend(("--gpu_id", "0", "--itr", "1"))
         command.extend(("--machine", "local", "--server_name", "server25"))
-        command.extend(("--exp_id", config["run_id"], "--use_norm", "0"))
+        # WDAN replaces the backbone's instance normalization, so the official
+        # plug-in scripts use ``use_norm=0``.  A bare iTransformer control must
+        # instead retain its native normalization; otherwise the control is a
+        # different (and much weaker) model rather than WDAN's true backbone.
+        default_use_norm = 1 if model_name == "iTransformer" else 0
+        use_norm = int(config["model_args"].get("use_norm", default_use_norm))
+        command.extend(
+            ("--exp_id", config["run_id"], "--use_norm", str(use_norm))
+        )
         mapped = {
             "seq_len": "seq_len",
             "label_len": "label_len",
@@ -193,7 +201,7 @@ def build_command(config: dict[str, Any], protocol_id: str) -> list[str]:
         for source, target in mapped.items():
             append_flag(command, target, config.get(source))
         for name, value in sorted(config["model_args"].items()):
-            if name != "model":
+            if name not in {"model", "use_norm"}:
                 append_flag(command, name, value)
         return command
 

@@ -45,7 +45,13 @@ def method_label(record: dict) -> str:
             label += f"[{','.join(qualifiers)}]"
         return label
     labels = {"timeemb": "TimeEmb", "tfps": "TFPS", "acn": "ACN", "wdan": "WDAN"}
-    return labels[record["engine"]]
+    label = labels[record["engine"]]
+    if (
+        record["engine"] in {"acn", "wdan"}
+        and config.get("model_args", {}).get("model") == "iTransformer"
+    ):
+        return f"{label}-engine Ori"
+    return label
 
 
 def parse_record(record_path: Path) -> dict | None:
