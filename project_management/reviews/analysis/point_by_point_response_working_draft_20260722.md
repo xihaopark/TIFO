@@ -247,11 +247,13 @@ build audit remains necessary after the theory-facing prose is replaced.
   and dependent abstract/introduction claims.
 - Exact final manuscript page/line references must be generated only after the
   theory rewrite is frozen.
-- The anonymous code URL must be externally checked before submission.
+- `EXTERNAL_ACTION_NEEDED`: the anonymous code URL currently redirects to the
+  4open API and returns HTTP 401 `{"error":"not_connected"}`. The author must
+  reconnect or recreate the anonymous repository before the final URL check.
 
 ## 中文核对
 
 - 理论回复目前只能标为“拟修改”，不能写成“已经解决”；需要作者明确同意后才能落到正文。
 - ACN+TIFO 的 9/9 运行已结束，正文完整报告三个数据集；它只作为 normalization 互补性证据，不替代独立 TIFO，也不回答 FilterNet 组合效果。
-- baseline 回复还需补最终的搜索候选数量、官方仓库 commit 和冻结配置位置。
+- baseline 回复的搜索候选数量、官方仓库 commit 和冻结配置位置已经补齐；最终稿冻结后只需补页码/行号。
 - 最终提交前需要重新生成页码/行号，不能沿用当前工作稿的位置。
