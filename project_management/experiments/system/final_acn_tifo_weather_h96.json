@@ -1,0 +1,117 @@
+{
+  "protocol_id": "kdd_resubmit_acn_tifo_weather_joint_h96_final_v1",
+  "selection_rule": "Using frozen seed-2022 checkpoints, require sample-weighted validation MSE and MAE to both beat the matched ACN control; among eligible candidates freeze the lowest validation MSE, then test three seeds.",
+  "validation_selection": {
+    "Weather/H96": {
+      "selected_run": "joint_acnt_weather_h96_hist_s2022",
+      "selected_validation_mse": 0.3935940996,
+      "selected_validation_mae": 0.2674746071,
+      "control_run": "joint_acnt_weather_h96_control_s2022",
+      "control_validation_mse": 0.3959085967,
+      "control_validation_mae": 0.26896044,
+      "eligible_candidate_count": 1
+    }
+  },
+  "defaults": {
+    "python": "/mnt/data1/park/Time Series/Forecasting/TKDE/envs/fredformer-cu128/bin/python",
+    "features": "M",
+    "seq_len": 96,
+    "label_len": 48,
+    "pred_len": 96,
+    "train_epochs": 30,
+    "patience": 5,
+    "batch_size": 32,
+    "learning_rate": 0.0001,
+    "num_workers": 0,
+    "cpu_threads": 4
+  },
+  "runs": [
+    {
+      "dataset": "Weather",
+      "data_type": "custom",
+      "root_path": "/home/park/TS/FredNormer/dataset/weather",
+      "data_path": "weather.csv",
+      "enc_in": 21,
+      "dec_in": 21,
+      "c_out": 21,
+      "engine": "native",
+      "backbone": "iTransformer",
+      "method": "acn_tifo",
+      "learning_rate": 0.0001,
+      "run_id": "final_acn_tifo_weather_h96_s2021",
+      "seed": 2021,
+      "model_args": {
+        "d_model": 512,
+        "d_ff": 512,
+        "e_layers": 3,
+        "n_heads": 8,
+        "factor": 3,
+        "acn_temperature": 0.1,
+        "filter_dim": 512,
+        "tifo_variant": "historical",
+        "tifo_dropout": 0.5,
+        "tifo_lr_scale": 0.25,
+        "tifo_residual_alpha": 0.5,
+        "tifo_zero_pad_ratio": 0.0
+      }
+    },
+    {
+      "dataset": "Weather",
+      "data_type": "custom",
+      "root_path": "/home/park/TS/FredNormer/dataset/weather",
+      "data_path": "weather.csv",
+      "enc_in": 21,
+      "dec_in": 21,
+      "c_out": 21,
+      "engine": "native",
+      "backbone": "iTransformer",
+      "method": "acn_tifo",
+      "learning_rate": 0.0001,
+      "run_id": "final_acn_tifo_weather_h96_s2022",
+      "seed": 2022,
+      "model_args": {
+        "d_model": 512,
+        "d_ff": 512,
+        "e_layers": 3,
+        "n_heads": 8,
+        "factor": 3,
+        "acn_temperature": 0.1,
+        "filter_dim": 512,
+        "tifo_variant": "historical",
+        "tifo_dropout": 0.5,
+        "tifo_lr_scale": 0.25,
+        "tifo_residual_alpha": 0.5,
+        "tifo_zero_pad_ratio": 0.0
+      }
+    },
+    {
+      "dataset": "Weather",
+      "data_type": "custom",
+      "root_path": "/home/park/TS/FredNormer/dataset/weather",
+      "data_path": "weather.csv",
+      "enc_in": 21,
+      "dec_in": 21,
+      "c_out": 21,
+      "engine": "native",
+      "backbone": "iTransformer",
+      "method": "acn_tifo",
+      "learning_rate": 0.0001,
+      "run_id": "final_acn_tifo_weather_h96_s2023",
+      "seed": 2023,
+      "model_args": {
+        "d_model": 512,
+        "d_ff": 512,
+        "e_layers": 3,
+        "n_heads": 8,
+        "factor": 3,
+        "acn_temperature": 0.1,
+        "filter_dim": 512,
+        "tifo_variant": "historical",
+        "tifo_dropout": 0.5,
+        "tifo_lr_scale": 0.25,
+        "tifo_residual_alpha": 0.5,
+        "tifo_zero_pad_ratio": 0.0
+      }
+    }
+  ]
+}
