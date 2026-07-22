@@ -30,7 +30,7 @@ ensure that no reviewer concern is lost.
 | PC.4, R2.2, R3.2, R3.5, R3.6 | Incomplete formatting, broken references, missing evidence, wrong bolding | presentation | critical | Verified tables mechanically generated; no unresolved PDF references; final preflight remains | partial |
 | R1.2, R3.1, R3.4 | Why mean/std; comparison with random or uninformative conditioning; variance | metric/evidence | critical | Three-seed ETTh1/ETTm2 data/permuted/ones ablation; data beats Ones 6/6, permutation mixed | ready |
 | R1.5, R2.1 | Tuning fairness and original-backbone rows | fairness | critical | Matched Ori/TIFO seeds; bare-backbone controls inside ACN/WDAN engines; validation-only selection | partial |
-| R2.3 | Ambiguous TIFO* and simultaneous normalizers | method/fairness | major | Historical TIFO* table removed; any ACN+TIFO result will define order and show full scope | ready by removal |
+| R2.3 | Ambiguous TIFO* and simultaneous normalizers | method/fairness | major | Historical TIFO* removed; ACN+TIFO is separately named, ordered, and reported over the full preregistered scope | ready |
 | R2.4 | Figure 2 lacks explanation | presentation | major | Pipeline prose now explains statistic, global gains, spectral transform, inverse transform, backbone | ready |
 | R2.5, R3.3 | Meaning of time-invariant; unseen temporal structures | naming/OOD | critical | Global sample-independent gains stated; universal language still remains in theory-facing sections | `AUTHOR_INPUT_NEEDED` |
 | R4.1 | Figure shows a separation not implemented in code | method consistency | critical | Figure replaced with code-consistent global spectral adapter | ready |
@@ -192,8 +192,11 @@ present the intervention as one controlled spectral shift, not as evidence of
 general OOD robustness or complete resolution of distribution shift.
 Separately, a preregistered ACN+TIFO composition evaluates whether TIFO can
 complement a recent normalization plug-in in the explicit order normalization,
-TIFO spectral adaptation, and ACN encoding; its final Traffic runs remain
-pending and no outcome is claimed here.
+TIFO spectral adaptation, and ACN encoding. All nine final runs are complete:
+mean MSE improves over ACN on ETTh1 (0.388795 to 0.385508, 3/3 paired wins),
+ETTm2 (0.180988 to 0.179959, 3/3), and Traffic (0.427060 to 0.425896, 2/3).
+We report this as normalization complementarity, not as a new standalone method
+or evidence that TIFO improves FilterNet.
 
 **Location.** Experiments, Tables 4 and 5 and controlled-shift paragraph;
 Summary of Changes item 6.
@@ -219,7 +222,8 @@ build audit remains necessary after the theory-facing prose is replaced.
   gain” or “weight.”
 - [ ] Add exact ACN/WDAN/TIFO search counts and pinned source commits to the
   response/provenance statement.
-- [ ] Decide on ACN+TIFO only after all nine final runs complete.
+- [x] Report all nine frozen ACN+TIFO runs as a bounded normalization
+  complementarity diagnostic without replacing standalone TIFO.
 - [ ] Run final visible-grammar, reference, anonymous-link, and clean-build
   checks.
 
@@ -227,15 +231,13 @@ build audit remains necessary after the theory-facing prose is replaced.
 
 - `AUTHOR_INPUT_NEEDED`: approval to replace the current Bochner/Mercer theory
   and dependent abstract/introduction claims.
-- ACN+TIFO Traffic final metrics are not yet complete; no response or manuscript
-  text may state its final outcome.
 - Exact final manuscript page/line references must be generated only after the
-  theory and optional composition result are frozen.
+  theory rewrite is frozen.
 - The anonymous code URL must be externally checked before submission.
 
 ## 中文核对
 
 - 理论回复目前只能标为“拟修改”，不能写成“已经解决”；需要作者明确同意后才能落到正文。
-- ACN+TIFO 只能作为互补性诊断，必须等 Traffic 三个种子全部结束并完整报告三个数据集。
+- ACN+TIFO 的 9/9 运行已结束，正文完整报告三个数据集；它只作为 normalization 互补性证据，不替代独立 TIFO，也不回答 FilterNet 组合效果。
 - baseline 回复还需补最终的搜索候选数量、官方仓库 commit 和冻结配置位置。
 - 最终提交前需要重新生成页码/行号，不能沿用当前工作稿的位置。

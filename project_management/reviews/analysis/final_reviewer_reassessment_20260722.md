@@ -114,10 +114,11 @@ shared as one scalar multiplier for a Fourier eigenfunction.
 2. The macro-average advantage over ACN is small. It should be reported as an
    observed aggregate ranking, not a statistically significant or universally
    superior result.
-3. ACN+TIFO is useful only as a complementarity diagnostic. If promoted, it must
-   retain the predeclared ETTh1/ETTm2/Traffic scope, show all three datasets, and
-   define the order `normalization -> TIFO -> ACN encoder`. It must not revive
-   the ambiguous historical `TIFO*` claim.
+3. ACN+TIFO is reported only as a complementarity diagnostic. It retains the
+   predeclared ETTh1/ETTm2/Traffic scope, shows all three datasets, defines the
+   order `normalization -> TIFO -> ACN encoder`, and states that it does not
+   establish complementarity with FilterNet. This avoids reviving the ambiguous
+   historical `TIFO*` claim.
 4. The controlled spectral intervention is one synthetic shift, not general OOD
    evidence. The current caveat is appropriate and must remain.
 
@@ -180,10 +181,11 @@ rewritten.
 4. In the response, give exact provenance/search-budget statements for ACN,
    WDAN, TIFO tuning, rejected configurations, and final frozen seeds.
 
-### Optional but useful
+### Completed supporting evidence
 
-5. Add the frozen ACN+TIFO three-dataset complementarity result only if all nine
-   final runs complete and all three datasets can be reported transparently.
+5. All nine frozen ACN+TIFO final runs are complete. The manuscript reports all
+   three selected datasets: mean MSE improves over ACN on ETTh1, ETTm2, and
+   Traffic, with 8/9 paired-seed wins, while preserving the standalone TIFO row.
 
 ### Not required
 
