@@ -33,7 +33,10 @@ claims that match the observed results. The completed changes are:
   on validation data only. Because the official repositories use different
   training engines, we reran a bare iTransformer inside each engine. In these
   paired controls, TIFO and ACN improve 6/7 datasets, while TIFO has the
-  smallest worst-case degradation (1.02\%) and effect variance.
+  smallest worst-case degradation (1.02\%) and effect variance. A separate
+  validation-selected composition test shows that ACN+TIFO improves ACN's mean
+  MSE on ETTh1, ETTm2, and Traffic, with eight wins in nine paired seeds; this is
+  reported as normalization complementarity rather than a new standalone method.
 
   \item \textbf{Calibrated empirical claims.}
   We removed the unverified 33.3\%/55.3\% gains, the universal-improvement
