@@ -1,0 +1,9 @@
+{
+  "iTransformer|ETTh1|96": "kdd_resubmit_tifo_itransformer_h96_full_final_v1",
+  "iTransformer|ETTh2|96": "kdd_resubmit_tifo_final_h96_v1",
+  "iTransformer|ETTm1|96": "kdd_resubmit_tifo_final_h96_v1",
+  "iTransformer|ETTm2|96": "kdd_resubmit_tifo_itransformer_h96_full_final_v1",
+  "iTransformer|Electricity|96": "kdd_resubmit_tifo_electricity_weather_h96_final_v1",
+  "iTransformer|Traffic|96": "kdd_resubmit_tifo_itransformer_h96_full_final_v1",
+  "iTransformer|Weather|96": "kdd_resubmit_tifo_electricity_weather_h96_final_v1"
+}
