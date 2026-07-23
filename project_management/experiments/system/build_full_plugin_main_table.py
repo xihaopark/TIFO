@@ -86,7 +86,7 @@ def render(summary: dict) -> tuple[str, str]:
     tex = [
         r"\begin{table*}[t]",
         r"\centering",
-        r"\caption{Full standalone plug-in comparison across two architecturally distinct backbones and four prediction horizons. Each cell is MSE/MAE (lower is better). Bold and underline indicate the best and second-best result within the same backbone--dataset--horizon comparison. Reported ACN/WDAN cells retain their source-paper protocol and are distinguished from local matched runs in the text.}",
+        r"\caption{Full standalone plug-in comparison across two architecturally distinct backbones and four prediction horizons. Each cell is MSE/MAE (lower is better). Bold and underline indicate the best and second-best result within the same backbone--dataset--horizon comparison. $\dagger$ denotes a source-paper-reported ACN/WDAN result; unmarked cells are local matched runs or values retained from the submitted matched table.}",
         r"\label{table:full_plugin_comparison}",
         r"\resizebox{\textwidth}{!}{%",
         r"\begin{tabular}{cc|cccc|cccccc}",
@@ -98,7 +98,7 @@ def render(summary: dict) -> tuple[str, str]:
     md = [
         "# Full standalone plug-in comparison",
         "",
-        "Each cell is MSE/MAE. A dash means that no compatible public or local result is available.",
+        "Each cell is MSE/MAE. † marks a source-paper-reported value; a dash means that no compatible public or local result is available.",
         "",
         "| Dataset | H | DLinear+TIFO | +RevIN | +SAN | +FAN | iTransformer+TIFO | +RevIN | +SAN | +FAN | +ACN | +WDAN |",
         "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
@@ -125,8 +125,12 @@ def render(summary: dict) -> tuple[str, str]:
                     mae_rank = 1 if method == mae_ranks[0] else 2 if method == mae_ranks[1] else 0
                     tex_cells.append(
                         f"{tex_number(value['mse'], mse_rank)}/{tex_number(value['mae'], mae_rank)}"
+                        + (r"\textsuperscript{\dagger}" if value["source"] == "source_paper_reported" else "")
                     )
-                    md_cells.append(f"{value['mse']:.3f}/{value['mae']:.3f}")
+                    md_cells.append(
+                        f"{value['mse']:.3f}/{value['mae']:.3f}"
+                        + ("†" if value["source"] == "source_paper_reported" else "")
+                    )
             tex.append(" & ".join(tex_cells) + r" \\")
             md.append("| " + " | ".join(md_cells) + " |")
         if dataset_index != len(DATASETS) - 1:
