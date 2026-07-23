@@ -19,25 +19,21 @@ claims that match the observed results. The completed changes are:
   \item \textbf{Replaced unsupported headline results and validated reconstruction.}
   The previous large-gain table could not be traced to complete multi-seed
   artifacts. We replaced it with mechanically generated evidence in
-  Table~\ref{table:verified_main_results}: PatchTST over seven datasets and four
-  horizons, and iTransformer over seven datasets at $H=96$. The revision reports
-  both improvements and negative cases, including the Traffic limitation. A
-  validation-only gates also tested a Hermitian rFFT/iRFFT implementation; the
+  Table~\ref{table:full_plugin_comparison}: standalone TIFO, RevIN, SAN, FAN,
+  ACN, and WDAN on DLinear and iTransformer over seven datasets and four
+  horizons. The revision reports both improvements and negative cases. A
+  validation-only gate also tested a Hermitian rFFT/iRFFT implementation; the
   selected ETTh1, ETTm2, Electricity, and Weather settings were frozen before
   three-seed evaluation.
 
   \item \textbf{Added recent baselines.}
-  Table~\ref{table:recent_baselines} adds ACN (ICML 2025) and WDAN (2025),
-  two recent model-agnostic normalization plug-ins, across all seven datasets
-  under the same iTransformer, $H=96$, three-seed protocol. Their official
-  dataset-level settings are retained; missing Traffic settings are selected
-  on validation data only. Because the official repositories use different
-  training engines, we reran a bare iTransformer inside each engine. In these
-  paired controls, TIFO and ACN improve 6/7 datasets, while TIFO has the
-  smallest worst-case degradation (1.02\%) and effect variance. A separate
-  validation-selected composition test shows that ACN+TIFO improves ACN's mean
-  MSE on ETTh1, ETTm2, and Traffic, with eight wins in nine paired seeds; this is
-  reported as normalization complementarity rather than a new standalone method.
+  The full table adds ACN (ICML 2025) and WDAN (2025), two recent
+  model-agnostic plug-ins. Under the local iTransformer, $H=96$, three-seed
+  protocol, standalone TIFO obtains the lowest mean MSE (0.273), ahead of ACN
+  (0.275) and WDAN (0.284); ACN has the lowest mean MAE. Longer-horizon
+  ACN/WDAN values are marked as source-paper references and excluded from
+  ranking when their input length or training engine differs. No composed
+  TIFO+baseline method is used in the main comparison.
 
   \item \textbf{Calibrated empirical claims.}
   We removed the unverified 33.3\%/55.3\% gains, the universal-improvement

@@ -1,0 +1,50 @@
+% Generated from the validation-selected evidence manifest in the TIFO code repository.
+\begin{table*}[t]
+\centering
+\caption{Full standalone plug-in comparison across two architecturally distinct backbones and four prediction horizons. Each cell is MSE/MAE (lower is better). Bold and underline indicate the best and second-best protocol-compatible result within the same backbone--dataset--horizon comparison or the matched $H=96$ average. $\dagger$ denotes a source-paper-reported ACN/WDAN reference under its original protocol; these reference-only cells are displayed but excluded from within-row ranking. Unmarked cells are local matched runs or values retained from the submitted matched table.}
+\label{table:full_plugin_comparison}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{cc|cccc|cccccc}
+\toprule
+\multicolumn{2}{c|}{} & \multicolumn{4}{c|}{DLinear} & \multicolumn{6}{c}{iTransformer} \\
+Dataset & $H$ & TIFO & RevIN & SAN & FAN & TIFO & RevIN & SAN & FAN & ACN & WDAN \\
+\midrule
+ETTh1 & 96 & \textbf{0.370}/\textbf{0.392} & 0.396/0.410 & \uline{0.383}/\uline{0.399} & 0.414/0.431 & \uline{0.390}/\uline{0.406} & 0.394/0.409 & 0.398/0.411 & 0.425/0.434 & 0.392/0.408 & \textbf{0.377}/\textbf{0.404} \\
+ & 192 & \textbf{0.408}/\textbf{0.416} & 0.445/0.440 & \uline{0.419}/\uline{0.419} & 0.446/0.451 & \uline{0.450}/\uline{0.443} & 0.460/0.449 & \textbf{0.438}/\textbf{0.435} & 0.483/0.468 & 0.431/0.429\textsuperscript{$\dagger$} & 0.406/0.421\textsuperscript{$\dagger$} \\
+ & 336 & \textbf{0.431}/\textbf{0.432} & 0.487/0.465 & \uline{0.437}/\uline{0.432} & 0.476/0.474 & \uline{0.490}/\uline{0.464} & 0.501/0.475 & \textbf{0.481}/\textbf{0.456} & 0.528/0.495 & 0.471/0.450\textsuperscript{$\dagger$} & 0.428/0.444\textsuperscript{$\dagger$} \\
+ & 720 & \textbf{0.432}/\textbf{0.453} & 0.512/0.510 & \uline{0.446}/\uline{0.459} & 0.539/0.538 & \textbf{0.511}/\textbf{0.493} & \uline{0.521}/0.504 & 0.528/\uline{0.502} & 0.582/0.555 & 0.470/0.469\textsuperscript{$\dagger$} & 0.452/0.470\textsuperscript{$\dagger$} \\
+\midrule
+ETTh2 & 96 & \textbf{0.272}/\textbf{0.334} & 0.344/0.397 & \uline{0.277}/\uline{0.338} & 0.316/0.376 & \uline{0.297}/\uline{0.348} & 0.300/0.349 & 0.302/0.354 & 0.358/0.408 & 0.299/0.349 & \textbf{0.289}/\textbf{0.338} \\
+ & 192 & \textbf{0.332}/\textbf{0.374} & 0.485/0.481 & \uline{0.340}/\uline{0.378} & 0.384/0.423 & \textbf{0.378}/\textbf{0.397} & \uline{0.381}/0.415 & 0.383/\uline{0.402} & 0.458/0.469 & 0.375/0.396\textsuperscript{$\dagger$} & 0.331/0.376\textsuperscript{$\dagger$} \\
+ & 336 & \uline{0.362}/\uline{0.398} & 0.582/0.536 & \textbf{0.356}/\textbf{0.398} & 0.465/0.479 & \textbf{0.421}/\textbf{0.431} & \uline{0.433}/0.442 & 0.435/\uline{0.441} & 0.570/0.533 & 0.409/0.427\textsuperscript{$\dagger$} & 0.358/0.403\textsuperscript{$\dagger$} \\
+ & 720 & \textbf{0.385}/\textbf{0.423} & 0.836/0.659 & \uline{0.396}/\uline{0.435} & 0.671/0.596 & \uline{0.428}/\uline{0.445} & \textbf{0.426}/\textbf{0.445} & 0.448/0.457 & 0.786/0.651 & 0.413/0.436\textsuperscript{$\dagger$} & 0.377/0.429\textsuperscript{$\dagger$} \\
+\midrule
+ETTm1 & 96 & 0.342/0.370 & 0.353/0.374 & \textbf{0.288}/\textbf{0.342} & \uline{0.302}/\uline{0.352} & 0.339/0.374 & 0.341/0.376 & \uline{0.331}/0.373 & 0.360/0.390 & 0.332/\uline{0.368} & \textbf{0.327}/\textbf{0.366} \\
+ & 192 & 0.383/0.390 & 0.391/0.392 & \textbf{0.323}/\textbf{0.363} & \uline{0.342}/\uline{0.376} & \uline{0.379}/0.395 & 0.380/\uline{0.394} & \textbf{0.376}/\textbf{0.381} & 0.398/0.408 & 0.370/0.387\textsuperscript{$\dagger$} & 0.330/0.375\textsuperscript{$\dagger$} \\
+ & 336 & 0.414/0.410 & 0.423/0.413 & \textbf{0.357}/\textbf{0.384} & \uline{0.385}/\uline{0.402} & 0.420/0.420 & \uline{0.419}/\textbf{0.418} & \textbf{0.412}/\uline{0.418} & 0.435/0.436 & 0.407/0.411\textsuperscript{$\dagger$} & 0.362/0.396\textsuperscript{$\dagger$} \\
+ & 720 & 0.481/0.446 & 0.486/0.449 & \textbf{0.409}/\textbf{0.415} & \uline{0.442}/\uline{0.439} & 0.488/0.458 & \uline{0.486}/\uline{0.455} & \textbf{0.485}/\textbf{0.453} & 0.503/0.478 & 0.474/0.446\textsuperscript{$\dagger$} & 0.412/0.422\textsuperscript{$\dagger$} \\
+\midrule
+ETTm2 & 96 & \textbf{0.165}/\textbf{0.253} & 0.194/0.293 & \uline{0.166}/\uline{0.258} & 0.170/0.262 & 0.185/0.270 & 0.200/0.281 & \uline{0.180}/0.272 & 0.195/0.293 & 0.180/\uline{0.263} & \textbf{0.177}/\textbf{0.257} \\
+ & 192 & \textbf{0.219}/\textbf{0.290} & 0.283/0.360 & \uline{0.223}/\uline{0.302} & 0.230/0.306 & \uline{0.251}/\textbf{0.311} & 0.252/\uline{0.312} & \textbf{0.248}/0.315 & 0.276/0.350 & 0.247/0.307\textsuperscript{$\dagger$} & 0.217/0.292\textsuperscript{$\dagger$} \\
+ & 336 & \uline{0.273}/\textbf{0.325} & 0.371/0.450 & \textbf{0.272}/\uline{0.331} & 0.293/0.351 & 0.315/\textbf{0.352} & \uline{0.314}/\uline{0.352} & \textbf{0.308}/0.352 & 0.336/0.385 & 0.315/0.349\textsuperscript{$\dagger$} & 0.273/0.331\textsuperscript{$\dagger$} \\
+ & 720 & \textbf{0.368}/\textbf{0.382} & 0.555/0.509 & \uline{0.380}/\uline{0.384} & 0.420/0.436 & \textbf{0.408}/\textbf{0.404} & \uline{0.411}/\uline{0.405} & 0.412/0.407 & 0.539/0.512 & 0.410/0.404\textsuperscript{$\dagger$} & 0.353/0.382\textsuperscript{$\dagger$} \\
+\midrule
+Electricity & 96 & 0.196/0.275 & 0.210/0.278 & \textbf{0.137}/\textbf{0.234} & \uline{0.146}/\uline{0.248} & \uline{0.141}/\uline{0.236} & 0.152/0.251 & 0.171/0.262 & 0.158/0.254 & \textbf{0.135}/\textbf{0.232} & 0.149/0.244 \\
+ & 192 & 0.196/0.277 & 0.210/0.304 & \textbf{0.151}/\textbf{0.247} & \uline{0.163}/\uline{0.264} & \textbf{0.158}/\textbf{0.252} & \uline{0.165}/\uline{0.255} & 0.180/0.270 & 0.170/0.263 & 0.150/0.244\textsuperscript{$\dagger$} & 0.146/0.242\textsuperscript{$\dagger$} \\
+ & 336 & 0.210/0.292 & 0.223/0.309 & \textbf{0.166}/\textbf{0.264} & \uline{0.180}/\uline{0.282} & \textbf{0.173}/\textbf{0.268} & \uline{0.180}/\uline{0.272} & 0.194/0.284 & 0.183/0.281 & 0.164/0.260\textsuperscript{$\dagger$} & 0.156/0.256\textsuperscript{$\dagger$} \\
+ & 720 & 0.251/0.324 & 0.257/0.349 & \textbf{0.201}/\textbf{0.295} & \uline{0.216}/\uline{0.316} & \uline{0.208}/\textbf{0.298} & 0.227/0.312 & 0.237/0.319 & \textbf{0.208}/\uline{0.306} & 0.187/0.280\textsuperscript{$\dagger$} & 0.182/0.281\textsuperscript{$\dagger$} \\
+\midrule
+Traffic & 96 & 0.640/0.382 & 0.648/0.396 & \textbf{0.412}/\textbf{0.288} & \uline{0.524}/\uline{0.340} & \textbf{0.392}/\textbf{0.269} & \uline{0.401}/0.277 & 0.502/0.329 & 0.525/0.341 & 0.424/\uline{0.269} & 0.495/0.314 \\
+ & 192 & 0.595/0.360 & 0.598/0.370 & \textbf{0.429}/\textbf{0.297} & \uline{0.523}/\uline{0.338} & \textbf{0.416}/\textbf{0.278} & \uline{0.421}/\uline{0.282} & 0.490/0.331 & 0.517/0.336 & -- & -- \\
+ & 336 & 0.604/0.363 & 0.605/0.373 & \textbf{0.445}/\textbf{0.306} & \uline{0.537}/\uline{0.343} & \textbf{0.426}/\textbf{0.284} & \uline{0.434}/0.389 & 0.512/0.341 & 0.530/\uline{0.339} & -- & -- \\
+ & 720 & 0.640/0.381 & 0.645/0.395 & \textbf{0.474}/\textbf{0.319} & \uline{0.581}/\uline{0.362} & \textbf{0.460}/\textbf{0.300} & \uline{0.465}/\uline{0.302} & 0.576/0.364 & 0.573/0.339 & -- & -- \\
+\midrule
+Weather & 96 & \uline{0.174}/\uline{0.222} & 0.196/0.256 & \textbf{0.152}/\textbf{0.210} & 0.187/0.242 & \uline{0.164}/\uline{0.208} & 0.175/0.225 & 0.170/0.227 & 0.178/0.235 & \textbf{0.161}/\textbf{0.204} & 0.172/0.220 \\
+ & 192 & \uline{0.225}/\uline{0.264} & 0.238/0.299 & \textbf{0.196}/\textbf{0.254} & 0.227/0.280 & \uline{0.217}/\textbf{0.255} & 0.225/\uline{0.257} & \textbf{0.214}/0.270 & 0.220/0.275 & 0.210/0.250\textsuperscript{$\dagger$} & 0.196/0.248\textsuperscript{$\dagger$} \\
+ & 336 & 0.278/\uline{0.301} & 0.281/0.330 & \textbf{0.246}/\textbf{0.294} & \uline{0.278}/0.330 & 0.272/\textbf{0.296} & 0.280/\uline{0.307} & \textbf{0.265}/0.309 & \uline{0.267}/0.314 & 0.266/0.290\textsuperscript{$\dagger$} & 0.242/0.282\textsuperscript{$\dagger$} \\
+ & 720 & 0.354/\uline{0.349} & 0.346/0.384 & \textbf{0.315}/\textbf{0.346} & \uline{0.341}/0.368 & 0.353/\textbf{0.350} & 0.373/0.366 & \uline{0.342}/\uline{0.358} & \textbf{0.340}/0.369 & 0.345/0.341\textsuperscript{$\dagger$} & 0.312/0.337\textsuperscript{$\dagger$} \\
+\midrule
+Avg. ($H=96$) & -- & 0.308/\uline{0.318} & 0.334/0.343 & \textbf{0.259}/\textbf{0.296} & \uline{0.294}/0.322 & \textbf{0.273}/\uline{0.302} & 0.280/0.310 & 0.293/0.318 & 0.314/0.336 & \uline{0.275}/\textbf{0.299} & 0.284/0.306 \\
+\bottomrule
+\end{tabular}}
+\end{table*}

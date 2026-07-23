@@ -1562,7 +1562,7 @@ We also selected FAN, it introduces a frequency normalization-based method to ad
 
 \noindent\textbf{Backbones and Setup.}
 \reviewtext{For fair comparisons, we selected three forecasting models, including DLinear \citep{DLinear}, PatchTST \citep{PatchTST}, and iTransformer \citep{liu2023itransformer}, as the backbones, and deployed all non-stationary modules (\method, RevIN, SAN, and FAN) for evaluation.}
-DLinear is a simple yet efficient forecasting model with an architecture solely involving MLPs. 
+DLinear is a simple non-Transformer forecasting model built from decomposition and linear projection layers.
 PatchTST and iTransformer are two well-known Transformer methods that frequently serve as baselines in various forecasting research \citep{liu2023itransformer, Liu2024FOIL, Piao2024fredformer, FRNet2024Zhang}.
 We followed the implementation and setup provided in \citep{liu2023SAN} and \citep{liu2023itransformer}.
 
@@ -1577,19 +1577,16 @@ Dataset splits, preprocessing, commands, seeds, hashes, and final metrics are
 recorded by the reproducibility ledger accompanying the anonymous code release.
 
 \noindent\textbf{Model selection and baseline fairness.}
-All promoted results use seeds 2021--2023. TIFO choices are selected using the
-validation split and frozen before the final test aggregation. ACN and WDAN are
-executed from their official repositories with their published dataset-level
-settings; the missing Traffic setting is likewise selected using validation
-data only. We do not claim identical search budgets: the external plug-ins use
-official settings wherever available, while the complete validation-only TIFO
-candidate lineages are disclosed in the accompanying reproducibility ledger.
-Since those repositories contain different training engines, their
-absolute errors mix plug-in and engine effects. We therefore also disable each
-plug-in and rerun its bare iTransformer within the same engine, yielding the
-paired effect comparison in Table~\ref{table:plugin_effects}. In particular,
-the WDAN-engine control retains the backbone's native instance normalization,
-whereas the WDAN plug-in replaces that path as specified by its implementation.
+All promoted TIFO results use seeds 2021--2023. Each dataset--horizon
+configuration is selected on the validation split and frozen before final test
+aggregation; the cell-to-protocol manifest and complete candidate lineages are
+included in the reproducibility ledger. Table~\ref{table:full_plugin_comparison}
+uses DLinear and iTransformer as architecturally distinct backbones and compares
+standalone TIFO with RevIN, SAN, FAN, ACN, and WDAN. The $H=96$ ACN/WDAN entries
+are local three-seed runs. Their longer-horizon values are shown only as
+source-paper references because the public protocols differ; they are marked
+with $\dagger$ and excluded from within-row ranking. We do not claim identical
+hyperparameter-search budgets across methods.
 
 \noindent\textbf{Reconstruction validation.}
 The historical operator uses full-spectrum complex coefficients. To test the
@@ -1602,10 +1599,12 @@ reported three-seed test runs. Later diagnostic variants are not used to replace
 these frozen main configurations.
 
 \noindent\textbf{Scope and limitations.}
-The current evidence supports a robust plug-in claim, not a universal or
-dataset-wise state-of-the-art claim. TIFO improves six of seven paired
-iTransformer datasets, but Traffic remains negative and ACN or WDAN has lower
-absolute MSE on several individual datasets. We therefore add one bounded
+The current evidence supports a robust plug-in claim, not a universal
+per-dataset claim. On the matched iTransformer $H=96$ aggregate, standalone
+TIFO has the lowest mean MSE among all six plug-ins, while ACN has the lowest
+mean MAE; individual datasets remain mixed. On DLinear, TIFO is strongest on
+the ETTh1, ETTh2, and ETTm2 families but SAN is stronger overall. We therefore
+add one bounded
 stress test that coherently scales the upper half of non-DC rFFT bins over each
 input/future window (table below). It probes sensitivity to
 a controlled high-frequency intervention, but does not establish robustness
@@ -1631,67 +1630,7 @@ Shift & ETTh1 Ori/TIFO & Effect & Traffic Ori/TIFO & Effect \\
 
 \clearpage
 \onecolumn
-\begin{table}[H]
-\centering
-\caption{\resubmitchange{Verified matched forecasting results over three seeds. PatchTST values average the four horizons $H\in\{96,192,336,720\}$; iTransformer values use $H=96$. Bold marks the better result within each TIFO--backbone pair.}}
-\label{table:verified_main_results}
-\begin{minipage}[t]{0.49\linewidth}
-\centering
-\textbf{PatchTST: four-horizon average}\\[2pt]
-\resizebox{\linewidth}{!}{%
-\begin{tabular}{c|cc|cc}
-\toprule
-Dataset & \multicolumn{2}{c|}{+TIFO} & \multicolumn{2}{c}{Ori} \\
- & MSE & MAE & MSE & MAE \\
-\midrule
-\input{generated_tables/main_patchtst_rows.tex}
-\end{tabular}}
-\end{minipage}\hfill
-\begin{minipage}[t]{0.49\linewidth}
-\centering
-\textbf{iTransformer: $H=96$}\\[2pt]
-\resizebox{\linewidth}{!}{%
-\begin{tabular}{c|cc|cc}
-\toprule
-Dataset & \multicolumn{2}{c|}{+TIFO} & \multicolumn{2}{c}{Ori} \\
- & MSE & MAE & MSE & MAE \\
-\midrule
-\input{generated_tables/main_itransformer_h96_rows.tex}
-\end{tabular}}
-\end{minipage}
-\end{table}
-
-\begin{table}[H]
-\centering
-\caption{\resubmitchange{Comparison with recent model-agnostic plug-ins at $H=96$ over seeds 2021--2023. TIFO hyperparameters and its host are selected independently for each dataset--horizon pair using validation data only and are frozen before final testing. TIFO is hosted by WDAN on the four ETT datasets, by ACN on Electricity and Weather, and by iTransformer on Traffic. Lower is better; bold marks the best result.}}
-\label{table:recent_baselines}
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{cc|cc|cc|cc}
-\toprule
-Dataset & $H$ & \multicolumn{2}{c|}{TIFO-enhanced (ours)} & \multicolumn{2}{c|}{ACN \citep{lee2025channel}} & \multicolumn{2}{c}{WDAN \citep{lin2025wdan}} \\
- & & MSE & MAE & MSE & MAE & MSE & MAE \\
-\midrule
-\input{generated_tables/plugin_baselines_h96_rows.tex}
-\end{tabular}}
-\end{table}
-
-\begin{table}[H]
-\centering
-\caption{Standalone plug-in effect relative to the bare backbone in each native
-engine; unlike Table~\ref{table:recent_baselines}, no plug-ins are composed.
-Positive $\Delta$MSE denotes error reduction; Std is across datasets.}
-\label{table:plugin_effects}
-\small
-\begin{tabular}{lcccc}
-\toprule
-Plug-in & Improves & Mean $\Delta$MSE$\uparrow$ & Worst $\Delta$MSE$\uparrow$ & Std$\downarrow$ \\
-\midrule
-ACN & \textbf{6/7} & \textbf{+2.44\%} & -7.47\% & 5.71 \\
-WDAN & 5/7 & -1.23\% & -22.17\% & 9.44 \\
-TIFO (standalone) & \textbf{6/7} & +2.06\% & \textbf{-1.02\%} & \textbf{2.53} \\
-\bottomrule
-\end{tabular}
-\end{table}
+\input{generated_tables/full_plugin_comparison.tex}
 
 \begin{table}[H]
 \centering
@@ -1813,13 +1752,11 @@ Multivariate forecasting results (average) with forecasting lengths $ H \in \{96
 
 
 \textbf{Main Results.}
-\resubmitchange{To answer RQ1, Table~\ref{table:verified_main_results} reports matched Ori--TIFO comparisons generated from completed three-seed artifacts.}
+\resubmitchange{To answer RQ1, Table~\ref{table:full_plugin_comparison} reports the complete standalone plug-in comparison on DLinear and iTransformer over four horizons.}
 %Table \ref{table: 1st_results} presents the overall forecasting results using iTransformer and PatchTST as the backbone across seven datasets. 
-\resubmitchange{For PatchTST, TIFO improves average MSE on ETTh2, ETTm1, ETTm2, and Weather, with its clearest gain on ETTm2; ETTh1, Electricity, and Traffic are neutral or negative. At $H=96$, validation-selected TIFO configurations improve iTransformer on ETTh1, ETTh2, ETTm1, ETTm2, Electricity, and Weather; Traffic is the sole negative case, with a modest 1.0\% MSE increase. These results support TIFO as a useful plug-in in selected settings rather than a universally improving transformation.}
+\resubmitchange{For iTransformer at $H=96$, validation-selected standalone TIFO obtains the lowest mean MSE (0.273), ahead of ACN (0.275), RevIN (0.280), WDAN (0.284), SAN (0.293), and FAN (0.314); ACN has the lowest mean MAE (0.299), followed by TIFO (0.302). Across all four horizons, TIFO is especially strong on Traffic and remains competitive with RevIN, SAN, and FAN. On DLinear, TIFO is strongest on ETTh1, ETTh2, and ETTm2, while SAN is stronger on ETTm1, Electricity, Traffic, and Weather. These mixed per-dataset results define the empirical boundary of the plug-in rather than supporting a universal-win claim.}
 %, as shown in all bold results.
-\resubmitchange{Table~\ref{table:recent_baselines} compares with ACN \citep{lee2025channel} and WDAN \citep{lin2025wdan}, two recent model-agnostic plug-ins, on seven datasets with the iTransformer backbone, $H=96$, and seeds 2021--2023. We rerun both baselines on the same data splits and select every displayed configuration using validation data only. The resulting TIFO-enhanced configuration achieves the lowest mean MSE and MAE on all seven datasets. Its host is also validation-selected and frozen: WDAN on the four ETT datasets, ACN on Electricity and Weather, and bare iTransformer on Traffic. The gains are substantial on ETTm1 and ETTm2 and remain positive in the narrowest comparison, Traffic MAE (0.26902 versus 0.26905 for ACN). Because this table evaluates TIFO's ability to enhance or compose with the strongest available plug-in host, we separately report the non-composed, paired effect of each standalone plug-in relative to its bare backbone in Table~\ref{table:plugin_effects}.}
-
-\resubmitchange{We additionally test whether TIFO complements ACN in the explicit order normalization $\rightarrow$ TIFO spectral adaptation $\rightarrow$ ACN encoding. After validation-only selection and frozen three-seed testing, ACN+TIFO improves mean MSE over ACN on all three preregistered datasets: ETTh1 ($0.388795\rightarrow0.385508$, 3/3 paired wins), ETTm2 ($0.180988\rightarrow0.179959$, 3/3), and Traffic ($0.427060\rightarrow0.425896$, 2/3). This diagnostic supports composability with a normalization plug-in; it does not replace the standalone TIFO comparison or establish complementarity with FilterNet.}
+\resubmitchange{The longer-horizon ACN and WDAN cells are retained as explicitly marked source-paper references rather than treated as matched wins: ACN uses iTransformer with input length 96, whereas the available WDAN table uses input length 720 and a different training engine. They are therefore excluded from bold/underline ranking. This separation prevents protocol differences from being presented as plug-in effects.}
 
 \resubmitchange{Table~\ref{table:weight_alignment} provides a direct diagnostic of the proposed mechanism on the frozen ETTh1 and ETTm2 checkpoints. Positive rank correlations and high/low quartile gain ratios above one show that higher stationarity scores tend to receive larger learned gains. This evidence supports the intended conditioning behavior, but it is not a proof of monotonicity and does not eliminate the negative Traffic case.}
 
