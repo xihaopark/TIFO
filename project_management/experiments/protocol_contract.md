@@ -1,6 +1,6 @@
 # Proposed matched experiment contract
 
-Status: `gate_v1_implemented; full_contract_not_frozen`
+Status: `full_plugin_table_v1_frozen; experiments_in_progress`
 
 Purpose: provide one auditable task definition for Ori, TIFO, normalization
 baselines, closest methods and recent forecasting models.
@@ -16,7 +16,7 @@ baselines, closest methods and recent forecasting models.
 | scaler | fit on training partition only, apply unchanged to validation/test | Prevent leakage; explicitly override legacy FAN defaults. |
 | label length | 48 | Matches current runs and TSLib-style scripts. |
 | PatchTST/iTransformer input length | 96 | Matches current main comparison contract. |
-| DLinear input length | 336 on ETT, 96 on Electricity/Traffic/Weather | Matches current scripts; present as backbone-specific, never as fixed L=96 for the whole table. |
+| DLinear input length | 336 on ETTh1/ETTh2/ETTm2; 96 on ETTm1/Electricity/Traffic/Weather | Exactly matches the scripts and result directories used by the original RevIN/SAN/FAN table; present as backbone-specific, never as fixed L=96 for the whole table. |
 | seed set | 2021, 2022, 2023 initially; expand if variance is high | Minimum matched stability evidence and compatible with existing partial repeats. |
 | selection | validation MSE only; test set evaluated once per frozen run | Avoid test-set tuning. |
 | metrics | MSE and MAE, same implementation and aggregation for all methods | Matches paper; invalid DTW logging excluded. |
@@ -56,16 +56,16 @@ Every new run must record:
 - exact command, checkpoint, log and metric paths;
 - final status, MSE/MAE and failure reason when applicable.
 
-## Freeze blockers
+## Frozen full-table decisions
 
-Before the full protocol becomes `frozen_v1`:
-
-1. Confirm whether the authors want to preserve DLinear's backbone-specific
-   length 336 or standardize it to 96 and rerun all DLinear comparisons.
-2. Decide a uniform search/tuning budget for module baselines and model
-   baselines. The representative ETTm2 gate is provisionally fixed at 30 epochs,
-   patience 5, batch size 32 and learning rate 1e-4 for pipeline validation; it
-   is not yet the final paper-wide optimization budget.
+1. Preserve DLinear's dataset-specific input lengths from the original scripts
+   so the existing RevIN/SAN/FAN results remain usable.
+2. Freeze existing baseline results. TIFO receives an eight-candidate,
+   validation-only first-pass search independently in each
+   dataset/backbone/horizon cell, followed by cell-local refinement only where
+   the frozen final result remains weaker than a baseline.
+3. Use 30 epochs, patience 5, and the original dataset/backbone batch size and
+   base learning rate for TIFO tuning and final evidence.
 
 Completed prerequisites: the Ori/TIFO switch and all three native backbone
 forward paths are smoke-tested; TimeEmb and TFPS (NeurIPS 2025) are selected,
