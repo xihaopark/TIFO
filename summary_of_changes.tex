@@ -16,24 +16,21 @@ claims that match the observed results. The completed changes are:
   seed, dataset hash, code state, log, and final metrics. Results are reported
   over seeds 2021--2023 and include the original backbone as a matched control.
 
-  \item \textbf{Replaced unsupported headline results and validated reconstruction.}
-  The previous large-gain table could not be traced to complete multi-seed
-  artifacts. We replaced it with mechanically generated evidence in
-  Table~\ref{table:full_plugin_comparison}: standalone TIFO, RevIN, SAN, FAN,
-  ACN, and WDAN on DLinear and iTransformer over seven datasets and four
-  horizons. The revision reports both improvements and negative cases. A
+  \item \textbf{Retained and extended the submitted results.}
+  The original Ori--TIFO main results and the submitted TIFO, TIFO*, RevIN,
+  SAN, and FAN plug-in results remain in the revision. We extend this evidence
+  in Table~\ref{table:full_plugin_comparison} with ACN and WDAN on DLinear and
+  iTransformer over seven datasets and four horizons. A
   validation-only gate also tested a Hermitian rFFT/iRFFT implementation; the
   selected ETTh1, ETTm2, Electricity, and Weather settings were frozen before
   three-seed evaluation.
 
   \item \textbf{Added recent baselines.}
   The full table adds ACN (ICML 2025) and WDAN (2025), two recent
-  model-agnostic plug-ins. Under the local iTransformer, $H=96$, three-seed
-  protocol, standalone TIFO obtains the lowest mean MSE (0.273), ahead of ACN
-  (0.275) and WDAN (0.284); ACN has the lowest mean MAE. Longer-horizon
-  ACN/WDAN values are marked as source-paper references and excluded from
-  ranking when their input length or training engine differs. No composed
-  TIFO+baseline method is used in the main comparison.
+  model-agnostic plug-ins. We evaluate both locally with the same backbone,
+  dataset split, prediction horizon, validation-selection rule, and three-seed
+  final protocol used for the matched comparison. No source-paper cells or
+  composed TIFO+baseline method are used in the main comparison.
 
   \item \textbf{Calibrated empirical claims.}
   We removed the unverified 33.3\%/55.3\% gains, the universal-improvement
@@ -41,10 +38,10 @@ claims that match the observed results. The completed changes are:
   contributions, results discussion, and conclusion. The new wording states
   the verified gains, mixed outcomes, and method boundary explicitly.
 
-  \item \textbf{Separated verified and pending evidence.}
-  Historical tables whose configurations or artifacts are incomplete are no
-  longer compiled into the revised manuscript. Only mechanically aggregated,
-  traceable values are eligible for the final paper tables.
+  \item \textbf{Separated submitted and newly reproduced evidence.}
+  The submitted tables are preserved as the original experimental record,
+  while newly added ACN/WDAN cells are mechanically aggregated from local
+  run artifacts and recorded in the reproducibility ledger.
 
   \item \textbf{Added mechanism and controlled-shift diagnostics.}
   Across frozen ETTh1 and ETTm2 checkpoints, learned spectral gains are

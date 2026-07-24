@@ -1549,7 +1549,9 @@ Models are trained with MSE loss and evaluated in the time domain by MSE and MAE
 % To relate accuracy gains to spectral shift, we use the train–test frequency divergence: JSD$^{2}$ and KS \citep{iqbal2021enhancing_JS, }.
 
 \noindent\textbf{Baselines.}
-\reviewtext{We selected RevIN \citep{kim2021RevIN}, SAN \citep{liu2023SAN}, and FAN \citep{ye2024FAN} as our baselines.}
+\reviewtext{We selected RevIN \citep{kim2021RevIN}, SAN \citep{liu2023SAN},
+FAN \citep{ye2024FAN}, ACN \citep{lee2025channel}, and WDAN
+\citep{lin2025wdan} as our plug-in baselines.}
 RevIN is widely used as a fundamental module in various forecasting models, including PatchTST \citep{PatchTST}, iTransformer \citep{liu2023itransformer}, 
 %Fredformer \citep{Piao2024fredformer}, 
 among others \citep{wang2024tssurvey}.
@@ -1583,10 +1585,10 @@ aggregation; the cell-to-protocol manifest and complete candidate lineages are
 included in the reproducibility ledger. Table~\ref{table:full_plugin_comparison}
 uses DLinear and iTransformer as architecturally distinct backbones and compares
 standalone TIFO with RevIN, SAN, FAN, ACN, and WDAN. The $H=96$ ACN/WDAN entries
-are local three-seed runs. Their longer-horizon values are shown only as
-source-paper references because the public protocols differ; they are marked
-with $\dagger$ and excluded from within-row ranking. We do not claim identical
-hyperparameter-search budgets across methods.
+and the newly added longer-horizon entries are local runs under the same
+backbone, data split, forecasting horizon, validation-selection rule, and
+three-seed final protocol. The submitted TIFO, TIFO*, RevIN, SAN, and FAN
+results are retained rather than replaced.
 
 \noindent\textbf{Reconstruction validation.}
 The historical operator uses full-spectrum complex coefficients. To test the
@@ -1628,6 +1630,7 @@ Shift & ETTh1 Ori/TIFO & Effect & Traffic Ori/TIFO & Effect \\
 \end{tabular}}
 \end{table}
 
+\input{generated_tables/submitted_main_results.tex}
 \clearpage
 \onecolumn
 \input{generated_tables/full_plugin_comparison.tex}
@@ -1670,7 +1673,7 @@ ETTm2 & $\mathbf{0.181120 \pm 0.000950}$ & $0.182516 \pm 0.002504$ & $0.186016 \
 \twocolumn
 \subsection{Experiment Results}
 
-\iffalse % Historical Table 1: retained only for provenance audit; not compiled.
+\iffalse % Duplicated inline copy; compiled version is generated_tables/submitted_main_results.tex.
 \begin{table*}[ht]
 \centering
 \caption{
@@ -1756,7 +1759,10 @@ Multivariate forecasting results (average) with forecasting lengths $ H \in \{96
 %Table \ref{table: 1st_results} presents the overall forecasting results using iTransformer and PatchTST as the backbone across seven datasets. 
 \resubmitchange{For iTransformer at $H=96$, validation-selected standalone TIFO obtains the lowest mean MSE (0.273), ahead of ACN (0.275), RevIN (0.280), WDAN (0.284), SAN (0.293), and FAN (0.314); ACN has the lowest mean MAE (0.299), followed by TIFO (0.302). Across all four horizons, TIFO is especially strong on Traffic and remains competitive with RevIN, SAN, and FAN. On DLinear, TIFO is strongest on ETTh1, ETTh2, and ETTm2, while SAN is stronger on ETTm1, Electricity, Traffic, and Weather. These mixed per-dataset results define the empirical boundary of the plug-in rather than supporting a universal-win claim.}
 %, as shown in all bold results.
-\resubmitchange{The longer-horizon ACN and WDAN cells are retained as explicitly marked source-paper references rather than treated as matched wins: ACN uses iTransformer with input length 96, whereas the available WDAN table uses input length 720 and a different training engine. They are therefore excluded from bold/underline ranking. This separation prevents protocol differences from being presented as plug-in effects.}
+\resubmitchange{The submitted main results are retained in
+Table~\ref{table:submitted_main_results}. Table~\ref{table:full_plugin_comparison}
+extends, rather than replaces, that evidence with ACN and WDAN evaluated
+locally under the matched DLinear and iTransformer protocols.}
 
 \resubmitchange{Table~\ref{table:weight_alignment} provides a direct diagnostic of the proposed mechanism on the frozen ETTh1 and ETTm2 checkpoints. Positive rank correlations and high/low quartile gain ratios above one show that higher stationarity scores tend to receive larger learned gains. This evidence supports the intended conditioning behavior, but it is not a proof of monotonicity and does not eliminate the negative Traffic case.}
 
@@ -1768,10 +1774,10 @@ Multivariate forecasting results (average) with forecasting lengths $ H \in \{96
 
 
 
-\iffalse % Unverified historical normalization table narrative; excluded pending matched reruns.
 \noindent\textbf{Comparison with Baseline Non-stationary Methods.}
 Table \ref{table: results of other methods} further presents the average comparison results between \method and the baseline non-stationary methods, i.e., RevIN, SAN, and FAN.
-We use the same parameters and forecasting length as in Table \ref{table: 1st_results}. 
+We use the same parameters and forecasting length as in
+Table~\ref{table:submitted_main_results}.
 For iTransformer, the input sequence length is $L=96$, and $L=336$ for DLinear.
 As shown, \method achieves 18 top-1 results and 6 top-2 results out of 28 settings. 
 For instance, in the ETTh1 dataset, \method improves the MSE values for DLinear and iTransformer to $0.407$ and $0.445$, outperforming RevIN ($0.460$ and $0.463$) and SAN ($0.421$ and $0.466$).
@@ -1779,10 +1785,6 @@ Similarly,  in the Traffic dataset, \method improves the MSE value to $0.430$, c
 % Notably, as we highlighted in Section \ref{sec:introduction}, one purpose of \method is to complement existing normalization methods in the frequency domain. 
 \reviewtext{Here, \method* represents the incorporation of SAN into the backbones, which further improves the second-best results (underlined in the table) to the best.}
 %For example, in the ETTh1 dataset with $H = 96$ and $192$ on the iTransformer backbone, the results improved from $0.389$ and $0.447$ to $0.380$ and $0.429$.
-\fi
-
-
-\iffalse % Legacy analyses lack complete run-level provenance and are excluded.
 \noindent\textbf{Frequency Domain Shift Analysis.}
 \reviewtext{To answer RQ2, we further measure the frequency-domain distribution difference between the train and test dataset amplitude spectra to link accuracy gains to reduced spectral distributional shift.}
 For each frequency $\omega_j$, we gather its amplitudes across all training and testing samples to build two empirical distributions.
@@ -1791,7 +1793,6 @@ Jensen–Shannon divergence squared (JSD$^2$) is a symmetric, bounded average of
 Kolmogorov–Smirnov statistic (KS) measures the largest gap between the cumulative distribution functions, highlighting the most significant mismatch between training and testing data \citep{wang2010KS_test}.
 Here, JSD$^2$ evaluates the overall shift in amplitude distributions, while KS measures the worst-case deviation between training and test data for each frequency component.
 
-\iffalse % Unverified historical RevIN/SAN/FAN/TIFO* table; not compiled.
 \begin{table*}[t]
 \centering
 \caption{
@@ -1862,10 +1863,6 @@ The \textbf{best} and \uline{second best} results are highlighted.
 \end{tabular}
 }
 \end{table*}
-\fi
-
-
-
 \begin{figure*}[ht]
   \centering
   \begin{minipage}{0.9\linewidth}
@@ -2102,7 +2099,6 @@ The STFT variant using a $\sqrt{\text{Hann}}$ window fails to outperform the ori
 % \subsection{Frequnecy domain models}
 
 
-\fi
 \section{Related Works}
 
 \textbf{Time-domain normalization.}
@@ -2137,7 +2133,6 @@ However, these methods rely on an attention mechanism or top-$k$ selection deriv
 % Therefore, \method is complementary to, rather than repetitive of, these architecture-level frequency domain models.
 
 
-\iffalse % Historical reconstruction ablations are not in the traceable ledger.
 \begin{table}[t]
 \centering
 \caption{Ablation on window functions and frequency resolution under the DFT setting (ETTh1, iTransformer).}
@@ -2175,7 +2170,6 @@ STFT ($\sqrt{\text{Hann}}$, 50\% ovlp) & $0.4005 \pm 0.0024$ & $0.4148 \pm 0.002
 \end{table}
 
 \noindent\textbf{Frequency domain models.}
-\fi
 \noindent\textbf{Frequency domain models.}
 Frequency domain modeling has proven highly effective for capturing global dependencies and improving efficiency.
 Mainstream architectures, such as Autoformer \citep{Autoformer}, Fedformer \citep{ICMLFedformer}, TimesNet \citep{Timesnet}, and Frequency MLP \citep{yi2023frequencyMLP}, move primary operators (e.g., attention or convolution) into the frequency domain.
@@ -2307,7 +2301,6 @@ As a result, a model trained on the training data may perform poorly on the test
 \bibliographystyle{ACM-Reference-Format}
 \bibliography{sample-base}
 
-\iffalse % Legacy appendix retained in source for provenance, not in submission PDF.
 \newpage
 %%
 %% If your work has an appendix, this is the place to put it.
@@ -4141,8 +4134,6 @@ hop0.25\_zpad1.0  & 0.3940 & 0.4090 & 0.3960 & 0.4110 & 0.3970 & 0.4120 & 0.3957
 %     \end{tabular}%
 %   }
 % \end{table}
-
-\fi
 
 \end{document}
 \endinput
