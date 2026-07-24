@@ -1592,9 +1592,11 @@ are evaluated on seed-2022 validation MSE without final-test access. The selecte
 configuration is then frozen and evaluated on seeds 2021--2023. The
 cell-to-protocol manifest and complete candidate lineages are included in the
 reproducibility ledger. Table~\ref{table:full_plugin_comparison} uses DLinear
-and iTransformer as architecturally distinct backbones and reports standalone
-TIFO and all five standalone baselines; it also retains the submitted TIFO*
-composition with SAN as a separate, explicitly labeled column.
+and iTransformer as architecturally distinct backbones. \resubmitchange{Unmarked
+cells are locally reproduced under the stated protocol, whereas dagger-marked
+cells are reported from the corresponding baseline source and are retained
+only for context; the table also retains the submitted TIFO* composition with
+SAN as a separate, explicitly labeled column.}
 
 \noindent\textbf{Reconstruction validation.}
 The historical operator uses full-spectrum complex coefficients. To test the
@@ -1758,14 +1760,15 @@ Multivariate forecasting results (average) with forecasting lengths $ H \in \{96
 
 
 \textbf{Main Results.}
-\resubmitchange{To answer RQ1, Table~\ref{table:full_plugin_comparison} reports the complete standalone plug-in comparison on DLinear and iTransformer over four horizons.}
+\resubmitchange{To answer RQ1, Table~\ref{table:full_plugin_comparison} reports the standalone plug-in comparison on DLinear and iTransformer over four horizons, with source-reported contextual cells explicitly marked by daggers.}
 %Table \ref{table: 1st_results} presents the overall forecasting results using iTransformer and PatchTST as the backbone across seven datasets. 
-\resubmitchange{For iTransformer at $H=96$, validation-selected standalone TIFO obtains the lowest mean MSE (0.273), ahead of ACN (0.275), RevIN (0.280), WDAN (0.284), SAN (0.293), and FAN (0.314); ACN has the lowest mean MAE (0.299), followed by TIFO (0.302). Across all four horizons, TIFO is especially strong on Traffic and remains competitive with RevIN, SAN, and FAN. On DLinear, TIFO is strongest on ETTh1, ETTh2, and ETTm2, while SAN is stronger on ETTm1, Electricity, Traffic, and Weather. These mixed per-dataset results define the empirical boundary of the plug-in rather than supporting a universal-win claim.}
+\resubmitchange{For iTransformer at $H=96$, validation-selected TIFO improves MSE over the matched bare backbone on six of seven datasets; Traffic remains the exception (0.397 versus 0.393 MSE). The four-horizon outcomes are mixed and should be interpreted cell by cell. Direct rankings are restricted to the locally reproduced, unmarked cells, while dagger-marked source values provide contextual comparison only. On DLinear, TIFO is strongest on ETTh1, ETTh2, and ETTm2, whereas SAN is stronger on ETTm1, Electricity, Traffic, and Weather. These mixed per-dataset results define the empirical boundary of the plug-in rather than supporting a universal-win claim.}
 %, as shown in all bold results.
 \resubmitchange{The submitted main results are retained in
 Table~\ref{table: 1st_results}. Table~\ref{table:full_plugin_comparison}
-extends, rather than replaces, that evidence with ACN and WDAN evaluated
-locally under the matched DLinear and iTransformer protocols.}
+extends, rather than replaces, that evidence with locally reproduced ACN and
+WDAN cells under matched DLinear and iTransformer protocols, alongside
+explicitly marked source-reported context where reproduction is pending.}
 
 \resubmitchange{Table~\ref{table:weight_alignment} provides a direct diagnostic of the proposed mechanism on the frozen ETTh1 and ETTm2 checkpoints. Positive rank correlations and high/low quartile gain ratios above one show that higher stationarity scores tend to receive larger learned gains. This evidence supports the intended conditioning behavior, but it is not a proof of monotonicity and does not eliminate the negative Traffic case.}
 
