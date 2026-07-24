@@ -1,6 +1,6 @@
 # KDD resubmission: full plug-in main-table contract
 
-Status: revised active experiment contract, 2026-07-24.
+Status: completed local experiment contract, 2026-07-24.
 
 ## Reviewer-facing scope
 
@@ -15,9 +15,9 @@ The revised main result is one `table*` with two backbone panels:
    DLinear input and output with its learned normalization/de-normalization.
 
 Rows cover ETTh1, ETTh2, ETTm1, ETTm2, Electricity, Traffic, and Weather at
-prediction horizons 96, 192, 336, and 720. Each cell reports MSE/MAE. TIFO is
-always standalone; compositions such as TIFO+SAN, TIFO+ACN, and TIFO+WDAN are
-excluded from the main comparison.
+prediction horizons 96, 192, 336, and 720. Each cell reports MSE/MAE. The
+submitted standalone TIFO and TIFO* (the submitted TIFO+SAN composition) are
+both retained. No new TIFO+ACN or TIFO+WDAN composition is introduced.
 
 ## Frozen baseline sources
 
@@ -26,11 +26,11 @@ excluded from the main comparison.
   environment on both DLinear and iTransformer.
 - ACN, WDAN at iTransformer/H96: reuse the completed local three-seed official-
   engine runs. Do not rerun them.
-- ACN, WDAN at other horizons: run validation-selected local matrices,
-  including all Traffic horizons, so the final table has no source-protocol
+- ACN, WDAN at other horizons: completed validation-selected local matrices,
+  including all Traffic horizons. The final table has no source-protocol
   symbols or missing cells.
-- ACN, WDAN on DLinear: run eight-candidate validation-only gates per cell and
-  freeze one configuration for seeds 2021--2023.
+- ACN, WDAN on DLinear: completed eight-candidate validation-only gates per
+  cell and frozen one configuration for seeds 2021--2023.
 - Never select among duplicate baseline runs using final-test performance.
 
 ## TIFO selection and final testing
@@ -59,3 +59,15 @@ submitted result surface with a narrower regenerated table. Remove per-cell
 source symbols once every new-baseline cell is locally complete. Keep the
 frequency-distribution distance table, spectral figures, ablations, and
 efficiency tables unchanged unless a consistency error is discovered.
+
+## Completed evidence
+
+- ACN and WDAN each contribute 84 final rows per backbone: seven datasets,
+  four horizons, and three frozen seeds.
+- The complete evidence file contains 616 rows: 280 retained submitted rows
+  and 336 locally reproduced ACN/WDAN final rows.
+- At displayed three-decimal precision, the TIFO family has at least one best
+  MSE or MAE in 25/28 DLinear rows and 18/28 iTransformer rows.
+- The generated table contains 56 complete dataset--horizon rows, two
+  backbone-specific averages, no missing method cells, and no provenance
+  superscripts.

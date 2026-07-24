@@ -155,8 +155,8 @@ def render(summary: dict) -> tuple[str, str]:
             if dataset_index != len(DATASETS) - 1:
                 tex.append(r"\addlinespace[1pt]")
         tex.append(r"\midrule")
-        tex_cells = [r"Avg. ($H=96$)", "--"]
-        md_cells = ["Avg. (H=96)", "--"]
+        tex_cells = [r"Avg. ($H=96$)", "96"]
+        md_cells = ["Avg. (H=96)", "96"]
         averages = {}
         for method in methods:
             values = [
