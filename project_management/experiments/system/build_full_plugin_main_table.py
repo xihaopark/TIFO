@@ -62,15 +62,21 @@ def summarize(rows: list[dict]) -> dict[tuple[str, str, str, int], dict]:
     return summary
 
 
-def rank(values: dict[str, dict], metric: str) -> tuple[str | None, str | None]:
-    ordered = sorted(
-        ((method, value[metric]) for method, value in values.items()),
-        key=lambda item: (item[1], item[0]),
-    )
-    return (
-        ordered[0][0] if ordered else None,
-        ordered[1][0] if len(ordered) > 1 else None,
-    )
+def rank_levels(values: dict[str, dict], metric: str) -> dict[str, int]:
+    """Rank at the same three-decimal precision shown to the reader.
+
+    Methods that are tied at the displayed precision receive the same
+    formatting. The underline marks the second distinct displayed value.
+    """
+
+    displayed = {method: round(value[metric], 3) for method, value in values.items()}
+    distinct = sorted(set(displayed.values()))
+    best = distinct[0] if distinct else None
+    second = distinct[1] if len(distinct) > 1 else None
+    return {
+        method: 1 if value == best else 2 if value == second else 0
+        for method, value in displayed.items()
+    }
 
 
 def tex_number(value: float, rank_value: int) -> str:
@@ -88,55 +94,69 @@ def render(summary: dict) -> tuple[str, str]:
         r"\centering",
         r"\caption{Complete plug-in comparison obtained by retaining the submitted TIFO, TIFO*, RevIN, SAN, and FAN results and adding locally evaluated ACN and WDAN. Each cell is MSE/MAE (lower is better). Bold and underline indicate the best and second-best result within the same backbone--dataset--horizon comparison or the $H=96$ average. TIFO* denotes TIFO used together with SAN, as in the submitted manuscript.}",
         r"\label{table:full_plugin_comparison}",
-        r"\resizebox{\textwidth}{!}{%",
-        r"\begin{tabular}{cc|ccccccc|ccccccc}",
+        r"\begingroup",
+        r"\scriptsize",
+        r"\setlength{\tabcolsep}{3pt}",
+        r"\renewcommand{\arraystretch}{0.91}",
+        r"\begin{tabular}{cc|ccccccc}",
         r"\toprule",
-        r"\multicolumn{2}{c|}{} & \multicolumn{7}{c|}{DLinear} & \multicolumn{7}{c}{iTransformer} \\",
-        r"Dataset & $H$ & TIFO* & TIFO & SAN & FAN & RevIN & ACN & WDAN & TIFO* & TIFO & SAN & FAN & RevIN & ACN & WDAN \\",
-        r"\midrule",
     ]
     md = [
-        "# Full standalone plug-in comparison",
+        "# Full plug-in comparison",
         "",
         "Each cell is MSE/MAE. TIFO* denotes TIFO used together with SAN.",
-        "",
-        "| Dataset | H | DLinear+TIFO* | +TIFO | +SAN | +FAN | +RevIN | +ACN | +WDAN | iTransformer+TIFO* | +TIFO | +SAN | +FAN | +RevIN | +ACN | +WDAN |",
-        "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
     ]
-    for dataset_index, dataset in enumerate(DATASETS):
-        for horizon in HORIZONS:
-            tex_cells = [dataset if horizon == 96 else "", str(horizon)]
-            md_cells = [dataset, str(horizon)]
-            for backbone, methods in METHODS.items():
+
+    for backbone_index, (backbone, methods) in enumerate(METHODS.items()):
+        if backbone_index:
+            tex.append(r"\midrule")
+        tex.extend(
+            (
+                rf"\multicolumn{{9}}{{c}}{{\textbf{{{backbone}}}}} \\",
+                r"Dataset & $H$ & TIFO* & TIFO & SAN & FAN & RevIN & ACN & WDAN \\",
+                r"\midrule",
+            )
+        )
+        md.extend(
+            (
+                "",
+                f"## {backbone}",
+                "",
+                "| Dataset | H | TIFO* | TIFO | SAN | FAN | RevIN | ACN | WDAN |",
+                "|---|---:|---:|---:|---:|---:|---:|---:|---:|",
+            )
+        )
+        for dataset_index, dataset in enumerate(DATASETS):
+            for horizon in HORIZONS:
+                tex_cells = [dataset if horizon == 96 else "", str(horizon)]
+                md_cells = [dataset, str(horizon)]
                 available = {
                     method: summary[(backbone, method, dataset, horizon)]
                     for method in methods
                     if (backbone, method, dataset, horizon) in summary
                 }
-                mse_ranks = rank(available, "mse")
-                mae_ranks = rank(available, "mae")
+                mse_ranks = rank_levels(available, "mse")
+                mae_ranks = rank_levels(available, "mae")
                 for method in methods:
                     value = available.get(method)
                     if value is None:
                         tex_cells.append("--")
                         md_cells.append("--")
                         continue
-                    mse_rank = 1 if method == mse_ranks[0] else 2 if method == mse_ranks[1] else 0
-                    mae_rank = 1 if method == mae_ranks[0] else 2 if method == mae_ranks[1] else 0
                     tex_cells.append(
-                        f"{tex_number(value['mse'], mse_rank)}/{tex_number(value['mae'], mae_rank)}"
+                        f"{tex_number(value['mse'], mse_ranks[method])}/"
+                        f"{tex_number(value['mae'], mae_ranks[method])}"
                     )
                     md_cells.append(
                         f"{value['mse']:.3f}/{value['mae']:.3f}"
                     )
-            tex.append(" & ".join(tex_cells) + r" \\")
-            md.append("| " + " | ".join(md_cells) + " |")
-        if dataset_index != len(DATASETS) - 1:
-            tex.append(r"\midrule")
-    tex.append(r"\midrule")
-    tex_cells = [r"Avg. ($H=96$)", "--"]
-    md_cells = ["Avg. (H=96)", "--"]
-    for backbone, methods in METHODS.items():
+                tex.append(" & ".join(tex_cells) + r" \\")
+                md.append("| " + " | ".join(md_cells) + " |")
+            if dataset_index != len(DATASETS) - 1:
+                tex.append(r"\addlinespace[1pt]")
+        tex.append(r"\midrule")
+        tex_cells = [r"Avg. ($H=96$)", "--"]
+        md_cells = ["Avg. (H=96)", "--"]
         averages = {}
         for method in methods:
             values = [
@@ -149,23 +169,29 @@ def render(summary: dict) -> tuple[str, str]:
                     "mse": statistics.mean(value["mse"] for value in values),
                     "mae": statistics.mean(value["mae"] for value in values),
                 }
-        mse_ranks = rank(averages, "mse")
-        mae_ranks = rank(averages, "mae")
+        mse_ranks = rank_levels(averages, "mse")
+        mae_ranks = rank_levels(averages, "mae")
         for method in methods:
             value = averages.get(method)
             if value is None:
                 tex_cells.append("--")
                 md_cells.append("--")
                 continue
-            mse_rank = 1 if method == mse_ranks[0] else 2 if method == mse_ranks[1] else 0
-            mae_rank = 1 if method == mae_ranks[0] else 2 if method == mae_ranks[1] else 0
             tex_cells.append(
-                f"{tex_number(value['mse'], mse_rank)}/{tex_number(value['mae'], mae_rank)}"
+                f"{tex_number(value['mse'], mse_ranks[method])}/"
+                f"{tex_number(value['mae'], mae_ranks[method])}"
             )
             md_cells.append(f"{value['mse']:.3f}/{value['mae']:.3f}")
-    tex.append(" & ".join(tex_cells) + r" \\")
-    md.append("| " + " | ".join(md_cells) + " |")
-    tex.extend((r"\bottomrule", r"\end{tabular}}", r"\end{table*}"))
+        tex.append(" & ".join(tex_cells) + r" \\")
+        md.append("| " + " | ".join(md_cells) + " |")
+    tex.extend(
+        (
+            r"\bottomrule",
+            r"\end{tabular}",
+            r"\endgroup",
+            r"\end{table*}",
+        )
+    )
     return "\n".join(tex) + "\n", "\n".join(md) + "\n"
 
 
