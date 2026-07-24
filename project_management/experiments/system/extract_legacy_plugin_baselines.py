@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Extract the submitted RevIN/SAN/FAN values into a canonical result file."""
+"""Extract the complete submitted TIFO/TIFO*/RevIN/SAN/FAN result surface."""
 
 from __future__ import annotations
 
@@ -78,7 +78,12 @@ def main() -> None:
                 ("iTransformer", 16, 8),
             ):
                 # Detailed table order: Ours*, Ours, SAN, RevIN.
-                for method, offset in (("SAN", 4), ("RevIN", 6)):
+                for method, offset in (
+                    ("TIFO*", 0),
+                    ("TIFO", 2),
+                    ("SAN", 4),
+                    ("RevIN", 6),
+                ):
                     records.append(
                         {
                             "source": "submitted_manuscript_matched_run",
@@ -103,7 +108,7 @@ def main() -> None:
                     }
                 )
 
-    expected = 2 * 3 * len(DATASETS) * len(HORIZONS)
+    expected = 2 * 5 * len(DATASETS) * len(HORIZONS)
     if len(records) != expected:
         raise ValueError(f"expected {expected} records, got {len(records)}")
 
