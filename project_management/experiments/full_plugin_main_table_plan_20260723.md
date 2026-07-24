@@ -1,15 +1,18 @@
 # KDD resubmission: full plug-in main-table contract
 
-Status: active experiment contract, 2026-07-23.
+Status: revised active experiment contract, 2026-07-24.
 
 ## Reviewer-facing scope
 
 The revised main result is one `table*` with two backbone panels:
 
-1. iTransformer: TIFO, RevIN, SAN, FAN, ACN, and WDAN.
-2. DLinear: TIFO, RevIN, SAN, and FAN. ACN/WDAN cells are included only when
-   their source paper or official implementation provides a compatible DLinear
-   result; otherwise they are shown as unavailable rather than inferred.
+1. Preserve the complete submitted-paper result surface, including its
+   original-backbone, TIFO, TIFO*, RevIN, SAN, and FAN results.
+2. Add ACN and WDAN on iTransformer without deleting or replacing submitted
+   results.
+3. Add ACN and WDAN on DLinear through explicit native adapters. ACN operates
+   on DLinear's normalized channel-by-time representation; WDAN wraps the
+   DLinear input and output with its learned normalization/de-normalization.
 
 Rows cover ETTh1, ETTh2, ETTm1, ETTm2, Electricity, Traffic, and Weather at
 prediction horizons 96, 192, 336, and 720. Each cell reports MSE/MAE. TIFO is
@@ -23,9 +26,11 @@ excluded from the main comparison.
   environment on both DLinear and iTransformer.
 - ACN, WDAN at iTransformer/H96: reuse the completed local three-seed official-
   engine runs. Do not rerun them.
-- ACN, WDAN at other horizons: prefer values explicitly reported by the source
-  papers under iTransformer, labeled as reported rather than local. Missing or
-  protocol-incompatible cells remain unavailable.
+- ACN, WDAN at other horizons: run validation-selected local matrices,
+  including all Traffic horizons, so the final table has no source-protocol
+  symbols or missing cells.
+- ACN, WDAN on DLinear: run eight-candidate validation-only gates per cell and
+  freeze one configuration for seeds 2021--2023.
 - Never select among duplicate baseline runs using final-test performance.
 
 ## TIFO selection and final testing
@@ -49,7 +54,8 @@ excluded from the main comparison.
 
 ## Manuscript change boundary
 
-Replace the incorrect recent-baseline composition table and its accompanying
-claims with the full standalone plug-in table. Keep the frequency-distribution
-distance table, spectral figures, ablations, and efficiency tables unchanged
-unless a consistency error is discovered.
+Retain the original result tables and extend them; do not replace the author's
+submitted result surface with a narrower regenerated table. Remove per-cell
+source symbols once every new-baseline cell is locally complete. Keep the
+frequency-distribution distance table, spectral figures, ablations, and
+efficiency tables unchanged unless a consistency error is discovered.

@@ -2,7 +2,9 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from layers.Autoformer_EncDec import series_decomp
+from layers.PluginNormalization import AdaptiveChannelNorm
 from utils.frequency_domain_filter import build_frequency_domain_filter
+from utils.wdan_adapter import build_wdan_adapter
 
 class Model(nn.Module):
     """
@@ -26,7 +28,10 @@ class Model(nn.Module):
         self.channels = configs.enc_in
 
         self.global_mask = global_mask
-        self.use_tifo = getattr(configs, 'method', 'tifo') == 'tifo'
+        method = getattr(configs, 'method', 'tifo')
+        self.use_tifo = method == 'tifo'
+        self.use_acn = method == 'acn'
+        self.use_wdan = method == 'wdan'
         if self.individual:
             self.Linear_Seasonal = nn.ModuleList()
             self.Linear_Trend = nn.ModuleList()
@@ -55,6 +60,16 @@ class Model(nn.Module):
                 configs.enc_in * configs.seq_len, configs.num_class)
 
         self.filter = build_frequency_domain_filter(configs, self.global_mask) if self.use_tifo else None
+        self.acn_adapter = (
+            AdaptiveChannelNorm(
+                configs.enc_in,
+                configs.seq_len,
+                float(getattr(configs, 'acn_temperature', 0.1)),
+            )
+            if self.use_acn
+            else None
+        )
+        self.wdan_adapter = build_wdan_adapter(configs) if self.use_wdan else None
 
     def encoder(self, x):
         seasonal_init, trend_init = self.decompsition(x)
@@ -78,11 +93,21 @@ class Model(nn.Module):
 
     def forecast(self, x_enc):
         # Encoder
-        # Normalization from Non-stationary Transformer
-        means = x_enc.mean(1, keepdim=True).detach()
-        x_enc = x_enc - means
-        stdev = torch.sqrt(torch.var(x_enc, dim=1, keepdim=True, unbiased=False) + 1e-5)
-        x_enc /= stdev
+        wdan_statistics = None
+        if self.use_wdan:
+            x_enc, wdan_statistics = self.wdan_adapter.normalize(x_enc)
+            means = stdev = None
+        else:
+            # Preserve DLinear's existing reversible instance normalization.
+            means = x_enc.mean(1, keepdim=True).detach()
+            x_enc = x_enc - means
+            stdev = torch.sqrt(torch.var(x_enc, dim=1, keepdim=True, unbiased=False) + 1e-5)
+            x_enc /= stdev
+            if self.use_acn:
+                # ACN operates across channel tokens. DLinear has no latent
+                # LayerNorm, so apply the official channel-normalization
+                # operator to its normalized channel-by-time representation.
+                x_enc = self.acn_adapter(x_enc.transpose(1, 2)).transpose(1, 2)
 
         if self.use_tifo:
             x_enc = self.filter(x_enc)
@@ -90,10 +115,24 @@ class Model(nn.Module):
 
         dec_out = self.encoder(x_enc)
 
-        # De-Normalization from Non-stationary Transformer
-        dec_out = dec_out * (stdev[:, 0, :].unsqueeze(1).repeat(1, self.pred_len, 1))
-        dec_out = dec_out + (means[:, 0, :].unsqueeze(1).repeat(1, self.pred_len, 1))
+        if self.use_wdan:
+            dec_out = self.wdan_adapter.de_normalize(dec_out, wdan_statistics)
+            save = wdan_statistics
+        else:
+            dec_out = dec_out * (stdev[:, 0, :].unsqueeze(1).repeat(1, self.pred_len, 1))
+            dec_out = dec_out + (means[:, 0, :].unsqueeze(1).repeat(1, self.pred_len, 1))
         return dec_out, save
+
+    def wdan_statistics_loss(self, predicted_statistics, future):
+        if not self.use_wdan or predicted_statistics is None:
+            raise RuntimeError("WDAN statistics loss requested outside WDAN mode")
+        _, low_frequency, high_frequency_scale = self.wdan_adapter.normalize(
+            future, predict=False
+        )
+        target_statistics = torch.stack(
+            (low_frequency, high_frequency_scale), dim=1
+        )
+        return F.mse_loss(predicted_statistics, target_statistics)
 
     def imputation(self, x_enc):
         # Encoder
