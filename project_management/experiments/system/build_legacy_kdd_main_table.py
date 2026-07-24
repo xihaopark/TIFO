@@ -33,7 +33,10 @@ SOURCES = (
     ("tifo_final_h96.csv", 30),
     ("tifo_hermitian_final_h96.csv", 30),
     ("tifo_electricity_weather_h96_final.csv", 30),
-    ("tifo_itransformer_all_horizons_final.csv", 30),
+    # The H=96 cells have dedicated validation-selected final runs above.
+    # This broader file supplies H=192/336/720 and is deliberately lower
+    # priority should it also contain a duplicate H=96 configuration.
+    ("tifo_itransformer_all_horizons_final.csv", 25),
     ("kdd_resubmit_itransformer_remaining_horizons.csv", 20),
 )
 PROMOTED_TIFO = {
