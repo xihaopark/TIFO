@@ -111,6 +111,38 @@ def number(value: tuple[float, float], best: bool) -> str:
     return "\\resubmitchange{" + rendered + "}"
 
 
+def write_evidence_audit(values: dict) -> Path:
+    """Emit the exact local run-source chosen for every rendered input cell."""
+    output = RESULTS / "kdd_resubmit_legacy_main_table_evidence.csv"
+    fields = (
+        "backbone", "method", "dataset", "pred_len", "seed", "mse", "mae",
+        "source_priority", "source_file",
+    )
+    with output.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(handle, fieldnames=fields)
+        writer.writeheader()
+        for backbone in ("PatchTST", "iTransformer"):
+            for method in ("TIFO", "Ori"):
+                for dataset in DATASETS:
+                    for horizon in HORIZONS:
+                        for seed in SEEDS:
+                            mse, mae, priority, source = values[
+                                (backbone, method, dataset, horizon, seed)
+                            ]
+                            writer.writerow({
+                                "backbone": backbone,
+                                "method": method,
+                                "dataset": dataset,
+                                "pred_len": horizon,
+                                "seed": seed,
+                                "mse": f"{mse:.10f}",
+                                "mae": f"{mae:.10f}",
+                                "source_priority": priority,
+                                "source_file": source,
+                            })
+    return output
+
+
 def main() -> None:
     values = load()
     rows = ["% Generated from complete local three-seed evidence; do not edit numbers manually."]
@@ -136,6 +168,7 @@ def main() -> None:
     output = RESULTS / "kdd_resubmit_legacy_main_table_rows.tex"
     output.write_text("\n".join(rows) + "\n", encoding="utf-8")
     print(output)
+    print(write_evidence_audit(values))
 
 
 if __name__ == "__main__":
