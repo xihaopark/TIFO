@@ -1539,6 +1539,10 @@ and Weather recordings of 21 meteorological variables.
 We follow the Time–Series-Library split (7:2:1) with a fixed window length $L=96$ and apply per-channel $z$-score normalisation; 
 \reviewtext{this rescales variables but leaves cross-instance non-stationarity intact.}
 Models are trained with MSE loss and evaluated in the time domain by MSE and MAE.
+\resubmitchange{The expanded DLinear plug-in panel preserves the submitted
+protocol: $L=336$ for ETTh1, ETTh2, and ETTm2, and $L=96$ for ETTm1,
+Electricity, Traffic, and Weather. The iTransformer panel uses $L=96$
+throughout.}
 
 
 %\footnote{\url{https://github.com/thuml/Time-Series-Library}}
@@ -1574,21 +1578,24 @@ We followed the implementation and setup provided in \citep{liu2023SAN} and \cit
 
 \noindent\textbf{Experiments Details.} 
 All experiments were implemented on a single NVIDIA RTX A6000 48GB GPU. 
+\resubmitchange{This hardware statement applies to the submitted experiments.
+The newly reproduced ACN/WDAN sweeps use eight NVIDIA RTX PRO 6000 Blackwell
+Max-Q GPUs; method comparisons retain identical data, backbone, and optimization
+protocols within each table row.}
 %More details of experimental settings can be found in Appendix \ref{appendix:exp}.
 Dataset splits, preprocessing, commands, seeds, hashes, and final metrics are
 recorded by the reproducibility ledger accompanying the anonymous code release.
 
 \noindent\textbf{Model selection and baseline fairness.}
-All promoted TIFO results use seeds 2021--2023. Each dataset--horizon
-configuration is selected on the validation split and frozen before final test
-aggregation; the cell-to-protocol manifest and complete candidate lineages are
-included in the reproducibility ledger. Table~\ref{table:full_plugin_comparison}
-uses DLinear and iTransformer as architecturally distinct backbones and compares
-standalone TIFO with RevIN, SAN, FAN, ACN, and WDAN. The $H=96$ ACN/WDAN entries
-and the newly added longer-horizon entries are local runs under the same
-backbone, data split, forecasting horizon, validation-selection rule, and
-three-seed final protocol. The submitted TIFO, TIFO*, RevIN, SAN, and FAN
-results are retained rather than replaced.
+The submitted TIFO, TIFO*, RevIN, SAN, and FAN results are retained rather than
+replaced. For every newly added ACN/WDAN dataset--horizon cell, eight candidates
+are evaluated on seed-2022 validation MSE without final-test access. The selected
+configuration is then frozen and evaluated on seeds 2021--2023. The
+cell-to-protocol manifest and complete candidate lineages are included in the
+reproducibility ledger. Table~\ref{table:full_plugin_comparison} uses DLinear
+and iTransformer as architecturally distinct backbones and reports standalone
+TIFO and all five standalone baselines; it also retains the submitted TIFO*
+composition with SAN as a separate, explicitly labeled column.
 
 \noindent\textbf{Reconstruction validation.}
 The historical operator uses full-spectrum complex coefficients. To test the
