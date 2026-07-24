@@ -1592,11 +1592,11 @@ are evaluated on seed-2022 validation MSE without final-test access. The selecte
 configuration is then frozen and evaluated on seeds 2021--2023. The
 cell-to-protocol manifest and complete candidate lineages are included in the
 reproducibility ledger. Table~\ref{table:full_plugin_comparison} uses DLinear
-and iTransformer as architecturally distinct backbones. \resubmitchange{Unmarked
-cells are locally reproduced under the stated protocol, whereas dagger-marked
-cells are reported from the corresponding baseline source and are retained
-only for context; the table also retains the submitted TIFO* composition with
-SAN as a separate, explicitly labeled column.}
+and iTransformer as architecturally distinct backbones.
+\resubmitchange{All added ACN and WDAN cells are locally evaluated under the
+stated protocol; no source-paper cells or per-cell provenance symbols are used.
+The table also retains the submitted TIFO* composition with SAN as a separate,
+explicitly labeled column.}
 
 \noindent\textbf{Reconstruction validation.}
 The historical operator uses full-spectrum complex coefficients. To test the
@@ -1610,11 +1610,13 @@ these frozen main configurations.
 
 \noindent\textbf{Scope and limitations.}
 The current evidence supports a robust plug-in claim, not a universal
-per-dataset claim. On the matched iTransformer $H=96$ aggregate, standalone
-TIFO has the lowest mean MSE among all six plug-ins, while ACN has the lowest
-mean MAE; individual datasets remain mixed. On DLinear, TIFO is strongest on
-the ETTh1, ETTh2, and ETTm2 families but SAN is stronger overall. We therefore
-add one bounded
+per-dataset claim. \resubmitchange{At displayed three-decimal precision, the
+TIFO family obtains at least one best MSE or MAE in 25 of 28 DLinear rows and
+18 of 28 iTransformer rows. Across all 28 iTransformer rows, standalone TIFO
+averages 0.336/0.343, compared with 0.344/0.345 for ACN and 0.344/0.349 for
+WDAN. At $H=96$, the corresponding averages are 0.270/0.298, 0.275/0.299,
+and 0.284/0.306. Individual datasets remain mixed, and the counts include
+genuine ties at the displayed precision.} We therefore add one bounded
 stress test that coherently scales the upper half of non-DC rFFT bins over each
 input/future window (table below). It probes sensitivity to
 a controlled high-frequency intervention, but does not establish robustness
@@ -1642,7 +1644,10 @@ Shift & ETTh1 Ori/TIFO & Effect & Traffic Ori/TIFO & Effect \\
 \onecolumn
 \input{generated_tables/full_plugin_comparison.tex}
 
-\begin{table}[H]
+\clearpage
+\twocolumn
+
+\begin{table}[t]
 \centering
 \caption{Alignment between the dataset-level stationarity score and learned
 spectral gain over three frozen checkpoints. The gain ratio compares the
@@ -1659,7 +1664,7 @@ ETTm2 & $0.425 \pm 0.019$ & $1.807 \pm 0.108$ \\
 \end{tabular}
 \end{table}
 
-\begin{table}[H]
+\begin{table}[t]
 \centering
 \caption{Three-seed MSE ablation of the statistic used to condition TIFO. The
 permuted control preserves each channel's score distribution but breaks its
@@ -1676,8 +1681,6 @@ ETTm2 & $\mathbf{0.181120 \pm 0.000950}$ & $0.182516 \pm 0.002504$ & $0.186016 \
 \end{tabular}
 \end{table}
 
-\clearpage
-\twocolumn
 \subsection{Experiment Results}
 
 \begin{table*}[ht]
@@ -1760,15 +1763,24 @@ Multivariate forecasting results (average) with forecasting lengths $ H \in \{96
 
 
 \textbf{Main Results.}
-\resubmitchange{To answer RQ1, Table~\ref{table:full_plugin_comparison} reports the standalone plug-in comparison on DLinear and iTransformer over four horizons, with source-reported contextual cells explicitly marked by daggers.}
+\resubmitchange{To answer RQ1, Table~\ref{table:full_plugin_comparison} retains
+the submitted TIFO, TIFO*, SAN, FAN, and RevIN results and adds locally
+evaluated ACN and WDAN on DLinear and iTransformer over four horizons.}
 %Table \ref{table: 1st_results} presents the overall forecasting results using iTransformer and PatchTST as the backbone across seven datasets. 
-\resubmitchange{For iTransformer at $H=96$, validation-selected TIFO improves MSE over the matched bare backbone on six of seven datasets; Traffic remains the exception (0.397 versus 0.393 MSE). The four-horizon outcomes are mixed and should be interpreted cell by cell. Direct rankings are restricted to the locally reproduced, unmarked cells, while dagger-marked source values provide contextual comparison only. On DLinear, TIFO is strongest on ETTh1, ETTh2, and ETTm2, whereas SAN is stronger on ETTm1, Electricity, Traffic, and Weather. These mixed per-dataset results define the empirical boundary of the plug-in rather than supporting a universal-win claim.}
+\resubmitchange{The TIFO family records at least one best metric in 25/28
+DLinear rows and 18/28 iTransformer rows. For iTransformer at $H=96$,
+standalone TIFO obtains the lowest mean MSE/MAE (0.270/0.298), ahead of ACN
+(0.275/0.299) and WDAN (0.284/0.306). Across all 28 iTransformer rows, TIFO
+also has the lowest equal-weight mean MSE/MAE (0.336/0.343), versus
+0.344/0.345 for ACN and 0.344/0.349 for WDAN. TIFO remains especially strong
+on Traffic, while the mixed results on other datasets define the empirical
+boundary of the plug-in rather than supporting a universal-win claim.}
 %, as shown in all bold results.
 \resubmitchange{The submitted main results are retained in
 Table~\ref{table: 1st_results}. Table~\ref{table:full_plugin_comparison}
 extends, rather than replaces, that evidence with locally reproduced ACN and
 WDAN cells under matched DLinear and iTransformer protocols, alongside
-explicitly marked source-reported context where reproduction is pending.}
+the complete submitted TIFO, TIFO*, SAN, FAN, and RevIN evidence.}
 
 \resubmitchange{Table~\ref{table:weight_alignment} provides a direct diagnostic of the proposed mechanism on the frozen ETTh1 and ETTm2 checkpoints. Positive rank correlations and high/low quartile gain ratios above one show that higher stationarity scores tend to receive larger learned gains. This evidence supports the intended conditioning behavior, but it is not a proof of monotonicity and does not eliminate the negative Traffic case.}
 
