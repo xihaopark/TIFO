@@ -16,14 +16,14 @@ def json_rows(path: Path) -> list[dict]:
     return value
 
 
-def local_plugin_rows(path: Path, method: str) -> list[dict]:
+def local_plugin_rows(path: Path, method: str, backbone: str = "iTransformer") -> list[dict]:
     rows = []
     with path.open(newline="", encoding="utf-8") as handle:
         for row in csv.DictReader(handle):
             rows.append(
                 {
                     "source": "local_matched_three_seed_final",
-                    "backbone": "iTransformer",
+                    "backbone": backbone,
                     "method": method,
                     "dataset": row["dataset"],
                     "pred_len": int(row["pred_len"]),
@@ -105,6 +105,14 @@ def main() -> None:
     parser.add_argument("--reported-recent", type=Path, required=True)
     parser.add_argument("--local-acn", type=Path)
     parser.add_argument("--local-wdan", type=Path)
+    parser.add_argument(
+        "--local-plugin",
+        action="append",
+        nargs=3,
+        metavar=("METHOD", "BACKBONE", "CSV"),
+        default=[],
+        help="repeatable locally matched plug-in CSV declaration",
+    )
     parser.add_argument("--tifo-itransformer", type=Path, nargs="*", default=[])
     parser.add_argument("--tifo-dlinear", type=Path, nargs="*", default=[])
     parser.add_argument(
@@ -120,6 +128,8 @@ def main() -> None:
         rows.extend(local_plugin_rows(args.local_acn, "ACN"))
     if args.local_wdan:
         rows.extend(local_plugin_rows(args.local_wdan, "WDAN"))
+    for method, backbone, path in args.local_plugin:
+        rows.extend(local_plugin_rows(Path(path), method, backbone))
     tifo_rows = []
     for path in args.tifo_itransformer:
         tifo_rows.extend(local_tifo_rows(path, "iTransformer"))

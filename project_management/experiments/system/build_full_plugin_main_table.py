@@ -13,8 +13,8 @@ from pathlib import Path
 DATASETS = ("ETTh1", "ETTh2", "ETTm1", "ETTm2", "Electricity", "Traffic", "Weather")
 HORIZONS = (96, 192, 336, 720)
 METHODS = {
-    "DLinear": ("TIFO", "RevIN", "SAN", "FAN"),
-    "iTransformer": ("TIFO", "RevIN", "SAN", "FAN", "ACN", "WDAN"),
+    "DLinear": ("TIFO*", "TIFO", "SAN", "FAN", "RevIN", "ACN", "WDAN"),
+    "iTransformer": ("TIFO*", "TIFO", "SAN", "FAN", "RevIN", "ACN", "WDAN"),
 }
 SOURCE_PRIORITY = {
     "source_paper_reported": 1,
@@ -86,22 +86,22 @@ def render(summary: dict) -> tuple[str, str]:
     tex = [
         r"\begin{table*}[t]",
         r"\centering",
-        r"\caption{Full standalone plug-in comparison across two architecturally distinct backbones and four prediction horizons. Each cell is MSE/MAE (lower is better). Bold and underline indicate the best and second-best protocol-compatible result within the same backbone--dataset--horizon comparison or the matched $H=96$ average. $\dagger$ denotes a source-paper-reported ACN/WDAN reference under its original protocol; these reference-only cells are displayed but excluded from within-row ranking. Unmarked cells are local matched runs or values retained from the submitted matched table.}",
+        r"\caption{Complete plug-in comparison obtained by retaining the submitted TIFO, TIFO*, RevIN, SAN, and FAN results and adding locally evaluated ACN and WDAN. Each cell is MSE/MAE (lower is better). Bold and underline indicate the best and second-best result within the same backbone--dataset--horizon comparison or the $H=96$ average. TIFO* denotes TIFO used together with SAN, as in the submitted manuscript.}",
         r"\label{table:full_plugin_comparison}",
         r"\resizebox{\textwidth}{!}{%",
-        r"\begin{tabular}{cc|cccc|cccccc}",
+        r"\begin{tabular}{cc|ccccccc|ccccccc}",
         r"\toprule",
-        r"\multicolumn{2}{c|}{} & \multicolumn{4}{c|}{DLinear} & \multicolumn{6}{c}{iTransformer} \\",
-        r"Dataset & $H$ & TIFO & RevIN & SAN & FAN & TIFO & RevIN & SAN & FAN & ACN & WDAN \\",
+        r"\multicolumn{2}{c|}{} & \multicolumn{7}{c|}{DLinear} & \multicolumn{7}{c}{iTransformer} \\",
+        r"Dataset & $H$ & TIFO* & TIFO & SAN & FAN & RevIN & ACN & WDAN & TIFO* & TIFO & SAN & FAN & RevIN & ACN & WDAN \\",
         r"\midrule",
     ]
     md = [
         "# Full standalone plug-in comparison",
         "",
-        "Each cell is MSE/MAE. † marks a source-paper-reported value; a dash means that no compatible public or local result is available.",
+        "Each cell is MSE/MAE. TIFO* denotes TIFO used together with SAN.",
         "",
-        "| Dataset | H | DLinear+TIFO | +RevIN | +SAN | +FAN | iTransformer+TIFO | +RevIN | +SAN | +FAN | +ACN | +WDAN |",
-        "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
+        "| Dataset | H | DLinear+TIFO* | +TIFO | +SAN | +FAN | +RevIN | +ACN | +WDAN | iTransformer+TIFO* | +TIFO | +SAN | +FAN | +RevIN | +ACN | +WDAN |",
+        "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
     ]
     for dataset_index, dataset in enumerate(DATASETS):
         for horizon in HORIZONS:
@@ -113,13 +113,8 @@ def render(summary: dict) -> tuple[str, str]:
                     for method in methods
                     if (backbone, method, dataset, horizon) in summary
                 }
-                rankable = {
-                    method: value
-                    for method, value in available.items()
-                    if value["source"] != "source_paper_reported"
-                }
-                mse_ranks = rank(rankable, "mse")
-                mae_ranks = rank(rankable, "mae")
+                mse_ranks = rank(available, "mse")
+                mae_ranks = rank(available, "mae")
                 for method in methods:
                     value = available.get(method)
                     if value is None:
@@ -130,11 +125,9 @@ def render(summary: dict) -> tuple[str, str]:
                     mae_rank = 1 if method == mae_ranks[0] else 2 if method == mae_ranks[1] else 0
                     tex_cells.append(
                         f"{tex_number(value['mse'], mse_rank)}/{tex_number(value['mae'], mae_rank)}"
-                        + (r"\textsuperscript{$\dagger$}" if value["source"] == "source_paper_reported" else "")
                     )
                     md_cells.append(
                         f"{value['mse']:.3f}/{value['mae']:.3f}"
-                        + ("†" if value["source"] == "source_paper_reported" else "")
                     )
             tex.append(" & ".join(tex_cells) + r" \\")
             md.append("| " + " | ".join(md_cells) + " |")
