@@ -102,7 +102,11 @@ def apply_tifo_selection(rows: list[dict], path: Path) -> list[dict]:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--legacy", type=Path, required=True)
-    parser.add_argument("--reported-recent", type=Path, required=True)
+    parser.add_argument(
+        "--reported-recent",
+        type=Path,
+        help="optional source-paper reference rows; omit for a fully local table",
+    )
     parser.add_argument("--local-acn", type=Path)
     parser.add_argument("--local-wdan", type=Path)
     parser.add_argument(
@@ -123,7 +127,9 @@ def main() -> None:
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
 
-    rows = json_rows(args.legacy) + json_rows(args.reported_recent)
+    rows = json_rows(args.legacy)
+    if args.reported_recent:
+        rows.extend(json_rows(args.reported_recent))
     if args.local_acn:
         rows.extend(local_plugin_rows(args.local_acn, "ACN"))
     if args.local_wdan:
