@@ -1630,7 +1630,63 @@ Shift & ETTh1 Ori/TIFO & Effect & Traffic Ori/TIFO & Effect \\
 \end{tabular}}
 \end{table}
 
-\input{generated_tables/submitted_main_results.tex}
+% Submitted main-result table, retained in the revision.
+\begin{table*}[t]
+\centering
+\caption{Multivariate forecasting results averaged over forecasting lengths
+$H\in\{96,192,336,720\}$ with fixed input length $L=96$. These submitted
+Ori--TIFO results are retained in the revision.}
+\label{table:submitted_main_results}
+\resizebox{0.8\linewidth}{!}{%
+\begin{tabular}{c|cccc|cccc}
+\toprule
+\multicolumn{1}{c|}{Backbone}
+& \multicolumn{4}{c|}{PatchTST \citep{PatchTST}}
+& \multicolumn{4}{c}{iTransformer \citep{liu2023itransformer}} \\
+\multicolumn{1}{c|}{Method}
+& \multicolumn{2}{c|}{+\method} & \multicolumn{2}{c|}{Ori}
+& \multicolumn{2}{c|}{+\method} & \multicolumn{2}{c}{Ori} \\
+\multicolumn{1}{c|}{Metric}
+& MSE & MAE & MSE & MAE & MSE & MAE & MSE & MAE \\
+\midrule
+ETTh1
+& \textbf{0.438}{\small $\pm$0.024} & \textbf{0.437}{\small $\pm$0.035}
+& 0.480{\small $\pm$0.037} & 0.481{\small $\pm$0.031}
+& \textbf{0.445}{\small $\pm$0.017} & \textbf{0.443}{\small $\pm$0.026}
+& 0.511{\small $\pm$0.033} & 0.496{\small $\pm$0.036} \\
+ETTh2
+& \textbf{0.379}{\small $\pm$0.032} & \textbf{0.380}{\small $\pm$0.038}
+& 0.604{\small $\pm$0.130} & 0.524{\small $\pm$0.027}
+& \textbf{0.376}{\small $\pm$0.041} & \textbf{0.400}{\small $\pm$0.057}
+& 0.813{\small $\pm$0.134} & 0.666{\small $\pm$0.072} \\
+ETTm1
+& \textbf{0.390}{\small $\pm$0.027} & \textbf{0.398}{\small $\pm$0.025}
+& 0.419{\small $\pm$0.055} & 0.432{\small $\pm$0.047}
+& \textbf{0.396}{\small $\pm$0.026} & \textbf{0.406}{\small $\pm$0.056}
+& 0.447{\small $\pm$0.026} & 0.457{\small $\pm$0.061} \\
+ETTm2
+& \textbf{0.280}{\small $\pm$0.032} & \textbf{0.325}{\small $\pm$0.031}
+& 0.420{\small $\pm$0.035} & 0.424{\small $\pm$0.044}
+& \textbf{0.283}{\small $\pm$0.020} & \textbf{0.327}{\small $\pm$0.026}
+& 0.633{\small $\pm$0.055} & 0.489{\small $\pm$0.041} \\
+Electricity
+& \textbf{0.197}{\small $\pm$0.027} & \textbf{0.296}{\small $\pm$0.033}
+& 0.218{\small $\pm$0.31} & 0.307{\small $\pm$0.032}
+& \textbf{0.169}{\small $\pm$0.035} & \textbf{0.262}{\small $\pm$0.041}
+& 0.179{\small $\pm$0.028} & 0.279{\small $\pm$0.046} \\
+Traffic
+& \textbf{0.427}{\small $\pm$0.029} & \textbf{0.285}{\small $\pm$0.025}
+& 0.619{\small $\pm$0.077} & 0.365{\small $\pm$0.029}
+& \textbf{0.424}{\small $\pm$0.031} & \textbf{0.282}{\small $\pm$0.027}
+& 0.576{\small $\pm$0.069} & 0.372{\small $\pm$0.035} \\
+Weather
+& \textbf{0.251}{\small $\pm$0.019} & \textbf{0.276}{\small $\pm$0.017}
+& 0.255{\small $\pm$0.021} & 0.312{\small $\pm$0.031}
+& \textbf{0.246}{\small $\pm$0.023} & \textbf{0.274}{\small $\pm$0.017}
+& 0.274{\small $\pm$0.029} & 0.320{\small $\pm$0.041} \\
+\bottomrule
+\end{tabular}}
+\end{table*}
 \clearpage
 \onecolumn
 \input{generated_tables/full_plugin_comparison.tex}
@@ -3210,7 +3266,7 @@ We have compared our method against all baseline models across all forecasting h
 % }
 % \end{table}
 
-\begin{table}[ht]
+\begin{table*}[ht]
 \centering
 \caption{Detailed results of comparing \method and FAN. The best results are highlighted in \textbf{bold}. The second best are \uline{underlined}.}
 \label{app_table_detailed_results_FAN}
@@ -3410,7 +3466,7 @@ We have compared our method against all baseline models across all forecasting h
 \bottomrule
 \end{tabular}
 }
-\end{table}
+\end{table*}
 
 
 \subsection{Analysis Results}
