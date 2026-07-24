@@ -62,7 +62,8 @@ def main() -> None:
                         if key not in {"run_id", "seed", "model_args"}
                     },
                     "run_id": (
-                        f"final_native_{args.method.lower()}_{dataset.lower()}_"
+                        f"final_native_{args.method.lower()}_"
+                        f"{template['backbone'].lower()}_{dataset.lower()}_"
                         f"h{horizon}_s{seed}"
                     ),
                     "seed": seed,
