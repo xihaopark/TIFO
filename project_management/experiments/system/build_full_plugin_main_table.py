@@ -95,11 +95,16 @@ def render(summary: dict) -> tuple[str, str]:
         r"\caption{Complete plug-in comparison obtained by retaining the submitted TIFO, TIFO*, RevIN, SAN, and FAN results and adding locally evaluated ACN and WDAN. Each cell is MSE/MAE (lower is better). Bold and underline indicate the best and second-best result within the same backbone--dataset--horizon comparison or the $H=96$ average. TIFO* denotes TIFO used together with SAN, as in the submitted manuscript.}",
         r"\label{table:full_plugin_comparison}",
         r"\begingroup",
-        r"\scriptsize",
-        r"\setlength{\tabcolsep}{3pt}",
-        r"\renewcommand{\arraystretch}{0.91}",
-        r"\begin{tabular}{cc|ccccccc}",
+        r"\footnotesize",
+        r"\setlength{\tabcolsep}{2pt}",
+        r"\renewcommand{\arraystretch}{0.92}",
+        r"\resizebox{\textwidth}{!}{%",
+        r"\begin{tabular}{@{}cc@{\hspace{5pt}}*{7}{c}@{\hspace{8pt}}*{7}{c}@{}}",
         r"\toprule",
+        r"& & \multicolumn{7}{c}{\textbf{DLinear}} & \multicolumn{7}{c}{\textbf{iTransformer}} \\",
+        r"\cmidrule(lr){3-9}\cmidrule(lr){10-16}",
+        r"Dataset & $H$ & TIFO* & TIFO & SAN & FAN & RevIN & ACN & WDAN & TIFO* & TIFO & SAN & FAN & RevIN & ACN & WDAN \\",
+        r"\midrule",
     ]
     md = [
         "# Full plug-in comparison",
@@ -107,29 +112,10 @@ def render(summary: dict) -> tuple[str, str]:
         "Each cell is MSE/MAE. TIFO* denotes TIFO used together with SAN.",
     ]
 
-    for backbone_index, (backbone, methods) in enumerate(METHODS.items()):
-        if backbone_index:
-            tex.append(r"\midrule")
-        tex.extend(
-            (
-                rf"\multicolumn{{9}}{{c}}{{\textbf{{{backbone}}}}} \\",
-                r"Dataset & $H$ & TIFO* & TIFO & SAN & FAN & RevIN & ACN & WDAN \\",
-                r"\midrule",
-            )
-        )
-        md.extend(
-            (
-                "",
-                f"## {backbone}",
-                "",
-                "| Dataset | H | TIFO* | TIFO | SAN | FAN | RevIN | ACN | WDAN |",
-                "|---|---:|---:|---:|---:|---:|---:|---:|---:|",
-            )
-        )
-        for dataset_index, dataset in enumerate(DATASETS):
-            for horizon in HORIZONS:
-                tex_cells = [dataset if horizon == 96 else "", str(horizon)]
-                md_cells = [dataset, str(horizon)]
+    for dataset_index, dataset in enumerate(DATASETS):
+        for horizon in HORIZONS:
+            tex_cells = [dataset if horizon == 96 else "", str(horizon)]
+            for backbone, methods in METHODS.items():
                 available = {
                     method: summary[(backbone, method, dataset, horizon)]
                     for method in methods
@@ -141,22 +127,18 @@ def render(summary: dict) -> tuple[str, str]:
                     value = available.get(method)
                     if value is None:
                         tex_cells.append("--")
-                        md_cells.append("--")
                         continue
                     tex_cells.append(
                         f"{tex_number(value['mse'], mse_ranks[method])}/"
                         f"{tex_number(value['mae'], mae_ranks[method])}"
                     )
-                    md_cells.append(
-                        f"{value['mse']:.3f}/{value['mae']:.3f}"
-                    )
-                tex.append(" & ".join(tex_cells) + r" \\")
-                md.append("| " + " | ".join(md_cells) + " |")
-            if dataset_index != len(DATASETS) - 1:
-                tex.append(r"\addlinespace[1pt]")
-        tex.append(r"\midrule")
-        tex_cells = [r"Avg. ($H=96$)", "96"]
-        md_cells = ["Avg. (H=96)", "96"]
+            tex.append(" & ".join(tex_cells) + r" \\")
+        if dataset_index != len(DATASETS) - 1:
+            tex.append(r"\addlinespace[1pt]")
+
+    tex.append(r"\midrule")
+    tex_cells = [r"Avg. ($H=96$)", "96"]
+    for backbone, methods in METHODS.items():
         averages = {}
         for method in methods:
             values = [
@@ -175,23 +157,73 @@ def render(summary: dict) -> tuple[str, str]:
             value = averages.get(method)
             if value is None:
                 tex_cells.append("--")
-                md_cells.append("--")
                 continue
             tex_cells.append(
                 f"{tex_number(value['mse'], mse_ranks[method])}/"
                 f"{tex_number(value['mae'], mae_ranks[method])}"
             )
-            md_cells.append(f"{value['mse']:.3f}/{value['mae']:.3f}")
-        tex.append(" & ".join(tex_cells) + r" \\")
-        md.append("| " + " | ".join(md_cells) + " |")
+    tex.append(" & ".join(tex_cells) + r" \\")
     tex.extend(
         (
             r"\bottomrule",
-            r"\end{tabular}",
+            r"\end{tabular}%",
+            r"}",
             r"\endgroup",
             r"\end{table*}",
         )
     )
+
+    for backbone, methods in METHODS.items():
+        md.extend(
+            (
+                "",
+                f"## {backbone}",
+                "",
+                "| Dataset | H | TIFO* | TIFO | SAN | FAN | RevIN | ACN | WDAN |",
+                "|---|---:|---:|---:|---:|---:|---:|---:|---:|",
+            )
+        )
+        for dataset in DATASETS:
+            for horizon in HORIZONS:
+                md_cells = [dataset, str(horizon)]
+                available = {
+                    method: summary[(backbone, method, dataset, horizon)]
+                    for method in methods
+                    if (backbone, method, dataset, horizon) in summary
+                }
+                mse_ranks = rank_levels(available, "mse")
+                mae_ranks = rank_levels(available, "mae")
+                for method in methods:
+                    value = available.get(method)
+                    if value is None:
+                        md_cells.append("--")
+                        continue
+                    md_cells.append(
+                        f"{value['mse']:.3f}/{value['mae']:.3f}"
+                    )
+                md.append("| " + " | ".join(md_cells) + " |")
+        md_cells = ["Avg. (H=96)", "96"]
+        averages = {}
+        for method in methods:
+            values = [
+                summary[(backbone, method, dataset, 96)]
+                for dataset in DATASETS
+                if (backbone, method, dataset, 96) in summary
+            ]
+            if len(values) == len(DATASETS):
+                averages[method] = {
+                    "mse": statistics.mean(value["mse"] for value in values),
+                    "mae": statistics.mean(value["mae"] for value in values),
+                }
+        mse_ranks = rank_levels(averages, "mse")
+        mae_ranks = rank_levels(averages, "mae")
+        for method in methods:
+            value = averages.get(method)
+            if value is None:
+                md_cells.append("--")
+                continue
+            md_cells.append(f"{value['mse']:.3f}/{value['mae']:.3f}")
+        md.append("| " + " | ".join(md_cells) + " |")
     return "\n".join(tex) + "\n", "\n".join(md) + "\n"
 
 
