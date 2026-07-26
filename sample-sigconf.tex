@@ -86,6 +86,28 @@
   urlcolor={red!80!black},
 }
 
+% Keep float-only pages top aligned and allow wide ACM floats to share pages
+% with nearby text. This avoids large elastic gaps without changing content.
+\makeatletter
+\setlength{\@fptop}{0pt}
+\setlength{\@fpsep}{12pt}
+\setlength{\@fpbot}{0pt plus 1fil}
+\setlength{\@dblfptop}{0pt}
+\setlength{\@dblfpsep}{12pt}
+\setlength{\@dblfpbot}{0pt plus 1fil}
+% The automatic acmart end-of-document balance can swallow pending appendix
+% floats. Disable only that final balancing pass; normal two-column layout stays.
+\global\@ACM@balancefalse
+\makeatother
+\renewcommand{\topfraction}{0.95}
+\renewcommand{\bottomfraction}{0.90}
+\renewcommand{\textfraction}{0.06}
+\renewcommand{\floatpagefraction}{0.75}
+\renewcommand{\dbltopfraction}{0.95}
+\renewcommand{\dblfloatpagefraction}{0.75}
+\setlength{\textfloatsep}{14pt plus 3pt minus 3pt}
+\setlength{\floatsep}{12pt plus 3pt minus 3pt}
+
 \usepackage{amsthm}
 \newtheorem{myDef}{\textbf{Definition}}
 \newtheorem{myTheo}{\textbf{Theorem}}
@@ -1640,12 +1662,9 @@ Shift & ETTh1 Ori/TIFO & Effect & Traffic Ori/TIFO & Effect \\
 \end{tabular}}
 \end{table}
 
-\clearpage
-\onecolumn
+% Keep the complete comparison in the native ACM two-column layout. The
+% generated table is a full-width table* and no longer needs a one-column page.
 \input{generated_tables/full_plugin_comparison.tex}
-
-\clearpage
-\twocolumn
 
 \begin{table}[t]
 \centering
@@ -3970,7 +3989,22 @@ On ETTh1 with iTransformer, we study the sensitivity of TIFO to the choice of wi
 We compare rectangular vs.\ Hann windows and $K=48$ vs.\ $K=96$ frequency bins. 
 \reviewtext{The ablation results show that using the full spectrum with a rectangular window (rect\_K96) gives the best performance with small variance across runs, and changing the window or $K$ within a reasonable range does not break the gains of TIFO. We therefore keep the simple global rectangular window with $K=96$ as the default.}
 
-\begin{table}[t]
+(2) \textbf{Robustness--expressiveness trade-off by scaling TIFO weights.}
+\reviewtext{To analyze whether suppressing non-stationary components harms the predictive upper bound, we train TIFO on ETTh1 with iTransformer and, at test time, multiply the learned frequency weights by a scalar $\alpha \in \{1.00, 0.75, 0.50, 0.25, 0.00\}$. Here $\alpha=0.00$ corresponds to removing TIFO. In this ablation, $\alpha=1.00$ and $\alpha=0.75$ achieve the best (and very similar) accuracy; performance starts to degrade at $\alpha=0.50$, and becomes clearly worse when $\alpha \le 0.25$ or when TIFO is disabled. This confirms a natural trade-off: fully using the learned TIFO weights improves robustness and accuracy, while aggressively shrinking them harms performance.}
+
+(3) \textbf{Frequency decomposition strategies.}
+\reviewtext{To address phase-distortion and boundary-effect concerns, we compare our original global FFT design with several STFT-style variants on ETTh1 + iTransformer: (i) \textit{Ori} (single global rectangular window, no overlap), (ii) \textit{hann\_50\_ola} (Hann, 50\% overlap, OLA), (iii) \textit{sqrt\_hann\_50\_wola} ($\sqrt{\text{Hann}}$, 50\% overlap, WOLA with COLA), and (iv) \textit{hann\_75\_ola} (Hann, 75\% overlap, OLA). The ablation shows that Ori remains the best, the COLA-compliant WOLA variant is slightly worse, and Hann-based OLA variants significantly degrade accuracy. This indicates that, in our setting, the simple global FFT with finite-length periodicity assumption is sufficient, and additional windowing/overlap does not provide benefit.}
+
+(4) \textbf{Online EMA refresh of stability scores under drift.}
+\reviewtext{We further test whether TIFO requires online updates of the stability-based weights in the presence of distribution drift. During inference on ETTh1 + iTransformer, we re-estimate batch-wise frequency statistics and update the global mask via exponential moving average with three settings: no update (no\_update), EMA with decay $0.9$, and EMA with decay $0.99$. The ablation shows that all three settings yield almost identical MSE/MAE, and the small differences are well within run-to-run randomness; EMA($0.9$) gives a marginally smaller MSE. This suggests that dataset-level statistics estimated on the training set are already robust, and TIFO does not rely on frequent online re-estimation.}
+
+
+(5) \textbf{Sensitivity to STFT hyperparameters (hop size and zero-padding).}
+\reviewtext{Complementary to the global FFT analysis, we also conduct an STFT-style ablation on ETTh1 + iTransformer, varying hop ratio $\in \{0.125, 0.25\}$ and zero-padding ratio $\in \{0, 0.5, 1.0\}$. The results show that moderate zero-padding ($0.5$) yields consistent small gains across hop sizes, while further increasing zero-padding to $1.0$ brings negligible improvement. A smaller hop (larger overlap) is slightly better overall, but the effect is modest. Together with the previous experiments, this indicates that TIFO is reasonably robust to FFT-related hyperparameters and that sophisticated STFT configurations are not necessary for the gains reported in the main paper.}
+
+\begin{table*}[t]
+\centering
+\begin{minipage}[t]{0.485\textwidth}
 \centering
 \caption{Ablation on window function and FFT resolution on ETTh1 with iTransformer. The \textbf{best} results are highlighted.}
 \label{tab:win_fft}
@@ -3990,16 +4024,9 @@ rect\_K96  & 0.3902 & 0.4068 & 0.3939 & 0.4105 & 0.3974 & 0.4140 & \textbf{0.393
 hann\_K48  & 0.4130 & 0.4260 & 0.4100 & 0.4240 & 0.4120 & 0.4250 & 0.4117          & 0.4250          \\
 hann\_K96  & 0.4110 & 0.4240 & 0.4090 & 0.4230 & 0.4130 & 0.4260 & 0.4110          & 0.4243          \\
 \bottomrule
-\end{tabular}
-}
-\end{table}
-
-
-
-(2) \textbf{Robustness--expressiveness trade-off by scaling TIFO weights.}
-\reviewtext{To analyze whether suppressing non-stationary components harms the predictive upper bound, we train TIFO on ETTh1 with iTransformer and, at test time, multiply the learned frequency weights by a scalar $\alpha \in \{1.00, 0.75, 0.50, 0.25, 0.00\}$. Here $\alpha=0.00$ corresponds to removing TIFO. In this ablation, $\alpha=1.00$ and $\alpha=0.75$ achieve the best (and very similar) accuracy; performance starts to degrade at $\alpha=0.50$, and becomes clearly worse when $\alpha \le 0.25$ or when TIFO is disabled. This confirms a natural trade-off: fully using the learned TIFO weights improves robustness and accuracy, while aggressively shrinking them harms performance.}
-
-\begin{table}[t]
+\end{tabular}}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.485\textwidth}
 \centering
 \caption{Effect of scaling the learned TIFO weights at test time by $\alpha$ on ETTh1 with iTransformer. The \textbf{best} average performance is highlighted.}
 \label{tab:alpha_scale}
@@ -4021,16 +4048,11 @@ hann\_K96  & 0.4110 & 0.4240 & 0.4090 & 0.4230 & 0.4130 & 0.4260 & 0.4110       
 0.75 & 0.3900 & 0.4050 & 0.4440 & 0.4380 & 0.4940 & 0.4650 & 0.4990 & 0.4840 & 0.4567      & 0.4480      \\
 1.00 & 0.3780 & 0.3930 & 0.4460 & 0.4390 & 0.4810 & 0.4520 & 0.4850 & 0.4710 & \textbf{0.4475} & \textbf{0.4388} \\
 \bottomrule
-\end{tabular}
-}
-\end{table}
+\end{tabular}}
+\end{minipage}
 
-
-
-(3) \textbf{Frequency decomposition strategies.}
-\reviewtext{To address phase-distortion and boundary-effect concerns, we compare our original global FFT design with several STFT-style variants on ETTh1 + iTransformer: (i) \textit{Ori} (single global rectangular window, no overlap), (ii) \textit{hann\_50\_ola} (Hann, 50\% overlap, OLA), (iii) \textit{sqrt\_hann\_50\_wola} ($\sqrt{\text{Hann}}$, 50\% overlap, WOLA with COLA), and (iv) \textit{hann\_75\_ola} (Hann, 75\% overlap, OLA). The ablation shows that Ori remains the best, the COLA-compliant WOLA variant is slightly worse, and Hann-based OLA variants significantly degrade accuracy. This indicates that, in our setting, the simple global FFT with finite-length periodicity assumption is sufficient, and additional windowing/overlap does not provide benefit.}
-
-\begin{table}[h]
+\vspace{10pt}
+\begin{minipage}[t]{0.485\textwidth}
 \centering
 \caption{Comparison of reconstruction strategies (global DFT vs.\ OLA/WOLA) on ETTh1 with iTransformer. The \textbf{best} results are highlighted.}
 \label{tab:recon_ola}
@@ -4050,12 +4072,9 @@ hann\_50\_ola        & 0.5887 & 0.5148 & 0.5623 & 0.5053 & 0.5951 & 0.5152 & 0.5
 sqrt\_hann\_50\_wola & 0.3999 & 0.4135 & 0.3985 & 0.4133 & 0.4032 & 0.4175 & 0.4005          & 0.4148          \\
 hann\_75\_ola        & 0.5872 & 0.5130 & 0.5627 & 0.5050 & 0.5944 & 0.5149 & 0.5814          & 0.5110          \\
 \bottomrule
-\end{tabular}
-}
-\end{table}
-
-
-\begin{table}
+\end{tabular}}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.485\textwidth}
 \centering
 \caption{Effect of online EMA refresh of frequency masks during inference on ETTh1 with iTransformer. The \textbf{best} results are highlighted.}
 \label{tab:ema_refresh}
@@ -4074,12 +4093,11 @@ no\_update & 0.3902 & 0.4068 & 0.3939 & 0.4105 & 0.3974 & 0.4140 & \reviewtext{\
 ema\_0.9   & 0.3916 & 0.4101 & 0.3930 & 0.4105 & 0.3952 & 0.4136 & \reviewtext{0.3932}          & 0.4114          \\
 ema\_0.99  & 0.3903 & 0.4085 & 0.3938 & 0.4110 & 0.3966 & 0.4146 & 0.3936          & 0.4114          \\
 \bottomrule
-\end{tabular}
-}
-\end{table}
+\end{tabular}}
+\end{minipage}
 
-
-\begin{table}
+\vspace{10pt}
+\begin{minipage}[t]{0.485\textwidth}
 \centering
 \caption{Sensitivity to STFT hyperparameters (hop ratio and zero-padding) on ETTh1 with iTransformer. The \textbf{best} results are highlighted.}
 \label{tab:hop_zpad}
@@ -4101,16 +4119,9 @@ hop0.25\_zpad0.0  & 0.3970 & 0.4120 & 0.4000 & 0.4150 & 0.4020 & 0.4170 & 0.3997
 hop0.25\_zpad0.5  & 0.3950 & 0.4100 & 0.3970 & 0.4120 & 0.3980 & 0.4130 & 0.3967          & 0.4117          \\
 hop0.25\_zpad1.0  & 0.3940 & 0.4090 & 0.3960 & 0.4110 & 0.3970 & 0.4120 & 0.3957          & 0.4107          \\
 \bottomrule
-\end{tabular}
-}
-\end{table}
-
-(4) \textbf{Online EMA refresh of stability scores under drift.}
-\reviewtext{We further test whether TIFO requires online updates of the stability-based weights in the presence of distribution drift. During inference on ETTh1 + iTransformer, we re-estimate batch-wise frequency statistics and update the global mask via exponential moving average with three settings: no update (no\_update), EMA with decay $0.9$, and EMA with decay $0.99$. The ablation shows that all three settings yield almost identical MSE/MAE, and the small differences are well within run-to-run randomness; EMA($0.9$) gives a marginally smaller MSE. This suggests that dataset-level statistics estimated on the training set are already robust, and TIFO does not rely on frequent online re-estimation.}
-
-
-(5) \textbf{Sensitivity to STFT hyperparameters (hop size and zero-padding).}
-\reviewtext{Complementary to the global FFT analysis, we also conduct an STFT-style ablation on ETTh1 + iTransformer, varying hop ratio $\in \{0.125, 0.25\}$ and zero-padding ratio $\in \{0, 0.5, 1.0\}$. The results show that moderate zero-padding ($0.5$) yields consistent small gains across hop sizes, while further increasing zero-padding to $1.0$ brings negligible improvement. A smaller hop (larger overlap) is slightly better overall, but the effect is modest. Together with the previous experiments, this indicates that TIFO is reasonably robust to FFT-related hyperparameters and that sophisticated STFT configurations are not necessary for the gains reported in the main paper.}
+\end{tabular}}
+\end{minipage}
+\end{table*}
 
 
 % \section{LLM Usage Statement}
