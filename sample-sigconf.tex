@@ -1642,40 +1642,6 @@ Shift & ETTh1 Ori/TIFO & Effect & Traffic Ori/TIFO & Effect \\
 % generated table is a full-width table* and no longer needs a one-column page.
 \input{generated_tables/full_plugin_comparison.tex}
 
-\begin{table}[t]
-\centering
-\caption{Alignment between the dataset-level stationarity score and learned
-spectral gain over three frozen checkpoints. The gain ratio compares the
-highest- and lowest-score quartiles.}
-\label{table:weight_alignment}
-\small
-\begin{tabular}{lcc}
-\toprule
-Dataset & Spearman $\rho\uparrow$ & High/low gain ratio$\uparrow$ \\
-\midrule
-ETTh1 & $0.248 \pm 0.075$ & $1.592 \pm 0.226$ \\
-ETTm2 & $0.425 \pm 0.019$ & $1.807 \pm 0.108$ \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\begin{table}[t]
-\centering
-\caption{Three-seed MSE ablation of the statistic used to condition TIFO. The
-permuted control preserves each channel's score distribution but breaks its
-frequency correspondence; Ones removes score variation.}
-\label{table:score_ablation}
-\small
-\begin{tabular}{lccc}
-\toprule
-Dataset & Data score & Permuted & Ones \\
-\midrule
-ETTh1 & $\mathbf{0.388955 \pm 0.000866}$ & $0.389214 \pm 0.000510$ & $0.391507 \pm 0.000450$ \\
-ETTm2 & $\mathbf{0.181120 \pm 0.000950}$ & $0.182516 \pm 0.002504$ & $0.186016 \pm 0.000259$ \\
-\bottomrule
-\end{tabular}
-\end{table}
-
 \subsection{Experiment Results}
 
 \textbf{Main Results.}
@@ -1695,9 +1661,40 @@ Additional aggregate comparisons with the original backbones and the submitted
 normalization baselines are retained in Appendix
 Tables~\ref{table: 1st_results} and~\ref{table: results of other methods}.}
 
-\resubmitchange{Table~\ref{table:weight_alignment} provides a direct diagnostic of the proposed mechanism on the frozen ETTh1 and ETTm2 checkpoints. Positive rank correlations and high/low quartile gain ratios above one show that higher stationarity scores tend to receive larger learned gains. This evidence supports the intended conditioning behavior, but it is not a proof of monotonicity.}
+\resubmitchange{Table~\ref{table:mechanism_diagnostics} reports two mechanism
+diagnostics on the frozen ETTh1 and ETTm2 checkpoints. Positive rank
+correlations and high/low gain ratios above one show that higher stationarity
+scores tend to receive larger learned gains. The data score also yields lower
+mean MSE than the uniform Ones control on both datasets. Differences from the
+frequency-permuted control are small, and the seed-level ordering is mixed.
+These results support non-uniform score conditioning but provide limited
+evidence that the precise frequency ordering is uniformly optimal.}
 
-\resubmitchange{Table~\ref{table:score_ablation} separates the value of data-dependent conditioning from the capacity of the additional MLP. Replacing the score by Ones degrades MSE in all six paired runs. The frequency-permuted control is mixed: the data score wins two of three ETTh1 seeds and one of three ETTm2 seeds, although its mean MSE is lower on both datasets. We therefore interpret the statistic as a useful non-uniform conditioning signal, while not claiming that its precise frequency ordering is uniformly optimal.}
+\begin{table}[H]
+\centering
+\caption{Mechanism diagnostics over three seeds. The gain ratio compares the
+highest- and lowest-score quartiles. Permuted preserves the score distribution
+but breaks its frequency correspondence; Ones removes score variation.}
+\label{table:mechanism_diagnostics}
+\small
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{lcc|ccc}
+\toprule
+& \multicolumn{2}{c|}{Score--gain alignment} &
+\multicolumn{3}{c}{MSE ablation} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-6}
+Dataset & Spearman $\rho\uparrow$ & Gain ratio$\uparrow$ &
+Data score & Permuted & Ones \\
+\midrule
+ETTh1 & $0.248 \pm 0.075$ & $1.592 \pm 0.226$ &
+$\mathbf{0.388955 \pm 0.000866}$ & $0.389214 \pm 0.000510$ &
+$0.391507 \pm 0.000450$ \\
+ETTm2 & $0.425 \pm 0.019$ & $1.807 \pm 0.108$ &
+$\mathbf{0.181120 \pm 0.000950}$ & $0.182516 \pm 0.002504$ &
+$0.186016 \pm 0.000259$ \\
+\bottomrule
+\end{tabular}}
+\end{table}
 
 \resubmitchange{The controlled-shift table reports a bounded high-frequency intervention on the frozen ETTh1 and Traffic checkpoints. This diagnostic does not establish robustness to arbitrary distribution shifts.}
 
@@ -1965,7 +1962,7 @@ By calculating the cross-sample stability of each frequency component across the
 \noindent\textbf{Frequency selection and masking.}
 Recognizing the importance of spectral features, recent works have explored selecting informative frequency components.
 For instance, FAN \citep{ye2024FAN} takes an initial step by learning predominant frequencies as non-stationarities, employing a heuristic top-$k$ masking strategy to zero out a subset of components based on amplitude.
-Similarly, methods like \citet{ICMLFedformer, Etsformer, zhou2022film} utilize sparse attention mechanisms to select frequencies.
+Similarly, FEDformer \citep{ICMLFedformer}, ETSformer \citep{Etsformer}, and FiLM \citep{zhou2022film} select or model informative frequency components through frequency-specific mechanisms.
 However, these methods rely on an attention mechanism or top-$k$ selection derived from the instantaneous high-energy frequencies of a single sample or local window.
 %This heuristic selection risks limiting the model to accidentally high-energy frequencies that are unstable at the dataset level, while inadvertently discarding stable but low-energy periodic patterns.
 In contrast, \method learns a set of continuous weights for Fourier basis functions based on dataset-level stationarity.
