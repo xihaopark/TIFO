@@ -228,13 +228,14 @@
 
 Normalization methods constitute a dominant approach for addressing non-stationarity in time series forecasting by measuring and suppressing distribution shifts between training and test data.
 In this paper, we recognize frequency-domain modeling as an underexplored perspective for characterizing the intrinsic non-stationary structures of time series.
-We therefore ask a fundamental question: how can we address the distribution shift in the frequency space by considering all possible time structures.
+We therefore ask a fundamental question: how can we address the distribution shift in the frequency space by considering all possible time structures?
 Our solution is a Time-Invariant Frequency Operator (\method), which learns stationarity-aware weights over the frequency spectrum across the entire dataset.
 The weight representation highlights stationary frequency components while suppressing non-stationary ones, thereby mitigating the distribution shift issue in time series.
 To justify our method, we show that the Fourier transform of time series data implicitly induces eigen-decomposition in the frequency space.
 % Learning the data-specific eigenvalues has the natural interpretation of weighting up frequency components responsible for distributional discrepancies.
 \method is a plug-and-play approach that can be seamlessly integrated into various forecasting models.
-\resubmitchange{Matched three-seed experiments show that \method improves PatchTST on four of seven datasets when averaged over four forecasting horizons and improves iTransformer on six of seven datasets at $H=96$. Across all 28 iTransformer settings, \method achieves the lowest equal-weight mean MSE and MAE among the compared plug-ins.}
+\resubmitchange{Matched three-seed experiments show that \method improves PatchTST on four of seven datasets when averaged over four forecasting horizons and improves iTransformer on six of seven datasets at $H=96$. 
+Across all 28 settings, \method achieves the best MSE and MAE accuracy among the baseline methods.}
 % Our code can be found at 
 % \href{https://anonymous.4open.science/r/TIFO-6BE1}{this anonymous GitHub repository}\footnote{\url{https://anonymous.4open.science/r/TIFO-6BE1}}.
 
