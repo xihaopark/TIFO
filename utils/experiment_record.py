@@ -47,7 +47,7 @@ def write_run_manifest(args: Any, setting: str, output_dir: str, metrics: dict[s
     data_path = Path(args.root_path) / args.data_path
     dirty = _git_value(["status", "--porcelain"])
     payload = {
-        "schema_version": "tifo-kdd-resubmit-run-v1",
+        "schema_version": "tifo-run-v1",
         "setting": setting,
         "status": "completed",
         "completed_at": datetime.now(timezone.utc).isoformat(),

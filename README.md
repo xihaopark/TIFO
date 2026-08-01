@@ -1,15 +1,35 @@
 # TIFO: Time-Invariant Frequency Operator
 
-This repository contains the anonymous implementation used for the TIFO time
-series forecasting experiments. TIFO is a dataset-conditioned spectral input
-adapter: it computes a frequency/channel statistic from training windows, maps
-that statistic to globally shared spectral gains, reweights each input in the
-frequency domain, and passes the reconstructed sequence to an unchanged
-forecasting backbone.
+This repository contains the anonymous reference implementation of TIFO. TIFO
+is a dataset-conditioned spectral input adapter: it computes a
+frequency/channel statistic from training windows, maps that statistic to
+globally shared spectral gains, reweights each input in the frequency domain,
+and passes the reconstructed sequence to an otherwise unchanged forecasting
+backbone.
 
 The implementation includes both the historical full-FFT path retained for
 result reproducibility and the real-reconstruction rFFT/iRFFT variants used in
 the revised evaluation.
+
+## Artifact scope
+
+The release is intentionally limited to the code needed to inspect and run the
+proposed operator:
+
+- the standalone TIFO and matched `ori` control paths;
+- DLinear, iTransformer, and PatchTST forecasting backbones;
+- the seven long-term forecasting datasets described in the paper; and
+- run-manifest generation for seeds, resolved arguments, dataset hashes, and
+  final metrics.
+
+The comparison methods in the paper are third-party baselines and are not
+redistributed here. `TIFO*` in the paper denotes the submitted composition of
+TIFO with SAN; it is not a separate proposed operator. This repository is the
+reference implementation for standalone TIFO and does not claim to regenerate
+third-party baseline cells.
+
+Datasets, checkpoints, generated logs, internal experiment orchestration,
+review material, manuscript sources, and Git history are excluded.
 
 ## Environment
 
@@ -38,10 +58,19 @@ dataset/
 
 Dataset files are not redistributed in this archive.
 
-## Representative matched run
+## Quick verification
 
-The following is the frozen ETTm2, horizon-96 TIFO configuration. Replace
-`2022` by `2021` or `2023` for the other reported seeds.
+The command-line entry point can be checked without downloading data:
+
+```bash
+python run.py --help
+```
+
+## Frozen representative run
+
+The following is the validation-selected ETTm2, horizon-96 standalone TIFO
+configuration used for the reported three-seed evaluation. Replace `2022` by
+`2021` or `2023` for the other reported seeds.
 
 ```bash
 python run.py \
@@ -65,6 +94,13 @@ python run.py \
   --train_epochs 30 --patience 5 \
   --batch_size 32 --learning_rate 0.0001 \
   --random_seed 2022 --itr 1 --gpu 0 --num_workers 0
+```
+
+The same command is available as `scripts/run_ettm2_h96.sh`; pass a seed and GPU
+index as its first and second arguments, respectively:
+
+```bash
+bash scripts/run_ettm2_h96.sh 2022 0
 ```
 
 For the matched backbone control, use the identical command with
@@ -93,6 +129,3 @@ Every run writes the resolved command, random seed, dataset hash, code state,
 and final metrics to a run manifest. Reported values use seeds 2021--2023 and
 sample standard deviation. Validation-selected configurations are frozen before
 the corresponding final three-seed aggregation.
-
-The anonymous release intentionally excludes datasets, checkpoints, generated
-logs, internal review notes, machine-specific paths, and Git history.
