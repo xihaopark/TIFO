@@ -6,7 +6,7 @@ from torch import nn, einsum
 from einops import rearrange, repeat
 import math
 
-class PreNorm(nn.Module): 
+class PreNorm(nn.Module):
     def __init__(self, dim, fn):
         super().__init__()
         self.norm = nn.LayerNorm(dim)
@@ -34,7 +34,7 @@ class c_Attention(nn.Module):
         self.dim_head = dim_head
         self.heads = heads
         self.d_k = math.sqrt(self.dim_head)
-        inner_dim = dim_head *  heads 
+        inner_dim = dim_head *  heads
         self.attend = nn.Softmax(dim = -1)
         self.to_q = nn.Linear(dim, inner_dim)
         self.to_k = nn.Linear(dim, inner_dim)
@@ -45,7 +45,7 @@ class c_Attention(nn.Module):
         )
 
     def forward(self, x):
-        h = self.heads        
+        h = self.heads
         q = self.to_q(x)
         k = self.to_k(x)
         v = self.to_v(x)
@@ -54,14 +54,14 @@ class c_Attention(nn.Module):
         k = rearrange(k, 'b n (h d) -> b h n d', h=h)
         v = rearrange(v, 'b n (h d) -> b h n d', h=h)
         dots = einsum('b h i d, b h j d -> b h i j', q, k) / self.d_k
-        
+
         attn = self.attend(dots)
         out = einsum('b h i j, b h j d -> b h i d', attn, v)
         out = rearrange(out, 'b h n d -> b n (h d)')
-        
+
         return self.to_out(out),attn
-       
-    
+
+
 
 
 class c_Transformer(nn.Module):           ##Register the blocks into whole network
@@ -71,7 +71,7 @@ class c_Transformer(nn.Module):           ##Register the blocks into whole netwo
         for _ in range(depth):
             self.layers.append(nn.ModuleList([
                 PreNorm(dim, c_Attention(dim,  heads = heads, dim_head = dim_head, dropout = dropout)),
-                PreNorm(dim, FeedForward(dim, mlp_dim, dropout = dropout)) 
+                PreNorm(dim, FeedForward(dim, mlp_dim, dropout = dropout))
             ]))
     def forward(self, x):
         for attn, ff in self.layers:
@@ -87,18 +87,18 @@ class c_Transformer(nn.Module):           ##Register the blocks into whole netwo
 class Trans_C(nn.Module):
     def __init__(self, *, dim, depth, heads, mlp_dim, dim_head, dropout , patch_dim, horizon, d_model):
         super().__init__()
-        
+
         self.dim = dim
         self.patch_dim = patch_dim
         self.to_patch_embedding = nn.Sequential(nn.Linear(patch_dim, dim),nn.Dropout(dropout))
         self.dropout = nn.Dropout(dropout)
         self.transformer = c_Transformer(dim, depth, heads, dim_head, mlp_dim, dropout)
-        
+
         self.mlp_head = nn.Linear(dim, d_model)#horizon)
-        
+
 
     def forward(self, x):
-        
+
         x = self.to_patch_embedding(x)
         x,attn = self.transformer(x)
         x = self.dropout(x)

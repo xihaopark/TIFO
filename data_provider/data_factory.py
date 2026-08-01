@@ -19,11 +19,13 @@ data_dict = {
 }
 
 
-def data_provider(args, flag):
+def data_provider(args, flag, shuffle_override=None):
     Data = data_dict[args.data]
     timeenc = 0 if args.embed != 'timeF' else 1
 
     shuffle_flag = False if flag == 'test' else True
+    if shuffle_override is not None:
+        shuffle_flag = bool(shuffle_override)
     drop_last = False
     batch_size = args.batch_size
     freq = args.freq

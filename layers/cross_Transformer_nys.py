@@ -60,7 +60,7 @@ def moore_penrose_iter_pinv(x, iters=6):
 
     return z
 
-class PreNorm(nn.Module): 
+class PreNorm(nn.Module):
     def __init__(self, dim, fn):
         super().__init__()
         self.norm = nn.LayerNorm(dim)
@@ -177,17 +177,17 @@ class Attention(nn.Module):
 class Trans_C(nn.Module):
     def __init__(self, *, dim, depth, heads, mlp_dim, dim_head, dropout , patch_dim, horizon, d_model):
         super().__init__()
-        
+
         self.dim = dim
         self.patch_dim = patch_dim
         self.to_patch_embedding = nn.Sequential(nn.Linear(patch_dim, dim),nn.Dropout(dropout))
         self.dropout = nn.Dropout(dropout)
         self.transformer = Nystromformer(dim, depth, heads, dim_head, mlp_dim, num_landmarks=5,pinv_iterations = 6,eps=1e-8,dropout=dropout)
-        
+
         self.mlp_head = nn.Linear(dim, d_model)
 
     def forward(self, x):
-        
+
         x = self.to_patch_embedding(x)
         #x = self.dropout(x)
         x = self.transformer(x)
