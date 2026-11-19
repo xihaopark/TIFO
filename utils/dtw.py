@@ -12,7 +12,7 @@ RETURN_ALL = -1
 def _traceback(DTW, slope_constraint):
     i, j = np.array(DTW.shape) - 1
     p, q = [i-1], [j-1]
-    
+
     if slope_constraint == "asymmetric":
         while (i > 1):
             tb = np.argmin((DTW[i-1, j], DTW[i-1, j-1], DTW[i-1, j-2]))
@@ -44,7 +44,7 @@ def _traceback(DTW, slope_constraint):
             q.insert(0, j-1)
     else:
         sys.exit("Unknown slope constraint %s"%slope_constraint)
-        
+
     return (np.array(p), np.array(q))
 
 def dtw(prototype, sample, return_flag = RETURN_VALUE, slope_constraint="asymmetric", window=None):
@@ -57,10 +57,10 @@ def dtw(prototype, sample, return_flag = RETURN_VALUE, slope_constraint="asymmet
     assert p != 0, "Prototype empty!"
     s = sample.shape[0]
     assert s != 0, "Sample empty!"
-    
+
     if window is None:
         window = s
-    
+
     cost = np.full((p, s), np.inf)
     for i in range(p):
         start = max(0, i-window)
@@ -68,7 +68,7 @@ def dtw(prototype, sample, return_flag = RETURN_VALUE, slope_constraint="asymmet
         cost[i,start:end]=np.linalg.norm(sample[start:end] - prototype[i], axis=1)
 
     DTW = _cummulative_matrix(cost, slope_constraint, window)
-        
+
     if return_flag == RETURN_ALL:
         return DTW[-1,-1], cost, DTW[1:,1:], _traceback(DTW, slope_constraint)
     elif return_flag == RETURN_PATH:
@@ -79,7 +79,7 @@ def dtw(prototype, sample, return_flag = RETURN_VALUE, slope_constraint="asymmet
 def _cummulative_matrix(cost, slope_constraint, window):
     p = cost.shape[0]
     s = cost.shape[1]
-    
+
     # Note: DTW is one larger than cost and the original patterns
     DTW = np.full((p+1, s+1), np.inf)
 
@@ -97,7 +97,7 @@ def _cummulative_matrix(cost, slope_constraint, window):
                 DTW[i,j] = cost[i-1,j-1] + min(DTW[i-1,j-1], DTW[i,j-1], DTW[i-1,j])
     else:
         sys.exit("Unknown slope constraint %s"%slope_constraint)
-        
+
     return DTW
 
 def shape_dtw(prototype, sample, return_flag = RETURN_VALUE, slope_constraint="asymmetric", window=None, descr_ratio=0.05):
@@ -108,43 +108,43 @@ def shape_dtw(prototype, sample, return_flag = RETURN_VALUE, slope_constraint="a
     """
     # shapeDTW
     # https://www.sciencedirect.com/science/article/pii/S0031320317303710
-    
+
     p = prototype.shape[0]
     assert p != 0, "Prototype empty!"
     s = sample.shape[0]
     assert s != 0, "Sample empty!"
-    
+
     if window is None:
         window = s
-        
+
     p_feature_len = np.clip(np.round(p * descr_ratio), 5, 100).astype(int)
     s_feature_len = np.clip(np.round(s * descr_ratio), 5, 100).astype(int)
-    
+
     # padding
     p_pad_front = (np.ceil(p_feature_len / 2.)).astype(int)
     p_pad_back = (np.floor(p_feature_len / 2.)).astype(int)
     s_pad_front = (np.ceil(s_feature_len / 2.)).astype(int)
     s_pad_back = (np.floor(s_feature_len / 2.)).astype(int)
-    
-    prototype_pad = np.pad(prototype, ((p_pad_front, p_pad_back), (0, 0)), mode="edge") 
-    sample_pad = np.pad(sample, ((s_pad_front, s_pad_back), (0, 0)), mode="edge") 
+
+    prototype_pad = np.pad(prototype, ((p_pad_front, p_pad_back), (0, 0)), mode="edge")
+    sample_pad = np.pad(sample, ((s_pad_front, s_pad_back), (0, 0)), mode="edge")
     p_p = prototype_pad.shape[0]
     s_p = sample_pad.shape[0]
-        
+
     cost = np.full((p, s), np.inf)
     for i in range(p):
         for j in range(max(0, i-window), min(s, i+window)):
             cost[i, j] = np.linalg.norm(sample_pad[j:j+s_feature_len] - prototype_pad[i:i+p_feature_len])
-            
+
     DTW = _cummulative_matrix(cost, slope_constraint=slope_constraint, window=window)
-    
+
     if return_flag == RETURN_ALL:
         return DTW[-1,-1], cost, DTW[1:,1:], _traceback(DTW, slope_constraint)
     elif return_flag == RETURN_PATH:
         return _traceback(DTW, slope_constraint)
     else:
         return DTW[-1,-1]
-    
+
 # Draw helpers
 def draw_graph2d(cost, DTW, path, prototype, sample):
     import matplotlib.pyplot as plt

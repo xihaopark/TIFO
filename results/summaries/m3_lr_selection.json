@@ -1,0 +1,16 @@
+{
+ "filternet|etth1": 1.0,
+ "filternet|etth2": 1.0,
+ "filternet|ettm1": 0.01,
+ "filternet|ettm2": 0.1,
+ "filternet|electricity": 0.1,
+ "filternet|traffic": 1.0,
+ "filternet|weather": 0.01,
+ "tqnet|etth1": 1.0,
+ "tqnet|etth2": 1.0,
+ "tqnet|ettm1": 0.01,
+ "tqnet|ettm2": 1.0,
+ "tqnet|electricity": 0.01,
+ "tqnet|traffic": 1.0,
+ "tqnet|weather": 1.0
+}

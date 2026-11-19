@@ -1,0 +1,9 @@
+{
+ "etth1": 0.1,
+ "etth2": 0.1,
+ "ettm1": 0.1,
+ "ettm2": 0.01,
+ "electricity": 0.1,
+ "traffic": 1.0,
+ "weather": 0.1
+}

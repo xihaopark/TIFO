@@ -9,12 +9,25 @@ from sklearn.preprocessing import StandardScaler
 from utils.timefeatures import time_features
 from data_provider.m4 import M4Dataset, M4Meta
 from data_provider.uea import subsample, interpolate_missing, Normalizer
-from sktime.datasets import load_from_tsfile_to_dataframe
 import warnings
 from utils.augmentation import run_augmentation_single
 
 warnings.filterwarnings('ignore')
 
+
+
+def reduced_train_start(start, end, args):
+    """Keep only the most recent ``train_fraction`` of the training split.
+
+    Used by the shortened-training-period experiment; validation/test splits
+    and their borders are unchanged, and the scaler is fit on the kept part.
+    """
+    fraction = float(getattr(args, "train_fraction", 1.0))
+    if not 0 < fraction <= 1:
+        raise ValueError("train_fraction must be in (0, 1]")
+    if fraction == 1.0:
+        return start
+    return end - int(round(fraction * (end - start)))
 
 class Dataset_ETT_hour(Dataset):
     def __init__(self, args, root_path, flag='train', size=None,
@@ -53,6 +66,7 @@ class Dataset_ETT_hour(Dataset):
 
         border1s = [0, 12 * 30 * 24 - self.seq_len, 12 * 30 * 24 + 4 * 30 * 24 - self.seq_len]
         border2s = [12 * 30 * 24, 12 * 30 * 24 + 4 * 30 * 24, 12 * 30 * 24 + 8 * 30 * 24]
+        border1s[0] = reduced_train_start(border1s[0], border2s[0], self.args)
         border1 = border1s[self.set_type]
         border2 = border2s[self.set_type]
 
@@ -79,14 +93,14 @@ class Dataset_ETT_hour(Dataset):
             data_stamp = df_stamp.drop(['date'], 1).values
         elif self.timeenc == 1:
             data_stamp = time_features(pd.to_datetime(df_stamp['date'].values), freq=self.freq)
-            data_stamp = data_stamp.transpose(1, 0) 
+            data_stamp = data_stamp.transpose(1, 0)
 
         self.data_x = data[border1:border2]
         self.data_y = data[border1:border2]
 
         if self.set_type == 0 and self.args.augmentation_ratio > 0:
             self.data_x, self.data_y, augmentation_tags = run_augmentation_single(self.data_x, self.data_y, self.args)
-            
+
         self.data_stamp = data_stamp
 
     def __getitem__(self, index):
@@ -146,6 +160,7 @@ class Dataset_ETT_minute(Dataset):
 
         border1s = [0, 12 * 30 * 24 * 4 - self.seq_len, 12 * 30 * 24 * 4 + 4 * 30 * 24 * 4 - self.seq_len]
         border2s = [12 * 30 * 24 * 4, 12 * 30 * 24 * 4 + 4 * 30 * 24 * 4, 12 * 30 * 24 * 4 + 8 * 30 * 24 * 4]
+        border1s[0] = reduced_train_start(border1s[0], border2s[0], self.args)
         border1 = border1s[self.set_type]
         border2 = border2s[self.set_type]
 
@@ -251,6 +266,7 @@ class Dataset_Custom(Dataset):
         num_vali = len(df_raw) - num_train - num_test
         border1s = [0, num_train - self.seq_len, len(df_raw) - num_test - self.seq_len]
         border2s = [num_train, num_train + num_vali, len(df_raw)]
+        border1s[0] = reduced_train_start(border1s[0], border2s[0], self.args)
         border1 = border1s[self.set_type]
         border2 = border2s[self.set_type]
 
@@ -684,6 +700,12 @@ class UEAloader(Dataset):
         return all_df, labels_df
 
     def load_single(self, filepath):
+        try:
+            from sktime.datasets import load_from_tsfile_to_dataframe
+        except ImportError as exc:
+            raise ImportError(
+                "UEA classification datasets require the optional 'sktime' package."
+            ) from exc
         df, labels = load_from_tsfile_to_dataframe(filepath, return_separate_X_and_y=True,
                                                              replace_missing_vals_with='NaN')
         labels = pd.Series(labels, dtype="category")

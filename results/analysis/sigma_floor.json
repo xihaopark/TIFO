@@ -1,0 +1,114 @@
+{
+ "etth1_sl96": {
+  "min_sd": 0.32181135409879263,
+  "min_sd_nondc": 0.32181135409879263,
+  "p01_sd": 0.33045342564582825,
+  "frac_sd_below_0p01": 0.0,
+  "min_mu": 0.4856974176620715,
+  "spearman_logS_logmu_within_channel": 0.15182265802920697
+ },
+ "etth1_sl336": {
+  "min_sd": 0.45435968830241197,
+  "min_sd_nondc": 0.45435968830241197,
+  "p01_sd": 0.5010858178138733,
+  "frac_sd_below_0p01": 0.0,
+  "min_mu": 0.8531356700475672,
+  "spearman_logS_logmu_within_channel": 0.0540995584763429
+ },
+ "etth2_sl96": {
+  "min_sd": 0.2903565892713479,
+  "min_sd_nondc": 0.2903565892713479,
+  "p01_sd": 0.30100366473197937,
+  "frac_sd_below_0p01": 0.0,
+  "min_mu": 0.30214828285420064,
+  "spearman_logS_logmu_within_channel": -0.08165079898502844
+ },
+ "etth2_sl336": {
+  "min_sd": 0.39690071922715925,
+  "min_sd_nondc": 0.39690071922715925,
+  "p01_sd": 0.4279995560646057,
+  "frac_sd_below_0p01": 0.0,
+  "min_mu": 0.4651437380501676,
+  "spearman_logS_logmu_within_channel": -0.1837613795494457
+ },
+ "ettm1_sl96": {
+  "min_sd": 0.163694790574289,
+  "min_sd_nondc": 0.163694790574289,
+  "p01_sd": 0.17230838537216187,
+  "frac_sd_below_0p01": 0.0,
+  "min_mu": 0.2386288886968995,
+  "spearman_logS_logmu_within_channel": 0.08714772796602625
+ },
+ "ettm1_sl336": {
+  "min_sd": 0.2543212576146256,
+  "min_sd_nondc": 0.2543212576146256,
+  "p01_sd": 0.272821843624115,
+  "frac_sd_below_0p01": 0.0,
+  "min_mu": 0.4488887039074865,
+  "spearman_logS_logmu_within_channel": 0.06657825447139859
+ },
+ "ettm2_sl96": {
+  "min_sd": 0.18592972637794844,
+  "min_sd_nondc": 0.18592972637794844,
+  "p01_sd": 0.1935122311115265,
+  "frac_sd_below_0p01": 0.0,
+  "min_mu": 0.16451085824527525,
+  "spearman_logS_logmu_within_channel": -0.07572179698369022
+ },
+ "ettm2_sl336": {
+  "min_sd": 0.2957270081072292,
+  "min_sd_nondc": 0.2957270081072292,
+  "p01_sd": 0.320277601480484,
+  "frac_sd_below_0p01": 0.0,
+  "min_mu": 0.3681478388331208,
+  "spearman_logS_logmu_within_channel": -0.12403485741162316
+ },
+ "electricity_sl96": {
+  "min_sd": 0.19525624639612457,
+  "min_sd_nondc": 0.19525624639612457,
+  "p01_sd": 0.3683188259601593,
+  "frac_sd_below_0p01": 0.0,
+  "min_mu": 0.15779597079027152,
+  "spearman_logS_logmu_within_channel": 0.17662643865317912
+ },
+ "electricity_sl336": {
+  "min_sd": 0.2805320059698156,
+  "min_sd_nondc": 0.2805320059698156,
+  "p01_sd": 0.5731640458106995,
+  "frac_sd_below_0p01": 0.0,
+  "min_mu": 0.26979560877462355,
+  "spearman_logS_logmu_within_channel": -0.038203600461238954
+ },
+ "traffic_sl96": {
+  "min_sd": 0.2364833732530422,
+  "min_sd_nondc": 0.2364833732530422,
+  "p01_sd": 0.5858290791511536,
+  "frac_sd_below_0p01": 0.0,
+  "min_mu": 0.2641043624936513,
+  "spearman_logS_logmu_within_channel": 0.6331644943587114
+ },
+ "traffic_sl336": {
+  "min_sd": 0.08966903368110217,
+  "min_sd_nondc": 0.08966903368110217,
+  "p01_sd": 0.8672508597373962,
+  "frac_sd_below_0p01": 0.0,
+  "min_mu": 0.05489294298329269,
+  "spearman_logS_logmu_within_channel": 0.29749557888534867
+ },
+ "weather_sl96": {
+  "min_sd": 0.15913846932254364,
+  "min_sd_nondc": 0.15913846932254364,
+  "p01_sd": 0.17184863984584808,
+  "frac_sd_below_0p01": 0.0,
+  "min_mu": 0.06900973043588063,
+  "spearman_logS_logmu_within_channel": 0.6934201880117739
+ },
+ "weather_sl336": {
+  "min_sd": 0.22203450912391232,
+  "min_sd_nondc": 0.22203450912391232,
+  "p01_sd": 0.24279671907424927,
+  "frac_sd_below_0p01": 0.0,
+  "min_mu": 0.08486890616049692,
+  "spearman_logS_logmu_within_channel": 0.6654828391368104
+ }
+}

@@ -6,7 +6,10 @@ from layers.SelfAttention_Family import FullAttention, AttentionLayer
 from layers.Embed import DataEmbedding_inverted
 import numpy as np
 
-from utils.frequency_domain_filter import FrequencyDomainFilter
+from utils.frequency_domain_filter import build_frequency_domain_filter
+from layers.PluginNormalization import AdaptiveChannelNorm
+from layers.official_norms import ReversibleNormPlugin
+from utils.wdan_adapter import build_wdan_adapter
 
 
 class Model(nn.Module):
@@ -17,9 +20,15 @@ class Model(nn.Module):
     def __init__(self, configs, global_mask):
         super(Model, self).__init__()
         self.global_mask = global_mask
-        self.filter = FrequencyDomainFilter(configs, self.global_mask)
+        method = getattr(configs, 'method', 'tifo')
+        self.use_tifo = method in {'tifo', 'wdan_tifo', 'acn_tifo', 'san_tifo'}
+        self.norm_kind = {'revin': 'revin', 'san': 'san', 'fan': 'fan', 'san_tifo': 'san'}.get(method)
+        self.norm_plugin = ReversibleNormPlugin(self.norm_kind, configs) if self.norm_kind else None
+        self.use_acn = method in {'acn', 'acn_tifo'}
+        self.use_wdan = method in {'wdan', 'wdan_tifo'}
+        self.tifo_before_wdan = method == 'wdan_tifo'
         self.channels = configs.enc_in
-        
+
         self.task_name = configs.task_name
         self.seq_len = configs.seq_len
         self.pred_len = configs.pred_len
@@ -28,18 +37,28 @@ class Model(nn.Module):
         self.enc_embedding = DataEmbedding_inverted(configs.seq_len, configs.d_model, configs.embed, configs.freq,
                                                     configs.dropout)
         # Encoder
-        self.encoder = Encoder(
-            [
-                EncoderLayer(
+        encoder_layers = []
+        for _ in range(configs.e_layers):
+            layer = EncoderLayer(
                     AttentionLayer(
                         FullAttention(False, configs.factor, attention_dropout=configs.dropout,
                                       output_attention=configs.output_attention), configs.d_model, configs.n_heads),
                     configs.d_model,
                     configs.d_ff,
                     dropout=configs.dropout,
-                    activation=configs.activation
-                ) for l in range(configs.e_layers)
-            ],
+                    activation=configs.activation,
+                )
+            if self.use_acn:
+                temperature = float(getattr(configs, 'acn_temperature', 0.1))
+                layer.norm1 = AdaptiveChannelNorm(
+                    configs.enc_in, configs.d_model, temperature
+                )
+                layer.norm2 = AdaptiveChannelNorm(
+                    configs.enc_in, configs.d_model, temperature
+                )
+            encoder_layers.append(layer)
+        self.encoder = Encoder(
+            encoder_layers,
             norm_layer=torch.nn.LayerNorm(configs.d_model)
         )
         # Decoder
@@ -53,29 +72,62 @@ class Model(nn.Module):
             self.act = F.gelu
             self.dropout = nn.Dropout(configs.dropout)
             self.projection = nn.Linear(configs.d_model * configs.enc_in, configs.num_class)
-    
+
+        self.filter = build_frequency_domain_filter(configs, self.global_mask) if self.use_tifo else None
+        self.wdan_adapter = build_wdan_adapter(configs) if self.use_wdan else None
+
     def forecast(self, x_enc, x_mark_enc, x_dec, x_mark_dec):
 
-        means = x_enc.mean(1, keepdim=True).detach()
-        x_enc = x_enc - means
-        stdev = torch.sqrt(torch.var(x_enc, dim=1, keepdim=True, unbiased=False) + 1e-5)
-        x_enc /= stdev
+        wdan_statistics = None
+        if self.use_wdan:
+            if self.tifo_before_wdan:
+                x_enc = self.filter(x_enc)
+            x_enc, wdan_statistics = self.wdan_adapter.normalize(x_enc)
+            means = stdev = None
+        elif self.norm_plugin is not None:
+            # RevIN/SAN/FAN replace the backbone's instance normalization.
+            x_enc = self.norm_plugin.normalize(x_enc)
+            means = stdev = None
+        else:
+            means = x_enc.mean(1, keepdim=True).detach()
+            x_enc = x_enc - means
+            stdev = torch.sqrt(torch.var(x_enc, dim=1, keepdim=True, unbiased=False) + 1e-5)
+            x_enc /= stdev
 
         _, _, N = x_enc.shape
 
-        x_enc = self.filter(x_enc)
+        if self.use_tifo and not self.tifo_before_wdan:
+            x_enc = self.filter(x_enc)
         save = x_enc
 
         # Embedding
         enc_out = self.enc_embedding(x_enc, x_mark_enc)
         enc_out, attns = self.encoder(enc_out, attn_mask=None)
-
         dec_out = self.projection(enc_out).permute(0, 2, 1)[:, :, :N]
-
         # De-Normalization from Non-stationary Transformer
-        dec_out = dec_out * (stdev[:, 0, :].unsqueeze(1).repeat(1, self.pred_len, 1))
-        dec_out = dec_out + (means[:, 0, :].unsqueeze(1).repeat(1, self.pred_len, 1))
+        if self.use_wdan:
+            dec_out = self.wdan_adapter.de_normalize(dec_out, wdan_statistics)
+            save = wdan_statistics
+        elif self.norm_plugin is not None:
+            dec_out = self.norm_plugin.denormalize(dec_out)
+        else:
+            dec_out = dec_out * (stdev[:, 0, :].unsqueeze(1).repeat(1, self.pred_len, 1))
+            dec_out = dec_out + (means[:, 0, :].unsqueeze(1).repeat(1, self.pred_len, 1))
         return dec_out, save
+
+    def auxiliary_loss(self, true):
+        return self.norm_plugin.auxiliary_loss(true) if self.norm_plugin is not None else true.new_zeros(())
+
+    def wdan_statistics_loss(self, predicted_statistics, future):
+        if not self.use_wdan or predicted_statistics is None:
+            raise RuntimeError("WDAN statistics loss requested outside WDAN mode")
+        _, low_frequency, high_frequency_scale = self.wdan_adapter.normalize(
+            future, predict=False
+        )
+        target_statistics = torch.stack(
+            (low_frequency, high_frequency_scale), dim=1
+        )
+        return F.mse_loss(predicted_statistics, target_statistics)
 
     def imputation(self, x_enc, x_mark_enc, x_dec, x_mark_dec, mask):
         # Normalization from Non-stationary Transformer
