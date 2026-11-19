@@ -145,9 +145,9 @@ official implementations; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 ## Citation
 
 ```bibtex
-@inproceedings{tifo2027,
+@inproceedings{piao2027tifo,
   title     = {TIFO: Time-Invariant Frequency Operator for Stationarity-Aware Representation Learning in Time Series},
-  author    = {TODO},
+  author    = {Piao, Xihao and Chen, Zheng and Zhu, Lingwei and Matsubara, Yasuko and Sakurai, Yasushi},
   booktitle = {Proceedings of the 33rd ACM SIGKDD Conference on Knowledge Discovery and Data Mining (KDD)},
   year      = {2027}
 }
